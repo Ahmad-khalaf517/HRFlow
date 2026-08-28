@@ -1,4 +1,4 @@
-# HRP AI Context
+# HRFlow AI Context
 
 Use this file as the first context supplied to any AI assistant working on this repository. It is intentionally short. Detailed rules live in the linked documents and in the current task brief.
 
@@ -16,7 +16,7 @@ Do not resolve a conflict silently. Report it before changing code.
 
 ## Product and Scope
 
-HRP is a focused HR and payroll Django MVP for three developers and one week. The primary goal is one reliable flow:
+HRFlow is a focused HR and payroll Django MVP. The primary goal is one reliable flow:
 
 ```text
 Employee -> Contract -> Attendance/Leave -> Payroll -> Payslip -> Payment

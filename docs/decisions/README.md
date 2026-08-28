@@ -1,4 +1,4 @@
-# Architecture and Business Decision Records
+# HRFlow Architecture and Business Decision Records
 
 Use a short decision record whenever a choice affects calculations, data shape, security, permissions, or multiple modules.
 
@@ -36,4 +36,3 @@ Which constraints, tests, pages, and documents prove the decision is implemented
 ```
 
 Accepted decisions override summaries in older planning documents. Update `business-rules.md` at the same time so implementers do not need to reconstruct policy from multiple files.
-

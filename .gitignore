@@ -39,3 +39,5 @@ Thumbs.db
 .ai/
 ai-bundles/
 
+# Microsoft Office temporary lock files
+~$*.docx

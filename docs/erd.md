@@ -1,4 +1,4 @@
-# HR & Payroll Management System — ERD
+# HRFlow — Entity Relationship Design
 
 This is a conceptual first-pass model. `business-rules.md` is authoritative. Fields or constraints affected by `open-questions.md` must not be frozen until the related decision is accepted.
 

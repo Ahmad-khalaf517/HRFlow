@@ -5,7 +5,7 @@ param(
 
     [string[]]$IncludeFiles = @(),
 
-    [string]$OutputPath = (Join-Path ([System.IO.Path]::GetTempPath()) 'hrp-ai-context-bundle.md'),
+    [string]$OutputPath = (Join-Path ([System.IO.Path]::GetTempPath()) 'hrflow-ai-context-bundle.md'),
 
     [switch]$ConfirmSanitized,
 
@@ -116,7 +116,7 @@ catch {
 }
 
 $header = @"
-# HRP AI Context Bundle
+# HRFlow AI Context Bundle
 
 > Generated for a bounded task. Review this entire file before uploading it anywhere.
 > The builder blocks common secret file types and patterns but cannot reliably detect personal, payroll, or confidential data.

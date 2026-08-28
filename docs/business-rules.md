@@ -1,8 +1,8 @@
-# HR & Payroll Management System — MVP Business Rules
+# HRFlow — MVP Business Rules
 
 ## 1. Scope
 
-These rules are intentionally limited to a three-developer, one-week MVP. The objective is a reliable demonstration of one complete payroll flow, not a production payroll platform.
+These rules are intentionally limited to a focused MVP. The objective is a reliable demonstration of one complete payroll flow, not a production payroll platform.
 
 Advanced cases are explicitly excluded so that developers and AI assistants do not expand the project accidentally.
 
@@ -85,7 +85,7 @@ Absence Deduction
 Net Salary = Gross - Total Deductions
 ```
 
-Recommended one-week MVP formula, pending Q-003 confirmation:
+Recommended MVP formula, pending Q-003 confirmation:
 
 ```text
 Daily Rate = Basic Salary / 30
@@ -168,4 +168,3 @@ Permissions are enforced server-side. Hiding a navigation item is not authorizat
 - Partial or failed payment workflows.
 - Bank integration, accounting integration, and notifications.
 - General-purpose audit-log subsystem.
-

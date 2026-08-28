@@ -1,4 +1,4 @@
-# HR & Payroll Management System — User Flows
+# HRFlow — User Flows
 
 These flows describe intended navigation. `business-rules.md` controls calculations and transitions; `security-and-data-policy.md` controls permissions and sensitive-data handling.
 

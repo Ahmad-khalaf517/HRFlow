@@ -1,8 +1,8 @@
-# HR & Payroll Management System — Modules
+# HRFlow — Django Modules and Responsibilities
 
 ## 1. Module Strategy
 
-Use four Django apps to keep the project manageable during the one-week deadline.
+Use four Django apps to keep the MVP manageable and its boundaries clear.
 
 ```text
 accounts
@@ -322,7 +322,7 @@ Only if time allows:
 - Alpine.js for lightweight interactivity
 - HTMX only where it gives clear value
 
-Do not build React/Vue for this one-week project.
+Do not add React or Vue to this MVP.
 
 ## Core Reusable UI Components
 

@@ -1,4 +1,4 @@
-# HR & Payroll Management System — Recommended Free Tools & Libraries
+# HRFlow — Recommended Free Tools and Libraries
 
 ## 1. Core Backend
 
@@ -166,7 +166,7 @@ Free/open-source core.
 
 Very reliable, but PDF layout is coded manually rather than using normal HTML templates.
 
-### Recommendation for one week
+### Recommendation for the MVP
 
 Use a printable HTML payslip first. Try WeasyPrint only after the complete flow works; if installation causes problems, keep PDF generation out of the MVP.
 
@@ -220,7 +220,7 @@ Possible hooks:
 - whitespace checks
 - end-of-file fixer
 
-Do not create a complicated quality pipeline for a one-week project.
+Do not create a complicated quality pipeline for this focused MVP.
 
 ---
 
@@ -392,7 +392,7 @@ python manage.py runserver
 
 # 14. Tool Selection Principle
 
-For a one-week deadline, every library must answer this question:
+For this focused MVP, every library must answer this question:
 
 > Does this remove more work than it creates?
 

@@ -1,28 +1,42 @@
-# HR & Payroll Management System Documentation
+# HRFlow Documentation
 
-Documentation and AI-assisted delivery pack for the one-week Django MVP.
+Documentation and AI-assisted delivery pack for the focused HR and payroll Django MVP.
 
 Start with [`AI_CONTEXT.md`](AI_CONTEXT.md). It defines the project invariants, document authority, safe change process, and required references.
 
-## Files
+## Why Each Document Exists
 
-1. `docs/project-plan.md` — scope, architecture, timeline, team plan
-2. `docs/erd.md` — relational data model and Mermaid ERD
-3. `docs/modules.md` — Django modules and responsibilities
-4. `docs/jira-plan.md` — Jira epics, stories, dependencies, daily milestones
-5. `docs/user-flows.md` — role-based and end-to-end user flows
-6. `docs/business-rules.md` — canonical confirmed, proposed, and pending business rules
-7. `docs/security-and-data-policy.md` — application security and safe AI-data policy
-8. `docs/testing-strategy.md` — calculation, constraint, permission, and workflow testing
-9. `docs/ai-agent-guide.md` — web and repository AI workflow
-10. `docs/task-brief-template.md` — reusable bounded-task specification
-11. `docs/open-questions.md` — decisions that must not be guessed
-12. `docs/decisions/` — accepted architecture and business decision records
-13. `docs/tools-and-libraries.md` — recommended free/open-source stack
-14. `CLAUDE.md` and `AGENTS.md` — tool-specific entry points to `AI_CONTEXT.md`
+You do not need to read every document for every task. Use this map to select the smallest reliable context.
+
+| Document | Why we need it | Main users |
+|---|---|---|
+| `docs/HRFlow-Business-Requirements-Document.docx` | Aligns sponsors and the delivery team on the business problem, scope, requirements, and approval decisions. | Sponsor, product owner, HR, technical lead |
+| `AI_CONTEXT.md` | Gives repository-aware AI tools a short, canonical set of rules and invariants before they change anything. | Developers and AI agents |
+| `docs/project-plan.md` | Connects scope, architecture, ownership areas, delivery sequence, and the definition of done. | Delivery team |
+| `docs/business-rules.md` | Prevents conflicting implementations by keeping calculations and behavioral rules in one authoritative place. | Product owner, developers, testers |
+| `docs/open-questions.md` | Makes unresolved owner decisions visible so neither people nor AI invent company policy. | Sponsor, product owner, developers |
+| `docs/decisions/` | Records accepted architecture and business decisions so later work does not reopen or contradict them. | Delivery team and AI agents |
+| `docs/erd.md` | Defines entities, relationships, and database constraints before models and migrations are written. | Backend developers and reviewers |
+| `docs/modules.md` | Defines application boundaries, responsibilities, public interfaces, and permissions to reduce duplicated or circular logic. | Developers and reviewers |
+| `docs/user-flows.md` | Describes what each role does from start to finish, making UI and acceptance testing coherent. | Product owner, designers, developers, testers |
+| `docs/jira-plan.md` | Turns the approved scope into bounded, ordered stories with dependencies and acceptance criteria. | Delivery team |
+| `docs/testing-strategy.md` | States the minimum evidence needed to trust calculations, permissions, constraints, and the end-to-end flow. | Developers, testers, reviewers |
+| `docs/security-and-data-policy.md` | Defines safe application behavior and what data may or may not be shared with web AI tools. | Everyone |
+| `docs/tools-and-libraries.md` | Keeps technology choices consistent and discourages unnecessary dependencies. | Developers |
+| `docs/ai-agent-guide.md` | Provides the repeatable workflow for preparing, prompting, checking, and reviewing AI-assisted work. | Teammates using ChatGPT, Claude, or coding agents |
+| `docs/team-ai-context-prompt.md` | Provides a standalone project explanation that can be pasted into a new web-AI conversation. | Teammates using web AI |
+| `docs/task-brief-template.md` | Gives each AI session a bounded outcome, allowed files, acceptance criteria, and verification requirements. | Developers and AI agents |
+| `AGENTS.md` and `CLAUDE.md` | Act as small tool-specific entry points that direct agents to the canonical context instead of duplicating it. | Repository-aware AI agents |
+
+## Suggested Reading by Task
+
+- Business or scope review: BRD, `business-rules.md`, `open-questions.md`, and `user-flows.md`.
+- Backend implementation: `AI_CONTEXT.md`, the task brief, relevant business rules, `erd.md`, `modules.md`, and tests.
+- Planning and coordination: `project-plan.md`, `jira-plan.md`, `open-questions.md`, and accepted decisions.
+- Web ChatGPT or Claude work: `team-ai-context-prompt.md`, a completed task brief, and only the relevant source files and rules.
 
 ## Important
 
-This remains an MVP specification. Before calculation work begins, answer the blocking items in `docs/open-questions.md`, record accepted decisions, and update the related Jira acceptance criteria and tests.
+HRFlow remains an MVP specification. Before calculation work begins, answer the blocking items in `docs/open-questions.md`, record accepted decisions, and update the related Jira acceptance criteria and tests.
 
 Never use real employee, salary, bank, tax, payment, credential, or production data in consumer web AI tools. See `docs/security-and-data-policy.md`.

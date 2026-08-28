@@ -1,10 +1,10 @@
-# HRP Task Brief Template
+# HRFlow Task Brief Template
 
 Copy this template into the Jira ticket or a temporary task file. One task brief should describe one reviewable change.
 
 ## Identity
 
-- **Ticket:** HRP-___
+- **Ticket:** HRF-___
 - **Title:**
 - **Owner:**
 - **Context version/commit:**
@@ -100,4 +100,3 @@ Changes outside this list require explicit approval.
 Do not let an AI invent answers. Reference `open-questions.md` or create a decision proposal.
 
 - None / Q-___
-

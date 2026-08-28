@@ -1,8 +1,8 @@
-# HRP One-Week MVP Testing Strategy
+# HRFlow MVP Testing Strategy
 
 ## 1. Goal
 
-Protect the core demo flow and the calculations most likely to fail. The team should not attempt enterprise-scale test coverage in one week.
+Protect the core demo flow and the calculations most likely to fail. The team should not attempt enterprise-scale coverage for this focused MVP.
 
 ## 2. Required Automated Tests
 
@@ -35,7 +35,7 @@ Proration, concurrent generation, partial payments, reversals, progressive tax, 
 
 ## 4. Manual End-to-End Check
 
-On Day 7 or earlier, run one synthetic scenario:
+Before declaring the MVP demo-ready, run one synthetic scenario:
 
 ```text
 Create employee
@@ -49,7 +49,7 @@ Create employee
 -> record full payment
 ```
 
-Record the exact input and expected gross, deductions, and net salary so all three developers test the same result.
+Record the exact input and expected gross, deductions, and net salary so every contributor tests the same result.
 
 ## 5. Commands
 
@@ -62,7 +62,7 @@ python manage.py makemigrations --check --dry-run
 python manage.py check
 ```
 
-Run targeted tests during development and the full suite before merging the daily integration branch.
+Run targeted tests during development and the full suite before merging into the shared integration branch.
 
 ## 6. Pull Request Note
 
@@ -72,4 +72,3 @@ Each PR states:
 - manual check performed;
 - anything not tested;
 - remaining risk.
-

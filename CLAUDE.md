@@ -1,4 +1,4 @@
-# HRP Instructions for Claude
+# HRFlow Instructions for Claude
 
 Before working on this repository, read and follow `AI_CONTEXT.md` completely. Then read the current task brief and only the detailed documents relevant to that task.
 

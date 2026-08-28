@@ -1,4 +1,4 @@
-# HRP AI-Assisted Development Guide
+# HRFlow AI-Assisted Development Guide
 
 ## 1. Purpose
 
@@ -98,7 +98,7 @@ Do not use a months-long general project chat. Old implementation details and st
 Prompt:
 
 ```text
-Read the supplied HRP context and task files. Do not write code yet.
+Read the supplied HRFlow context and task files. Do not write code yet.
 
 Return:
 1. your understanding of the requested outcome;
@@ -191,7 +191,7 @@ Example:
 
 ```powershell
 .\tools\build-ai-context.ps1 `
-  -TaskFile .ai\tasks\HRP-013.md `
+  -TaskFile .ai\tasks\HRF-013.md `
   -IncludeFiles docs\business-rules.md,employees\models.py,employees\tests\test_contracts.py `
   -ConfirmSanitized
 ```
@@ -269,7 +269,7 @@ For a bug:
 - Keep a shared library of approved task briefs and prompts rather than personal prompt folklore.
 - Spend five minutes improving acceptance criteria before spending thirty minutes correcting generated code.
 - Use synthetic examples with exact expected numbers.
-- Let one developer own updates to canonical business rules during the one-week sprint.
+- Assign one accountable owner to canonical business-rule updates during active delivery.
 - Review and merge small PRs daily.
 - Capture recurring AI mistakes as tests or short rules; do not rely on reminders in chat history.
 - Measure useful outcomes: cycle time, review findings, escaped defects, and rework—not number of generated lines.

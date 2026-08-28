@@ -1,8 +1,8 @@
-# HRP MVP Security and AI Data Rules
+# HRFlow MVP Security and AI Data Rules
 
 ## 1. MVP Boundary
 
-This one-week project is a demonstration using synthetic data. Production security, legal retention, bank-data encryption, compliance certification, and incident operations are out of scope.
+HRFlow is an MVP demonstration using synthetic data. Production security, legal retention, bank-data encryption, compliance certification, and incident operations are out of scope.
 
 The following minimum rules still apply because they prevent easy mistakes and do not require a separate subsystem.
 
@@ -51,4 +51,3 @@ A full immutable audit trail is a future production feature.
 ## 6. Before Any Real Deployment
 
 Stop and perform a separate production-readiness review covering jurisdiction, real payroll rules, sensitive-field encryption/masking, audit logging, retention, backups, monitoring, and organizational access controls.
-

@@ -1,4 +1,4 @@
-# HR & Payroll Management System — Jira Sprint Plan
+# HRFlow — Jira Delivery Plan
 
 ## 1. Board Workflow
 
@@ -13,15 +13,14 @@ Backlog
 -> Done
 ```
 
-## 2. Sprint Strategy
+## 2. Delivery Strategy
 
-Because the deadline is one week, do not create several formal sprints. Use one delivery sprint with daily milestones.
+Keep one ordered MVP backlog and move work through named milestones. Staffing and calendar commitments are managed separately from this product specification.
 
-Recommended sprint:
+Recommended release:
 
 ```text
-Sprint 1 — HR & Payroll MVP
-Duration: 7 days
+HRFlow MVP
 ```
 
 ## 3. Epics
@@ -86,7 +85,7 @@ Duration: 7 days
 
 ## Foundation
 
-### HRP-001 Setup Django Project
+### HRF-001 Setup Django Project
 
 **As a developer, I want the Django project configured so the team can develop on a shared foundation.**
 
@@ -99,7 +98,7 @@ Acceptance Criteria:
 - base settings committed
 - `.env`, credentials, database dumps, uploaded payslips, and local sensitive files excluded from Git
 
-### HRP-002 Configure Tailwind
+### HRF-002 Configure Tailwind
 
 Acceptance Criteria:
 
@@ -107,7 +106,7 @@ Acceptance Criteria:
 - base template loads compiled CSS
 - production/dev commands documented
 
-### HRP-003 Authentication
+### HRF-003 Authentication
 
 Acceptance Criteria:
 
@@ -120,7 +119,7 @@ Acceptance Criteria:
 
 ## Employees
 
-### HRP-010 Department CRUD
+### HRF-010 Department CRUD
 
 Acceptance Criteria:
 
@@ -129,7 +128,7 @@ Acceptance Criteria:
 - edit department
 - deactivate department
 
-### HRP-011 Position CRUD
+### HRF-011 Position CRUD
 
 Acceptance Criteria:
 
@@ -137,7 +136,7 @@ Acceptance Criteria:
 - create/edit/list works
 - salary range is optional
 
-### HRP-012 Employee CRUD
+### HRF-012 Employee CRUD
 
 Acceptance Criteria:
 
@@ -146,7 +145,7 @@ Acceptance Criteria:
 - active/inactive status supported
 - searchable employee list
 
-### HRP-013 Contract Management
+### HRF-013 Contract Management
 
 Acceptance Criteria:
 
@@ -160,7 +159,7 @@ Acceptance Criteria:
 
 ## Attendance & Leave
 
-### HRP-020 Attendance CRUD
+### HRF-020 Attendance CRUD
 
 Acceptance Criteria:
 
@@ -168,7 +167,7 @@ Acceptance Criteria:
 - check-in/check-out supported
 - worked hours calculated
 
-### HRP-021 Calculate Overtime Hours
+### HRF-021 Calculate Overtime Hours
 
 Acceptance Criteria:
 
@@ -176,7 +175,7 @@ Acceptance Criteria:
 - overtime stores hours only
 - negative overtime is not allowed
 
-### HRP-022 Leave Type Management
+### HRF-022 Leave Type Management
 
 Acceptance Criteria:
 
@@ -184,7 +183,7 @@ Acceptance Criteria:
 - paid/unpaid flag supported
 - annual allowance supported
 
-### HRP-023 Employee Leave Request
+### HRF-023 Employee Leave Request
 
 Acceptance Criteria:
 
@@ -195,7 +194,7 @@ Acceptance Criteria:
 - overlapping pending/approved requests rejected
 - working-day behavior follows an accepted decision
 
-### HRP-024 Leave Approval
+### HRF-024 Leave Approval
 
 Acceptance Criteria:
 
@@ -203,7 +202,7 @@ Acceptance Criteria:
 - approver and date stored
 - employee cannot approve own request
 
-### HRP-025 Attendance Summary Services
+### HRF-025 Attendance Summary Services
 
 Acceptance Criteria:
 
@@ -217,7 +216,7 @@ Expose services for:
 
 ## Payroll Inputs
 
-### HRP-030 Bonus Management
+### HRF-030 Bonus Management
 
 Acceptance Criteria:
 
@@ -225,7 +224,7 @@ Acceptance Criteria:
 - amount and effective date required
 - payroll can retrieve bonuses for a period
 
-### HRP-031 Manual Deduction Management
+### HRF-031 Manual Deduction Management
 
 Acceptance Criteria:
 
@@ -233,7 +232,7 @@ Acceptance Criteria:
 - effective date stored
 - payroll can retrieve deductions for period
 
-### HRP-032 Tax Configuration
+### HRF-032 Tax Configuration
 
 Acceptance Criteria:
 
@@ -246,7 +245,7 @@ Acceptance Criteria:
 
 ## Payroll
 
-### HRP-040 Create Payroll Run
+### HRF-040 Create Payroll Run
 
 Acceptance Criteria:
 
@@ -254,7 +253,7 @@ Acceptance Criteria:
 - duplicate month/year prevented
 - initial status = draft
 
-### HRP-041 Payroll Calculation Service
+### HRF-041 Payroll Calculation Service
 
 Acceptance Criteria:
 
@@ -286,7 +285,7 @@ Additional Acceptance Criteria:
 - fails safely when an active contract is missing
 - table-driven boundary tests document exact expected values
 
-### HRP-042 Generate Payroll Items
+### HRF-042 Generate Payroll Items
 
 Acceptance Criteria:
 
@@ -294,7 +293,7 @@ Acceptance Criteria:
 - snapshot values saved
 - duplicate employee item prevented
 
-### HRP-043 Payroll Review
+### HRF-043 Payroll Review
 
 Acceptance Criteria:
 
@@ -302,7 +301,7 @@ Acceptance Criteria:
 - payroll totals displayed
 - individual employee breakdown visible
 
-### HRP-044 Payroll Approval
+### HRF-044 Payroll Approval
 
 Acceptance Criteria:
 
@@ -315,7 +314,7 @@ Acceptance Criteria:
 
 ## Payslips & Payments
 
-### HRP-050 Payslip View
+### HRF-050 Payslip View
 
 Acceptance Criteria:
 
@@ -327,7 +326,7 @@ Shows:
 - deductions
 - net salary
 
-### HRP-051 Generate Payslip PDF
+### HRF-051 Generate Payslip PDF
 
 **Optional — only after the complete HTML payslip/payment flow works.**
 
@@ -336,7 +335,7 @@ Acceptance Criteria:
 - PDF generated from payroll snapshot
 - employee can download own payslip
 
-### HRP-052 Record Employee Payment
+### HRF-052 Record Employee Payment
 
 Acceptance Criteria:
 
@@ -353,7 +352,7 @@ Acceptance Criteria:
 
 ## Dashboard / QA
 
-### HRP-060 Dashboard
+### HRF-060 Dashboard
 
 Acceptance Criteria:
 
@@ -366,7 +365,7 @@ Display:
 - pending leaves
 - current payroll net total
 
-### HRP-061 Seed Demo Data
+### HRF-061 Seed Demo Data
 
 Acceptance Criteria:
 
@@ -381,7 +380,7 @@ Seed includes:
 - bonuses/deductions
 - one payroll period
 
-### HRP-062 End-to-End Demo Test
+### HRF-062 End-to-End Demo Test
 
 Acceptance Criteria:
 
@@ -398,87 +397,87 @@ Employee -> Contract -> Attendance -> Leave -> Payroll -> Payslip -> Payment
 Important Jira links:
 
 ```text
-HRP-013 Contract Management
-blocks HRP-041 Payroll Calculation Service
+HRF-013 Contract Management
+blocks HRF-041 Payroll Calculation Service
 
-HRP-021 Calculate Overtime Hours
-blocks HRP-041 Payroll Calculation Service
+HRF-021 Calculate Overtime Hours
+blocks HRF-041 Payroll Calculation Service
 
-HRP-025 Attendance Summary Services
-blocks HRP-041 Payroll Calculation Service
+HRF-025 Attendance Summary Services
+blocks HRF-041 Payroll Calculation Service
 
-HRP-030 Bonus Management
-blocks HRP-041 Payroll Calculation Service
+HRF-030 Bonus Management
+blocks HRF-041 Payroll Calculation Service
 
-HRP-031 Manual Deduction Management
-blocks HRP-041 Payroll Calculation Service
+HRF-031 Manual Deduction Management
+blocks HRF-041 Payroll Calculation Service
 
-HRP-041 Payroll Calculation Service
-blocks HRP-042 Generate Payroll Items
+HRF-041 Payroll Calculation Service
+blocks HRF-042 Generate Payroll Items
 
-HRP-042 Generate Payroll Items
-blocks HRP-050 Payslip View
+HRF-042 Generate Payroll Items
+blocks HRF-050 Payslip View
 
-HRP-042 Generate Payroll Items
-blocks HRP-052 Record Employee Payment
+HRF-042 Generate Payroll Items
+blocks HRF-052 Record Employee Payment
 ```
 
-## 6. Daily Milestones
+## 6. Delivery Milestones
 
-### Day 1
+### Foundation
 
-- HRP-001
-- HRP-002
-- HRP-003
+- HRF-001
+- HRF-002
+- HRF-003
 - ERD freeze
 
-### Day 2
+### HR Core
 
-- HRP-010
-- HRP-011
-- HRP-012
-- HRP-020 start
-- HRP-040 model start
+- HRF-010
+- HRF-011
+- HRF-012
+- HRF-020 start
+- HRF-040 model start
 
-### Day 3
+### Attendance and Payroll Inputs
 
-- HRP-013
-- HRP-020
-- HRP-021
-- HRP-030
-- HRP-031
+- HRF-013
+- HRF-020
+- HRF-021
+- HRF-030
+- HRF-031
 
-### Day 4
+### Leave and Calculation Services
 
-- HRP-022
-- HRP-023
-- HRP-024
-- HRP-025
-- HRP-032
-- HRP-041 with fixture/mock data
+- HRF-022
+- HRF-023
+- HRF-024
+- HRF-025
+- HRF-032
+- HRF-041 with fixture/mock data
 
-### Day 5
+### Payroll Integration
 
-- HRP-041 real integration
-- HRP-042
+- HRF-041 real integration
+- HRF-042
 
-### Day 6
+### Approval, Payslips, and Payments
 
-- HRP-043
-- HRP-044
-- HRP-050
-- HRP-052
+- HRF-043
+- HRF-044
+- HRF-050
+- HRF-052
 - integration fixes
 
-### Day 7
+### Quality and Demo Readiness
 
-- HRP-060
-- HRP-061
-- HRP-062
+- HRF-060
+- HRF-061
+- HRF-062
 - bug fixing
 - UI polish
 - documentation
-- HRP-051 only if the full MVP is already stable
+- HRF-051 only if the full MVP is already stable
 
 ---
 

@@ -1,11 +1,9 @@
-# HR & Payroll Management System — Project Plan
+# HRFlow — Project Plan
 
 ## 1. Project Summary
 
-**Project:** HR & Payroll Management System  
+**Project:** HRFlow — HR & Payroll Management System  
 **Framework:** Django  
-**Team Size:** 3 developers  
-**Deadline:** 7 days
 **Frontend:** Django Templates + Tailwind CSS  
 **Database:** PostgreSQL
 
@@ -153,7 +151,7 @@ The snapshot must also retain enough policy/version information to reproduce the
 
 ## 5. Django App Structure
 
-To reduce overhead during the one-week deadline, use four main apps:
+To keep the MVP easy to understand and maintain, use four main apps:
 
 ```text
 project/
@@ -197,9 +195,11 @@ project/
 - payslips
 - payments
 
-## 6. Team Ownership
+## 6. Domain Ownership
 
-### Developer 1 — Employee Domain
+Assign one accountable owner to each domain according to current team capacity. Ownership is a coordination role, not a fixed staffing requirement.
+
+### Employee Domain
 
 - project setup support
 - authentication support
@@ -208,7 +208,7 @@ project/
 - employees
 - contracts
 
-### Developer 2 — Attendance Domain
+### Attendance Domain
 
 - attendance
 - worked hours
@@ -218,7 +218,7 @@ project/
 - leave approval
 - absence/unpaid leave facts
 
-### Developer 3 — Payroll Domain
+### Payroll Domain
 
 - bonuses
 - deductions
@@ -228,7 +228,7 @@ project/
 - payslips
 - payments
 
-### Shared Responsibilities
+### Delivery-Wide Responsibilities
 
 - dashboard
 - UI consistency
@@ -262,9 +262,9 @@ get_absence_days(employee, start_date, end_date)
 
 This allows payroll development against mock values before attendance is complete.
 
-### Integrate daily
+### Integrate continuously
 
-Do not wait until Day 7 to combine branches.
+Combine reviewed changes as each dependency becomes ready; do not postpone integration until the end.
 
 Recommended Git branches:
 
@@ -276,17 +276,19 @@ feature/attendance
 feature/payroll
 ```
 
-## 8. Seven-Day Delivery Plan
+## 8. Delivery Sequence
 
-| Day | Main Work |
+Progress through these outcomes in dependency order. Schedule and staffing can be set outside this specification without changing the product scope.
+
+| Milestone | Main outcome |
 |---|---|
-| 1 | Finalize docs, ERD, project setup, PostgreSQL, Tailwind, auth foundation |
-| 2 | Employees, departments, positions, attendance skeleton, payroll models |
-| 3 | Contracts, attendance completion, bonuses/deductions |
-| 4 | Leave flow, overtime calculations, payroll calculation service with test data |
-| 5 | Connect employee/contract/attendance/leave data into payroll |
-| 6 | Full payroll run, review/approval, printable payslip, payment, integration testing |
-| 7 | Basic dashboard, seed data, QA, bug fixes, documentation, final demo rehearsal |
+| Foundation | Finalize decisions and the ERD; set up Django, PostgreSQL, Tailwind, authentication, and shared models |
+| HR Core | Deliver departments, positions, employees, and contract history |
+| Time and Leave | Deliver attendance, worked/overtime hours, leave requests, approvals, and monthly fact services |
+| Payroll Inputs | Deliver bonuses, manual deductions, and the agreed tax configuration |
+| Payroll Processing | Integrate domain inputs, calculate payroll, and save immutable PayrollItem snapshots |
+| Employee Output | Deliver review/approval, printable payslips, employee access, and full payment recording |
+| Quality and Demo | Complete dashboard, synthetic seed data, automated checks, fixes, documentation, and demo rehearsal |
 
 ## 9. Definition of Done
 
