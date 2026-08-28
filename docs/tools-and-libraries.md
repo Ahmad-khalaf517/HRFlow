@@ -166,9 +166,9 @@ Free/open-source core.
 
 Very reliable, but PDF layout is coded manually rather than using normal HTML templates.
 
-### Recommendation for 8 days
+### Recommendation for one week
 
-Try WeasyPrint early on Day 1 or Day 2. If installation causes problems, switch quickly rather than losing hours.
+Use a printable HTML payslip first. Try WeasyPrint only after the complete flow works; if installation causes problems, keep PDF generation out of the MVP.
 
 ---
 
@@ -220,7 +220,7 @@ Possible hooks:
 - whitespace checks
 - end-of-file fixer
 
-Do not create a complicated quality pipeline for an 8-day project.
+Do not create a complicated quality pipeline for a one-week project.
 
 ---
 
@@ -234,7 +234,7 @@ Recommended free ERD options:
 
 Free and works directly inside Markdown on GitHub and many editors.
 
-Use Mermaid in `02-erd.md` as the source of truth.
+Use Mermaid in `erd.md` as the source of truth.
 
 ### dbdiagram.io
 
@@ -305,6 +305,8 @@ Use:
 
 Use whichever assistants the team already has access to.
 
+Tool choice does not override `security-and-data-policy.md`. Free/personal web accounts may receive only a manually reviewed, sanitized, bounded context bundle. Real employee, payroll, bank, tax, payment, credential, production, and other Restricted data are prohibited.
+
 Recommended usage style rather than product dependence:
 
 - Claude Code / Claude in IDE for scoped implementation and repository reasoning
@@ -314,6 +316,20 @@ Recommended usage style rather than product dependence:
 Do not depend on paid AI features for something the project cannot function without.
 
 The repository must remain understandable and maintainable without AI.
+
+Standardize the workflow rather than relying on individual prompt habits:
+
+```text
+task brief
+-> sanitized context bundle
+-> context check
+-> bounded implementation
+-> local tests
+-> independent review
+-> human-reviewed PR
+```
+
+See `ai-agent-guide.md` and `../AI_CONTEXT.md`.
 
 ---
 
@@ -376,7 +392,7 @@ python manage.py runserver
 
 # 14. Tool Selection Principle
 
-For an 8-day deadline, every library must answer this question:
+For a one-week deadline, every library must answer this question:
 
 > Does this remove more work than it creates?
 

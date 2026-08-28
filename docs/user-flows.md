@@ -1,5 +1,7 @@
 # HR & Payroll Management System — User Flows
 
+These flows describe intended navigation. `business-rules.md` controls calculations and transitions; `security-and-data-policy.md` controls permissions and sensitive-data handling.
+
 ## 1. Roles
 
 - Admin
@@ -249,6 +251,8 @@ Status = Approved
 Lock Standard Recalculation
 ```
 
+For this small MVP, a Payroll Officer may perform calculation, review, and approval. Each action remains authorized server-side and records the responsible user/timestamp.
+
 ---
 
 # 10. Employee — Payslip Flow
@@ -289,7 +293,7 @@ Optional Reference Number
 Save
 ```
 
-If all payroll items are paid, payroll may be marked `Paid`.
+Only approved payroll items may receive payments. The MVP records one completed payment equal to each payroll item's net salary. Payroll becomes `Paid` after every item has its full payment. Partial payments and reversals are out of scope.
 
 ---
 

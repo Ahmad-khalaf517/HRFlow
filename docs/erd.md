@@ -1,5 +1,7 @@
 # HR & Payroll Management System — ERD
 
+This is a conceptual first-pass model. `business-rules.md` is authoritative. Fields or constraints affected by `open-questions.md` must not be frozen until the related decision is accepted.
+
 ## 1. ERD Principles
 
 The database should separate:
@@ -96,6 +98,8 @@ created_at
 updated_at
 ```
 
+The MVP uses synthetic bank values only. Bank details are excluded from logs, AI context, and committed fixtures. Real bank data requires a separate production-readiness review.
+
 ### Contract
 
 ```text
@@ -190,6 +194,8 @@ approved_at NULL
 created_at
 updated_at
 ```
+
+`requested_days` is a derived value based on the approved work calendar. It should not be independently editable.
 
 Statuses:
 
@@ -286,15 +292,16 @@ approved_by_id FK -> User NULL
 created_at
 reviewed_at NULL
 approved_at NULL
+currency_code
 ```
 
-Recommended unique constraint:
+Required unique constraint:
 
 ```text
 (month, year)
 ```
 
-If multi-company support is added later, use `(company, month, year)` instead.
+The MVP supports monthly payroll only. `period_start` and `period_end` are derived from month/year.
 
 ### PayrollItem
 
@@ -330,7 +337,7 @@ Required unique constraint:
 (payroll_id, employee_id)
 ```
 
-PayrollItem is a historical snapshot. Do not dynamically recalculate old payroll items from current contracts.
+PayrollItem is a historical financial snapshot. Do not dynamically recalculate old payroll items from current contracts.
 
 ### Payslip
 

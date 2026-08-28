@@ -1,0 +1,41 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+*.p12
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Django/local data
+*.sqlite3
+*.db
+media/
+private/
+exports/
+staticfiles/
+*.log
+
+# Frontend
+node_modules/
+
+# Editors and operating systems
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Temporary AI context bundles must not be committed
+.ai/
+ai-bundles/
+

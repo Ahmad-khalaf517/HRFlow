@@ -2,7 +2,7 @@
 
 ## 1. Module Strategy
 
-Use four Django apps to keep the project manageable during the 8-day deadline.
+Use four Django apps to keep the project manageable during the one-week deadline.
 
 ```text
 accounts
@@ -122,6 +122,8 @@ Do not build a custom RBAC engine for this MVP.
 - mark active/inactive
 
 ## Important Business Rules
+
+See `business-rules.md` for authoritative status and details.
 
 - employee number must be unique
 - only one active contract per employee
@@ -278,6 +280,8 @@ Paid
 
 Approved payroll must not be recalculated through the standard UI.
 
+Status transitions use a payroll service and record the responsible user/timestamp. Correction and reversal workflows are outside the MVP.
+
 ---
 
 # 6. Dashboard
@@ -318,7 +322,7 @@ Only if time allows:
 - Alpine.js for lightweight interactivity
 - HTMX only where it gives clear value
 
-Do not build React/Vue for this 8-day project.
+Do not build React/Vue for this one-week project.
 
 ## Core Reusable UI Components
 
@@ -399,7 +403,10 @@ Bad:
 | Manage bonuses | Yes | No | Yes | No |
 | Manage deductions | Yes | No | Yes | No |
 | Generate payroll | Yes | No | Yes | No |
+| Review payroll | Yes | No | Yes | No |
 | Approve payroll | Yes | No | Yes | No |
 | View all payslips | Yes | Limited | Yes | No |
 | View own payslip | Yes | Yes | Yes | Yes |
 | Record payment | Yes | No | Yes | No |
+
+For this small MVP, a Payroll Officer may calculate, review, and approve. Separation of duties is a future production concern. Navigation visibility never replaces server-side permission and object-level checks.

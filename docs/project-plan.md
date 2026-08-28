@@ -5,7 +5,7 @@
 **Project:** HR & Payroll Management System  
 **Framework:** Django  
 **Team Size:** 3 developers  
-**Deadline:** 8 days  
+**Deadline:** 7 days
 **Frontend:** Django Templates + Tailwind CSS  
 **Database:** PostgreSQL
 
@@ -74,6 +74,8 @@ Deliver one complete end-to-end workflow:
 
 ## 4. Key Business Rules
 
+This section is a planning summary. `business-rules.md` is authoritative and identifies which rules are confirmed versus awaiting an owner decision. Do not implement a pending formula from examples in this plan.
+
 ### Attendance
 
 Attendance stores factual work data:
@@ -133,6 +135,8 @@ Attendance Deductions
 Net Salary = Gross Salary - Total Deductions
 ```
 
+The remaining currency, rate, overtime, and weekday-counting decisions are Q-002 through Q-004 in `open-questions.md`. Proration and complex calendar rules are out of scope.
+
 ### Payroll Status
 
 ```text
@@ -145,9 +149,11 @@ Approved or paid payroll should not be recalculated without an explicit administ
 
 PayrollItem stores a salary snapshot for each employee and payroll period. Historical payslips must never be dynamically recalculated from the employee's current salary.
 
+The snapshot must also retain enough policy/version information to reproduce the result, including currency, effective contract inputs, calculation version, and applicable tax details.
+
 ## 5. Django App Structure
 
-To reduce overhead during the 8-day deadline, use four main apps:
+To reduce overhead during the one-week deadline, use four main apps:
 
 ```text
 project/
@@ -270,7 +276,7 @@ feature/attendance
 feature/payroll
 ```
 
-## 8. Eight-Day Delivery Plan
+## 8. Seven-Day Delivery Plan
 
 | Day | Main Work |
 |---|---|
@@ -279,9 +285,8 @@ feature/payroll
 | 3 | Contracts, attendance completion, bonuses/deductions |
 | 4 | Leave flow, overtime calculations, payroll calculation service with test data |
 | 5 | Connect employee/contract/attendance/leave data into payroll |
-| 6 | Full payroll run, review/approval, integration testing |
-| 7 | Payslip PDF, payments, dashboard, UI polish |
-| 8 | QA, bug fixes, seed data, documentation, final demo rehearsal |
+| 6 | Full payroll run, review/approval, printable payslip, payment, integration testing |
+| 7 | Basic dashboard, seed data, QA, bug fixes, documentation, final demo rehearsal |
 
 ## 9. Definition of Done
 
@@ -295,6 +300,8 @@ A task is done only when:
 - tests or manual acceptance checks pass
 - code is merged through review
 - no known blocking bug remains
+- no unresolved decision was silently converted into implementation behavior
+- no secrets or real employee/payroll data appear in code, fixtures, logs, screenshots, or AI prompts
 
 ## 10. Demo Scenario
 

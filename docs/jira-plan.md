@@ -15,13 +15,13 @@ Backlog
 
 ## 2. Sprint Strategy
 
-Because the deadline is 8 days, do not create several long formal sprints. Use one delivery sprint with daily milestones.
+Because the deadline is one week, do not create several formal sprints. Use one delivery sprint with daily milestones.
 
 Recommended sprint:
 
 ```text
 Sprint 1 — HR & Payroll MVP
-Duration: 8 days
+Duration: 7 days
 ```
 
 ## 3. Epics
@@ -97,6 +97,7 @@ Acceptance Criteria:
 - PostgreSQL connection configured
 - apps created
 - base settings committed
+- `.env`, credentials, database dumps, uploaded payslips, and local sensitive files excluded from Git
 
 ### HRP-002 Configure Tailwind
 
@@ -191,6 +192,8 @@ Acceptance Criteria:
 - start/end dates required
 - requested days calculated
 - initial status is pending
+- overlapping pending/approved requests rejected
+- working-day behavior follows an accepted decision
 
 ### HRP-024 Leave Approval
 
@@ -236,6 +239,8 @@ Acceptance Criteria:
 
 - configurable percentage brackets supported
 - tax service returns monetary tax value
+- uses the simple non-progressive demonstrative rule in `business-rules.md`
+- UI does not claim legal tax compliance
 
 ---
 
@@ -245,8 +250,8 @@ Acceptance Criteria:
 
 Acceptance Criteria:
 
-- month/year or period selectable
-- duplicate payroll period prevented
+- month/year selectable
+- duplicate month/year prevented
 - initial status = draft
 
 ### HRP-041 Payroll Calculation Service
@@ -274,6 +279,13 @@ total deductions
 net salary
 ```
 
+Additional Acceptance Criteria:
+
+- calculation follows accepted decisions Q-002 through Q-004
+- uses `Decimal` throughout
+- fails safely when an active contract is missing
+- table-driven boundary tests document exact expected values
+
 ### HRP-042 Generate Payroll Items
 
 Acceptance Criteria:
@@ -297,6 +309,7 @@ Acceptance Criteria:
 - authorized user only
 - approver/date stored
 - approved payroll cannot be recalculated normally
+- Payroll Officer or Admin may approve for this MVP
 
 ---
 
@@ -316,6 +329,8 @@ Shows:
 
 ### HRP-051 Generate Payslip PDF
 
+**Optional — only after the complete HTML payslip/payment flow works.**
+
 Acceptance Criteria:
 
 - PDF generated from payroll snapshot
@@ -330,6 +345,9 @@ Acceptance Criteria:
 - method
 - optional reference number
 - payment linked to payroll item
+- only approved payroll items can be paid
+- payment amount must equal the payroll item's net salary
+- partial payments, overpayments, failures, and reversals are out of scope
 
 ---
 
@@ -356,7 +374,7 @@ Seed includes:
 
 - departments
 - positions
-- 5+ employees
+- 3 employees
 - contracts
 - attendance
 - leave
@@ -448,22 +466,19 @@ blocks HRP-052 Record Employee Payment
 
 - HRP-043
 - HRP-044
+- HRP-050
+- HRP-052
 - integration fixes
 
 ### Day 7
 
-- HRP-050
-- HRP-051
-- HRP-052
 - HRP-060
-
-### Day 8
-
 - HRP-061
 - HRP-062
 - bug fixing
 - UI polish
 - documentation
+- HRP-051 only if the full MVP is already stable
 
 ---
 
@@ -476,6 +491,8 @@ A Jira story can enter development when:
 - dependencies are identified
 - expected UI is understood
 - no unresolved business rule blocks implementation
+- related Q-001 through Q-004 decisions are answered where relevant
+- AI context contains no Restricted data
 
 # 8. Definition of Done
 
@@ -486,3 +503,6 @@ A Jira story can enter development when:
 - merged to `develop`
 - no regression in existing flow
 - manual or automated tests pass
+- exact verification commands and results recorded in the PR
+- server-side permission and object-level access tests pass
+- no secrets or real employee/payroll data are present
