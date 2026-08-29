@@ -28,6 +28,7 @@ staticfiles/
 
 # Frontend
 node_modules/
+static/css/dist/
 
 # Editors and operating systems
 .idea/

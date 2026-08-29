@@ -1,0 +1,15 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-hrflow}
+      POSTGRES_USER: ${DB_USER:-hrflow}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-hrflow}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - hrflow_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  hrflow_postgres_data:

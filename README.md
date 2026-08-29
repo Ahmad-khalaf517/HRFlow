@@ -4,6 +4,31 @@ Documentation and AI-assisted delivery pack for the focused HR and payroll Djang
 
 Start with [`AI_CONTEXT.md`](AI_CONTEXT.md). It defines the project invariants, document authority, safe change process, and required references.
 
+## Running the Project Locally
+
+Requires Python 3.12+, Node.js (for the Tailwind build), and Docker (for local PostgreSQL) — or a PostgreSQL 16 instance reachable via the `DB_*` variables below.
+
+```bash
+python -m venv .venv
+.venv\Scripts\activate          # macOS/Linux: source .venv/bin/activate
+pip install -r requirements.txt
+
+cp .env.example .env            # fill in local values; never commit .env
+
+docker compose up -d            # starts PostgreSQL on localhost:5432
+python manage.py migrate
+
+npm install
+npm run build:css               # one-off build; use `npm run watch:css` while developing
+
+python manage.py createsuperuser
+python manage.py runserver
+```
+
+Then visit `http://localhost:8000`. Run `pytest` for the test suite and `ruff check .` for linting.
+
+The four Django apps (`accounts`, `employees`, `attendance`, `payroll`) are scaffolded and registered but intentionally empty — see `docs/jira-plan.md` for what each ticket adds next.
+
 ## Why Each Document Exists
 
 You do not need to read every document for every task. Use this map to select the smallest reliable context.
