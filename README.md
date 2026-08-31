@@ -1,12 +1,18 @@
-# HRFlow Documentation
+# HRFlow
 
-Documentation and AI-assisted delivery pack for the focused HR and payroll Django MVP.
+HRFlow is a focused HR and payroll Django MVP with a **seven-calendar-day delivery constraint**.
 
-Start with [`AI_CONTEXT.md`](AI_CONTEXT.md). It defines the project invariants, document authority, safe change process, and required references.
+The required demonstration flow is:
+
+```text
+Employee -> Contract -> Attendance/Leave -> Payroll -> Payslip -> Payment
+```
 
 ## Running the Project Locally
 
 Requires Python 3.12+, Node.js (for the Tailwind build), and a PostgreSQL connection string — this project targets [Neon](https://neon.tech) and does not run a local database service.
+
+`database/neon_schema.sql` is the executable source of truth for the domain tables. It uses Django's built-in `auth_user` table rather than a competing authentication system, so bootstrap order matters:
 
 ```bash
 python -m venv .venv
@@ -15,8 +21,12 @@ pip install -r requirements.txt
 
 cp .env.example .env            # set DATABASE_URL to your Neon connection string; never commit .env
 
-python manage.py migrate
+python manage.py migrate        # Django's built-in auth/admin/sessions tables only
+```
 
+Then execute `database/neon_schema.sql` against that same database (Neon SQL Editor or `psql`) to create the domain tables, and reconcile Django's migration state against what the script just created with `migrate --fake-initial`. Do not run Django's own domain migrations independently of this script — both would try to create the same tables.
+
+```bash
 npm install
 npm run build:css               # one-off build; use `npm run watch:css` while developing
 
@@ -26,41 +36,44 @@ python manage.py runserver
 
 Then visit `http://localhost:8000`. Run `pytest` for the test suite and `ruff check .` for linting.
 
-The four Django apps (`accounts`, `employees`, `attendance`, `payroll`) are scaffolded and registered but intentionally empty — see `docs/jira-plan.md` for what each ticket adds next.
+## Start Here
 
-## Why Each Document Exists
+| Document | Purpose |
+|---|---|
+| `docs/delivery-plan.md` | Seven-day scope, work packages, sequence, cut line, and definition of done |
+| `docs/business-rules.md` | Canonical calculations, permissions, workflow rules, and pending decisions |
+| `docs/erd.md` | Minimum entities, relationships, and database constraints |
+| `database/neon_schema.sql` | Executable PostgreSQL schema for the HRFlow domain tables on Neon |
+| `docs/security-and-data-policy.md` | Application security and safe use of consumer web AI |
+| `AI_CONTEXT.md` | Short repository context and non-negotiable rules for coding agents |
+| `docs/team-ai-context-prompt.md` | Standalone prompt for teammates using web ChatGPT or Claude |
+| `docs/task-brief-template.md` | Bounded task specification for one implementation change |
 
-You do not need to read every document for every task. Use this map to select the smallest reliable context.
+`AGENTS.md` and `CLAUDE.md` are intentionally tiny adapters that direct compatible coding agents to `AI_CONTEXT.md`.
 
-| Document | Why we need it | Main users |
-|---|---|---|
-| `docs/HRFlow-Business-Requirements-Document.docx` | Aligns sponsors and the delivery team on the business problem, scope, requirements, and approval decisions. | Sponsor, product owner, HR, technical lead |
-| `AI_CONTEXT.md` | Gives repository-aware AI tools a short, canonical set of rules and invariants before they change anything. | Developers and AI agents |
-| `docs/project-plan.md` | Connects scope, architecture, ownership areas, delivery sequence, and the definition of done. | Delivery team |
-| `docs/business-rules.md` | Prevents conflicting implementations by keeping calculations and behavioral rules in one authoritative place. | Product owner, developers, testers |
-| `docs/open-questions.md` | Makes unresolved owner decisions visible so neither people nor AI invent company policy. | Sponsor, product owner, developers |
-| `docs/decisions/` | Records accepted architecture and business decisions so later work does not reopen or contradict them. | Delivery team and AI agents |
-| `docs/erd.md` | Defines entities, relationships, and database constraints before models and migrations are written. | Backend developers and reviewers |
-| `docs/modules.md` | Defines application boundaries, responsibilities, public interfaces, and permissions to reduce duplicated or circular logic. | Developers and reviewers |
-| `docs/user-flows.md` | Describes what each role does from start to finish, making UI and acceptance testing coherent. | Product owner, designers, developers, testers |
-| `docs/jira-plan.md` | Turns the approved scope into bounded, ordered stories with dependencies and acceptance criteria. | Delivery team |
-| `docs/testing-strategy.md` | States the minimum evidence needed to trust calculations, permissions, constraints, and the end-to-end flow. | Developers, testers, reviewers |
-| `docs/security-and-data-policy.md` | Defines safe application behavior and what data may or may not be shared with web AI tools. | Everyone |
-| `docs/tools-and-libraries.md` | Keeps technology choices consistent and discourages unnecessary dependencies. | Developers |
-| `docs/ai-agent-guide.md` | Provides the repeatable workflow for preparing, prompting, checking, and reviewing AI-assisted work. | Teammates using ChatGPT, Claude, or coding agents |
-| `docs/team-ai-context-prompt.md` | Provides a standalone project explanation that can be pasted into a new web-AI conversation. | Teammates using web AI |
-| `docs/task-brief-template.md` | Gives each AI session a bounded outcome, allowed files, acceptance criteria, and verification requirements. | Developers and AI agents |
-| `AGENTS.md` and `CLAUDE.md` | Act as small tool-specific entry points that direct agents to the canonical context instead of duplicating it. | Repository-aware AI agents |
+## Locked Technology
 
-## Suggested Reading by Task
+- Python 3.12+ and Django 5.x
+- PostgreSQL
+- Django Templates and Tailwind CSS
+- Alpine.js only for small interactions
+- HTMX only when a specific interaction clearly benefits
+- Ruff
 
-- Business or scope review: BRD, `business-rules.md`, `open-questions.md`, and `user-flows.md`.
-- Backend implementation: `AI_CONTEXT.md`, the task brief, relevant business rules, `erd.md`, `modules.md`, and tests.
-- Planning and coordination: `project-plan.md`, `jira-plan.md`, `open-questions.md`, and accepted decisions.
-- Web ChatGPT or Claude work: `team-ai-context-prompt.md`, a completed task brief, and only the relevant source files and rules.
+Do not add a large frontend framework. Use Django Admin for low-value support-data management when a custom screen is not required for the demo.
 
-## Important
+## Team AI Workflow
 
-HRFlow remains an MVP specification. Before calculation work begins, answer the blocking items in `docs/open-questions.md`, record accepted decisions, and update the related Jira acceptance criteria and tests.
+For each task:
 
-Never use real employee, salary, bank, tax, payment, credential, or production data in consumer web AI tools. See `docs/security-and-data-policy.md`.
+1. Complete `docs/task-brief-template.md`.
+2. Give the AI `AI_CONTEXT.md`, the task brief, and only the relevant sanitized files.
+3. Ask the AI to restate constraints and identify missing decisions before producing code.
+4. Review the full diff and manually exercise the affected workflow.
+5. Use a separate review pass before merge.
+
+Never send real employee, salary, bank, tax, payment, credential, log, database, or production data to consumer web AI tools.
+
+## Immediate Decision Gate
+
+The decision table at the top of `docs/business-rules.md` must be resolved before payroll calculation work begins. Until then, AI assistants and developers must not invent currency, rate, overtime, or leave-calendar policy.
