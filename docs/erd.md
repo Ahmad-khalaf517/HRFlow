@@ -1,6 +1,6 @@
 # HRFlow — Lean Entity Relationship Design
 
-`business-rules.md` is authoritative. This document defines only the minimum data shape and constraints required by the seven-day MVP. `database/neon_schema.sql` is the executable PostgreSQL representation of this design.
+`business-rules.md` is authoritative. This document defines only the minimum data shape and constraints required by the seven-day MVP. The Django ORM migrations under `accounts/`, `employees/`, `attendance/`, and `payroll/` are the executable representation of this design (`database/legacy_neon_schema.sql` is a stale, pre-ORM draft kept for historical reference only).
 
 ## 1. Model Summary
 

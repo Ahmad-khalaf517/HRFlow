@@ -59,6 +59,6 @@ Before completion, inspect the full diff, manually exercise the affected workflo
 - Seven-day scope and sequence: `docs/delivery-plan.md`
 - Canonical rules and decisions: `docs/business-rules.md`
 - Minimum data design: `docs/erd.md`
-- Executable PostgreSQL schema: `database/neon_schema.sql`
+- Schema source of truth: Django ORM migrations in `accounts/`, `employees/`, `attendance/`, `payroll/` (run via `manage.py migrate`); `database/legacy_neon_schema.sql` is stale and kept for historical reference only
 - Security and AI data handling: `docs/security-and-data-policy.md`
 - Per-task scope: `docs/task-brief-template.md`

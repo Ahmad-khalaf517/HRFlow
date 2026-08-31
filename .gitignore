@@ -28,11 +28,13 @@ staticfiles/
 
 # Frontend
 node_modules/
-static/css/dist/
+static/css/dist/*
+!static/css/dist/output.css
 
 # Editors and operating systems
 .idea/
 .vscode/
+.claude/settings.local.json
 .DS_Store
 Thumbs.db
 

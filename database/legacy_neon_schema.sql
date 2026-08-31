@@ -1,11 +1,14 @@
+-- LEGACY / STALE — do not run against a live database.
+-- Superseded by the Django ORM migrations in accounts/employees/attendance/payroll,
+-- which are the actual source of truth for the schema (run via `manage.py migrate`).
+-- This file predates those migrations and has since drifted (e.g. Employee gained
+-- employment_status, bank_name, bank_account_number, date_of_birth, address; Contract
+-- gained contract_type, working_days_per_week, probation_end_date — none reflected here).
+-- Kept only for historical reference.
+--
+-- Original header, for context:
 -- HRFlow PostgreSQL schema for Neon
 -- Target: PostgreSQL / Neon, DB-first bootstrap for an empty domain schema
---
--- IMPORTANT DJANGO PREREQUISITE
--- Run Django's built-in migrations first so public.auth_user exists.
--- This script intentionally does not create a second authentication system.
--- When HRFlow Django models and initial domain migrations are created later,
--- make them match these tables and review before using migrate --fake-initial.
 
 BEGIN;
 
