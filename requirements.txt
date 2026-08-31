@@ -1,5 +1,6 @@
 Django>=5.0,<6.0
 psycopg[binary]>=3.1
+dj-database-url
 django-widget-tweaks
 django-filter
 python-dotenv

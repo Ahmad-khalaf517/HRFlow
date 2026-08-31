@@ -38,6 +38,8 @@ Free and open source.
 
 Use PostgreSQL instead of SQLite for the team project because it is closer to a real production relational database and reduces surprises around relational behavior.
 
+The project uses [Neon](https://neon.tech) (hosted, serverless Postgres) rather than a local database service. Every environment reads a single `DATABASE_URL` connection string from `.env` — see `.env.example` and `README.md`.
+
 ---
 
 # 2. Frontend

@@ -5,38 +5,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}HRFlow{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/dist/output.css' %}">
 </head>
-<body class="bg-gray-50 text-gray-900">
+<body class="bg-background text-on-background">
     <div class="min-h-screen flex">
-        <!-- Sidebar -->
-        <aside class="w-64 shrink-0 bg-white border-r border-gray-200 hidden md:flex md:flex-col">
-            <div class="h-16 flex items-center px-6 border-b border-gray-200">
-                <span class="text-lg font-semibold tracking-tight">HRFlow</span>
+        <!-- Sidebar: fixed 240px per docs/design-system.md -->
+        <aside class="w-[240px] shrink-0 bg-primary text-on-primary hidden md:flex md:flex-col">
+            <div class="h-16 flex items-center px-6 border-b border-white/10">
+                <span class="text-headline-md">HRFlow</span>
             </div>
-            <nav class="flex-1 px-3 py-4 space-y-1 text-sm">
+            <nav class="flex-1 px-3 py-4 space-y-1">
                 <!-- Placeholder links: wired up as each module ships -->
-                <a href="{% url 'home' %}" class="block rounded-md px-3 py-2 font-medium text-gray-700 hover:bg-gray-100">Dashboard</a>
-                <a href="#" class="block rounded-md px-3 py-2 text-gray-500 hover:bg-gray-100">Employees</a>
-                <a href="#" class="block rounded-md px-3 py-2 text-gray-500 hover:bg-gray-100">Attendance</a>
-                <a href="#" class="block rounded-md px-3 py-2 text-gray-500 hover:bg-gray-100">Leave</a>
-                <a href="#" class="block rounded-md px-3 py-2 text-gray-500 hover:bg-gray-100">Payroll</a>
-                <a href="#" class="block rounded-md px-3 py-2 text-gray-500 hover:bg-gray-100">Payslips</a>
+                <a href="{% url 'home' %}" class="block rounded px-3 py-2 text-body-md font-semibold bg-primary-container">Dashboard</a>
+                <a href="#" class="block rounded px-3 py-2 text-body-md text-on-primary-container hover:bg-primary-container">Employees</a>
+                <a href="#" class="block rounded px-3 py-2 text-body-md text-on-primary-container hover:bg-primary-container">Attendance</a>
+                <a href="#" class="block rounded px-3 py-2 text-body-md text-on-primary-container hover:bg-primary-container">Leave</a>
+                <a href="#" class="block rounded px-3 py-2 text-body-md text-on-primary-container hover:bg-primary-container">Payroll</a>
+                <a href="#" class="block rounded px-3 py-2 text-body-md text-on-primary-container hover:bg-primary-container">Payslips</a>
             </nav>
         </aside>
 
         <!-- Main column -->
         <div class="flex-1 flex flex-col min-w-0">
             <!-- Top header -->
-            <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 md:px-6">
+            <header class="h-16 bg-surface-container-lowest border-b border-outline-variant flex items-center justify-between px-4 md:px-6">
                 <div class="flex items-center gap-3">
-                    {% block page_title %}<h1 class="text-base font-semibold text-gray-900">Dashboard</h1>{% endblock %}
+                    {% block page_title %}<h1 class="text-headline-md text-on-surface">Dashboard</h1>{% endblock %}
                 </div>
-                <div class="flex items-center gap-3 text-sm text-gray-600">
+                <div class="flex items-center gap-3 text-body-sm text-on-surface-variant">
                     {% if request.user.is_authenticated %}
                         <span>{{ request.user.get_username }}</span>
                     {% else %}
-                        <span class="text-gray-400">Not signed in</span>
+                        <span class="text-outline">Not signed in</span>
                     {% endif %}
                 </div>
             </header>
@@ -46,7 +49,7 @@
                 {% if messages %}
                     <div class="mb-4 space-y-2">
                         {% for message in messages %}
-                            <div class="rounded-md border border-gray-200 bg-white px-4 py-3 text-sm">{{ message }}</div>
+                            <div class="card text-body-md">{{ message }}</div>
                         {% endfor %}
                     </div>
                 {% endif %}

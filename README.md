@@ -6,16 +6,15 @@ Start with [`AI_CONTEXT.md`](AI_CONTEXT.md). It defines the project invariants, 
 
 ## Running the Project Locally
 
-Requires Python 3.12+, Node.js (for the Tailwind build), and Docker (for local PostgreSQL) — or a PostgreSQL 16 instance reachable via the `DB_*` variables below.
+Requires Python 3.12+, Node.js (for the Tailwind build), and a PostgreSQL connection string — this project targets [Neon](https://neon.tech) and does not run a local database service.
 
 ```bash
 python -m venv .venv
 .venv\Scripts\activate          # macOS/Linux: source .venv/bin/activate
 pip install -r requirements.txt
 
-cp .env.example .env            # fill in local values; never commit .env
+cp .env.example .env            # set DATABASE_URL to your Neon connection string; never commit .env
 
-docker compose up -d            # starts PostgreSQL on localhost:5432
 python manage.py migrate
 
 npm install
