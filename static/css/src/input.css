@@ -172,3 +172,9 @@
            placeholder:text-outline focus:outline-none focus:border-2 focus:border-secondary
            focus:px-[11px] focus:py-[7px];
 }
+
+/* "Subtle Tag" chip per docs/design-system.md — pair with a semantic bg/text
+   color utility, e.g. class="badge bg-secondary-container text-on-secondary-container". */
+@utility badge {
+    @apply inline-flex items-center gap-1 rounded px-2 py-0.5 text-label-caps;
+}

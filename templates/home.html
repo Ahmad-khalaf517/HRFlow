@@ -2,19 +2,45 @@
 
 {% block title %}Dashboard · HRFlow{% endblock %}
 
+{% block page_title %}
+<h1 class="text-headline-md text-on-surface">Dashboard</h1>
+{% endblock %}
+
 {% block content %}
-<div class="max-w-3xl space-y-4">
-    <div class="card">
-        <h2 class="text-headline-md text-on-surface">Project scaffolding is up</h2>
-        <p class="mt-2 text-body-md text-on-surface-variant">
-            Django, PostgreSQL (Neon), and the design system are wired together. Dashboard cards,
-            employee, attendance, and payroll screens land as their tickets are implemented.
-        </p>
-        <div class="mt-4 flex items-center gap-3">
-            <button type="button" class="btn-primary">Primary action</button>
-            <button type="button" class="btn-secondary">Secondary</button>
-            <button type="button" class="btn-ghost">Ghost</button>
+<div class="max-w-5xl space-y-6">
+    <!-- Stat cards -->
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {% for stat in stats %}
+        <div class="card">
+            <p class="text-label-caps text-on-surface-variant">{{ stat.label }}</p>
+            <p class="text-display text-on-surface mt-2">{{ stat.value }}</p>
         </div>
+        {% endfor %}
+    </div>
+
+    <!-- Setup progress -->
+    <div class="card max-w-2xl">
+        <h2 class="text-headline-md text-on-surface mb-1">Setup progress</h2>
+        <p class="text-body-sm text-on-surface-variant mb-4">
+            What's wired up so far, and what each ticket adds next.
+        </p>
+        <ul class="divide-y divide-outline-variant">
+            {% for step in setup_steps %}
+            <li class="flex items-center justify-between py-3">
+                <span class="text-body-md text-on-surface">{{ step.label }}</span>
+                {% if step.done %}
+                    <span class="badge bg-secondary-container text-on-secondary-container">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-3.5 w-3.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                        </svg>
+                        Done
+                    </span>
+                {% else %}
+                    <span class="badge bg-surface-container text-on-surface-variant">Pending</span>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
     </div>
 </div>
 {% endblock %}
