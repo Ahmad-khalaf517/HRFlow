@@ -8,6 +8,34 @@ The required demonstration flow is:
 Employee -> Contract -> Attendance/Leave -> Payroll -> Payslip -> Payment
 ```
 
+## Running the Project Locally
+
+Requires Python 3.12+, Node.js (for the Tailwind build), and a PostgreSQL connection string — this project targets [Neon](https://neon.tech) and does not run a local database service.
+
+`database/neon_schema.sql` is the executable source of truth for the domain tables. It uses Django's built-in `auth_user` table rather than a competing authentication system, so bootstrap order matters:
+
+```bash
+python -m venv .venv
+.venv\Scripts\activate          # macOS/Linux: source .venv/bin/activate
+pip install -r requirements.txt
+
+cp .env.example .env            # set DATABASE_URL to your Neon connection string; never commit .env
+
+python manage.py migrate        # Django's built-in auth/admin/sessions tables only
+```
+
+Then execute `database/neon_schema.sql` against that same database (Neon SQL Editor or `psql`) to create the domain tables, and reconcile Django's migration state against what the script just created with `migrate --fake-initial`. Do not run Django's own domain migrations independently of this script — both would try to create the same tables.
+
+```bash
+npm install
+npm run build:css               # one-off build; use `npm run watch:css` while developing
+
+python manage.py createsuperuser
+python manage.py runserver
+```
+
+Then visit `http://localhost:8000`. Run `pytest` for the test suite and `ruff check .` for linting.
+
 ## Start Here
 
 | Document | Purpose |
@@ -45,16 +73,6 @@ For each task:
 5. Use a separate review pass before merge.
 
 Never send real employee, salary, bank, tax, payment, credential, log, database, or production data to consumer web AI tools.
-
-## Neon Schema Setup
-
-`database/neon_schema.sql` uses Django's built-in `auth_user` table instead of creating a competing authentication system.
-
-1. Point Django at the Neon database and run the built-in Django migrations so `public.auth_user` exists.
-2. Execute `database/neon_schema.sql` in the Neon SQL Editor or through `psql`.
-3. When domain models are added to Django, make their table/column definitions match this script and review the initial migrations before using `migrate --fake-initial`.
-
-Do not run this DB-first script and normal initial domain migrations independently against the same database; they would both try to create the same tables.
 
 ## Immediate Decision Gate
 

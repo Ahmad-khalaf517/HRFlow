@@ -6,10 +6,12 @@ with include() as each app's views land.
 """
 
 from django.contrib import admin
-from django.urls import path
-from django.views.generic import TemplateView
+from django.urls import include, path
+
+from . import views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", TemplateView.as_view(template_name="home.html"), name="home"),
+    path("accounts/", include("accounts.urls")),
+    path("", views.dashboard, name="home"),
 ]

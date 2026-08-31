@@ -7,6 +7,7 @@ See docs/AI_CONTEXT.md for the project's architecture and invariants.
 import os
 from pathlib import Path
 
+import dj_database_url
 from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -82,17 +83,23 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
+#
+# A single DATABASE_URL (e.g. from Neon) is the only supported configuration —
+# no local database service is required. Include sslmode in the URL itself
+# (Neon connection strings already do: ?sslmode=require).
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get("DB_NAME", "hrflow"),
-        "USER": os.environ.get("DB_USER", "hrflow"),
-        "PASSWORD": os.environ.get("DB_PASSWORD", "hrflow"),
-        "HOST": os.environ.get("DB_HOST", "localhost"),
-        "PORT": os.environ.get("DB_PORT", "5432"),
-    }
-}
+DATABASE_URL = os.environ.get("DATABASE_URL")
+if not DATABASE_URL:
+    raise RuntimeError(
+        "DATABASE_URL is not set. Copy .env.example to .env and set it to your "
+        "PostgreSQL (e.g. Neon) connection string."
+    )
+
+# conn_max_age is left at Django's default (0 = close after each request).
+# Neon's own pooler already handles connection pooling; a persistent Django-side
+# connection on top of it caused the test runner's CREATE/DROP DATABASE calls at
+# test-database setup/teardown to intermittently see the database "still in use".
+DATABASES = {"default": dj_database_url.parse(DATABASE_URL)}
 
 
 # Password validation
