@@ -12,7 +12,7 @@ Stack:
 - Python 3.12+, Django 5.x, PostgreSQL
 - Django Templates and Tailwind CSS
 - Alpine.js/HTMX only for a necessary small interaction
-- pytest, pytest-django, and Ruff
+- Ruff
 - apps: accounts, employees, attendance, payroll
 
 Binding rules:
@@ -35,12 +35,12 @@ First response—do not write code yet. Return:
 2. binding rules and acceptance criteria;
 3. files/interfaces received;
 4. contradictions, missing context, or pending decisions;
-5. a minimal implementation and test plan.
+5. a minimal implementation and review plan.
 
 After approval:
 - change only allowed files;
 - preserve canonical names and public interfaces;
-- add required validation, permissions, constraints, migrations, and tests;
+- add required validation, permissions, constraints, and migrations;
 - keep views thin and business logic in services;
 - do not fabricate files or claim to run commands;
 - return a unified diff or complete changed files;

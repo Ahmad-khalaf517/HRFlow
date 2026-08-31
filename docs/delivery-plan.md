@@ -8,7 +8,7 @@ Deliver one reliable demonstration flow in seven calendar days:
 Employee -> Contract -> Attendance/Leave -> Payroll -> Payslip -> Payment
 ```
 
-This is a synthetic-data MVP, not a production payroll or legal-compliance system. Day 7 is reserved for verification, fixes, and rehearsal; no new mandatory feature starts on Day 7.
+This is a synthetic-data MVP, not a production payroll or legal-compliance system. Day 7 is reserved for manual review, fixes, and rehearsal; no new mandatory feature starts on Day 7.
 
 ## 2. Required Scope
 
@@ -23,7 +23,7 @@ This is a synthetic-data MVP, not a production payroll or legal-compliance syste
 - Immutable `PayrollItem` snapshots and explicit payroll statuses.
 - Printable HTML payslip with employee access limited to their own payslip.
 - One full completed payment per payroll item.
-- Synthetic seed data and one end-to-end demonstration test.
+- Synthetic seed data and one end-to-end demonstration scenario.
 
 ## 3. Cut Line
 
@@ -63,27 +63,27 @@ Payroll consumes attendance through public service functions. Views stay thin; c
 | HRF-03 | Attendance capture and worked/overtime-hour calculations | HRF-02 |
 | HRF-04 | Leave request, approval, overlap validation, and unpaid-leave facts | HRF-02 |
 | HRF-05 | Bonus, manual deduction, and demonstrative tax inputs | HRF-02 |
-| HRF-06 | Payroll calculation service with exact Decimal tests | HRF-03, HRF-04, HRF-05 |
+| HRF-06 | Payroll calculation service with one exact Decimal example and expected result | HRF-03, HRF-04, HRF-05 |
 | HRF-07 | Payroll runs, PayrollItem snapshots, and guarded status transitions | HRF-06 |
 | HRF-08 | Printable payslip and own-record authorization | HRF-07 |
 | HRF-09 | Full payment recording and Paid transition | HRF-07 |
-| HRF-10 | Synthetic seed data, integration tests, UI consistency, and demo | HRF-08, HRF-09 |
+| HRF-10 | Synthetic seed data, manual integration review, UI consistency, and demo | HRF-08, HRF-09 |
 
 ## 6. Seven-Day Sequence
 
 | Day | Required outcome |
 |---|---|
 | 1 | Approve the four pending defaults; freeze ERD and interfaces; set up Django, PostgreSQL, authentication, roles, base UI, and initial synthetic fixtures |
-| 2 | Complete employees and contracts, including constraints, permissions, migrations, and tests |
-| 3 | Complete attendance and simplified leave facts/services with tests |
+| 2 | Complete employees and contracts, including constraints, permissions, migrations, and manual workflow review |
+| 3 | Complete attendance and simplified leave facts/services and review their workflows manually |
 | 4 | Complete payroll inputs and the calculation service against one exact synthetic scenario |
 | 5 | Complete payroll runs, immutable item snapshots, statuses, and real module integration |
-| 6 | Complete payslip access, full payment, end-to-end tests, and required UI polish |
-| 7 | Run the full suite and manual scenario; fix defects; verify permissions and data safety; rehearse the demo |
+| 6 | Complete payslip access, full payment, end-to-end workflow review, and required UI polish |
+| 7 | Run the complete manual scenario; fix defects; review permissions and data safety; rehearse the demo |
 
 ## 7. Ownership and Integration
 
-Assign one accountable owner to each domain: employee, attendance, and payroll. Ownership does not prevent collaboration. Shared responsibilities are authentication, UI consistency, integration, tests, seed data, documentation, and demo readiness.
+Assign one accountable owner to each domain: employee, attendance, and payroll. Ownership does not prevent collaboration. Shared responsibilities are authentication, UI consistency, integration, manual review, seed data, documentation, and demo readiness.
 
 Freeze shared model names and public service signatures before dependent work. Merge small reviewed changes continuously; do not wait for the final days to integrate.
 
@@ -94,8 +94,7 @@ A work package is done only when:
 - its acceptance criteria pass;
 - validation, server-side permissions, and database constraints are present;
 - migrations are included when required;
-- targeted automated tests pass;
-- the affected workflow is manually reviewable;
+- the affected workflow has been manually exercised and its observed result recorded;
 - the diff contains no unrelated changes, secrets, or real HR/payroll data;
 - another person has reviewed the change.
 

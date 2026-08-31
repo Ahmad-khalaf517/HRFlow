@@ -28,7 +28,7 @@ A payslip is a printable view rendered from `PayrollItem`; a separate Payslip da
 - `Employee.employee_number` is unique.
 - At most one active `Contract` exists per employee.
 - `(Attendance.employee, Attendance.date)` is unique.
-- Pending or approved leave requests for one employee cannot overlap; enforce in validation and tests.
+- Pending or approved leave requests for one employee cannot overlap; enforce with application validation and the PostgreSQL exclusion constraint.
 - `(Payroll.month, Payroll.year)` is unique.
 - `(PayrollItem.payroll, PayrollItem.employee)` is unique.
 - `Payment.payroll_item` is unique because the MVP supports one full payment only.

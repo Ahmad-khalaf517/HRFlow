@@ -32,11 +32,11 @@ Stop if a pending decision materially affects implementation.
 
 Use exact expected values for calculations and exact allowed/denied cases for permissions.
 
-## Required Verification
+## Required Review
 
-- Automated tests:
-- Manual check:
-- Migration/check command:
+- Manual workflow review:
+- Migration or framework command:
+- Expected observable result:
 
 ## AI Context Package
 
@@ -44,11 +44,11 @@ Provide only:
 
 - `AI_CONTEXT.md`;
 - this completed brief;
-- relevant source files and existing tests;
+- relevant source files and public interfaces;
 - relevant sections of `business-rules.md` or `erd.md`.
 
 Never include real employee/payroll data, secrets, `.env` files, database dumps, or production logs.
 
 ## Expected AI Output
 
-Before code, the AI must restate the outcome, constraints, received files, blockers, and minimal plan. After implementation, it must return changed files/diff, tests to run, assumptions, and remaining risks without claiming unperformed verification.
+Before code, the AI must restate the outcome, constraints, received files, blockers, and minimal plan. After implementation, it must return changed files/diff, commands to run, assumptions, and remaining risks without claiming unperformed work.

@@ -23,7 +23,7 @@ Turning off model training or using a temporary chat does not authorize uploadin
 - Upload the smallest relevant, sanitized context.
 - Review every file and prompt before uploading.
 - Treat generated code and commands as untrusted until reviewed.
-- Never merge generated changes without tests and human review.
+- Never merge generated changes without reviewing the full diff and manually checking the affected workflow.
 - Report accidental sensitive-data uploads immediately.
 
 ## 4. Application Minimums
