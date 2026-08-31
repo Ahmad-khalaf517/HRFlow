@@ -1,18 +1,28 @@
-# HRFlow Task Brief Template
+# HRFlow Task Brief
 
-Copy this template into the Jira ticket or a temporary task file. One task brief should describe one reviewable change.
+Use one completed brief for one reviewable change.
 
-## Identity
+## Task
 
-- **Ticket:** HRF-___
-- **Title:**
-- **Owner:**
-- **Context version/commit:**
-- **Related decision IDs:**
+- Ticket / title:
+- Owner:
+- Context commit:
+- Required outcome:
 
-## Outcome
+## Scope
 
-Describe the user-visible or system outcome in one or two sentences.
+- In scope:
+- Out of scope:
+- Files allowed to change:
+
+## Binding Context
+
+- Relevant confirmed rules:
+- Relevant models/services/interfaces:
+- Permission or object-access rule:
+- Pending decision IDs: None / Q-___
+
+Stop if a pending decision materially affects implementation.
 
 ## Acceptance Criteria
 
@@ -20,83 +30,25 @@ Describe the user-visible or system outcome in one or two sentences.
 - [ ]
 - [ ]
 
-Use exact examples for calculations, permissions, and status changes.
+Use exact expected values for calculations and exact allowed/denied cases for permissions.
 
-## In Scope
+## Required Verification
 
--
+- Automated tests:
+- Manual check:
+- Migration/check command:
 
-## Out of Scope
+## AI Context Package
 
--
+Provide only:
 
-## Business Rules and Invariants
+- `AI_CONTEXT.md`;
+- this completed brief;
+- relevant source files and existing tests;
+- relevant sections of `business-rules.md` or `erd.md`.
 
-Reference confirmed rules in `business-rules.md`. Repeat the critical rules that directly constrain this task.
+Never include real employee/payroll data, secrets, `.env` files, database dumps, or production logs.
 
--
+## Expected AI Output
 
-## Permissions
-
-| Action | Admin | HR Manager | Payroll Officer | Employee |
-|---|---:|---:|---:|---:|
-| Example | Yes | No | No | Own only |
-
-Include object-level rules such as "employee may access only their own record."
-
-## Inputs and Outputs
-
-- Inputs:
-- Outputs:
-- Validation failures:
-- Side effects/audit events:
-
-## Interfaces and Dependencies
-
-- Models:
-- Public service functions:
-- Templates/pages:
-- Blocking tickets or decisions:
-
-## Files Provided to the AI
-
-List every file included in the context bundle. Do not assume a web AI can inspect the repository.
-
-- `AI_CONTEXT.md`
-- this task brief
--
-
-## Files Allowed to Change
-
--
-
-Changes outside this list require explicit approval.
-
-## Required Tests
-
-- Happy path:
-- Boundary cases:
-- Permission failures:
-- Database constraints:
-- Regression case:
-
-## Manual Verification
-
-1.
-2.
-
-## Definition of Done
-
-- [ ] Acceptance criteria pass.
-- [ ] Validation and permissions are tested.
-- [ ] Migration is included if required.
-- [ ] Targeted tests pass.
-- [ ] Diff contains no unrelated changes or sensitive data.
-- [ ] Documentation is updated when an interface or rule changed.
-- [ ] Human review is complete.
-
-## Open Questions
-
-Do not let an AI invent answers. Reference `open-questions.md` or create a decision proposal.
-
-- None / Q-___
+Before code, the AI must restate the outcome, constraints, received files, blockers, and minimal plan. After implementation, it must return changed files/diff, tests to run, assumptions, and remaining risks without claiming unperformed verification.

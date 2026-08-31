@@ -1,77 +1,66 @@
 # HRFlow — MVP Business Rules
 
-## 1. Scope
+This is the canonical source for HR and payroll behavior. Planning documents may summarize these rules but must not redefine them.
 
-These rules are intentionally limited to a focused MVP. The objective is a reliable demonstration of one complete payroll flow, not a production payroll platform.
+## 1. Decision Status
 
-Advanced cases are explicitly excluded so that developers and AI assistants do not expand the project accidentally.
+Payroll calculation work is blocked until Q-002 through Q-004 are approved. Do not let a developer or AI assistant invent an answer.
 
-## 2. MVP Assumptions
+| ID | Decision | Recommended default | Status |
+|---|---|---|---|
+| Q-001 | HRFlow uses synthetic/demo data and is not used for real payroll | Approve | Pending |
+| Q-002 | Single currency shown in payroll and payslips | USD | Pending |
+| Q-003 | Daily rate = salary / 30; hourly rate = daily rate / contract hours; overtime = hourly rate × 1.5 | Approve | Pending |
+| Q-004 | Leave counts Monday-Friday only; weekends excluded; no holiday calendar | Approve | Pending |
 
-- One company.
-- One configurable currency.
-- Monthly payroll only.
-- Synthetic/demo employee data only.
+The business owner may resolve all four by approving the recommended defaults. Record the approver and date in this section and change each accepted status to `Confirmed`.
+
+## 2. MVP Boundary
+
+- One company, one currency, and monthly payroll only.
+- Synthetic employee and payroll data only.
 - Whole-day attendance and leave rules.
 - One active contract per employee.
-- One simple tax calculation method.
+- One simple demonstrative tax method.
 - One full payment per payroll item.
 - No legal-compliance claim.
-
-The few owner decisions still required are listed in `open-questions.md`.
 
 ## 3. Money
 
 - Use Python `Decimal` and Django `DecimalField`; never use `float`.
-- Store monetary values with two decimal places.
-- Round final component amounts using `ROUND_HALF_UP`.
+- Store money with two decimal places and round final components with `ROUND_HALF_UP`.
 - Negative salary, bonus, deduction, tax, payment, or net-pay values are invalid.
 - Currency conversion is out of scope.
 
 ## 4. Employees and Contracts
 
-- `employee_number` is unique.
-- Salary belongs to `Contract`.
-- An employee can have contract history but only one contract marked active.
+- `employee_number` is unique; salary and fixed allowances belong to `Contract`.
+- An employee may have contract history but only one active contract.
 - Contract `end_date` cannot precede `start_date`.
-- Only active employees with an active contract are included in payroll.
-- Mid-month hires, terminations, contract changes, suspension, and salary proration are out of scope. Demo data must avoid these cases.
-- Historical contracts are deactivated, not deleted when referenced.
+- Payroll includes only active employees with an active contract.
+- Referenced historical contracts are deactivated, not deleted.
+- Proration, mid-month hires/terminations, and mid-period contract changes are out of scope; demo data avoids them.
 
-## 5. Attendance
+## 5. Attendance and Leave
 
-- One attendance record exists per employee and date.
-- Attendance stores check-in, check-out, worked hours, overtime hours, and status.
-- Attendance never stores overtime pay or monetary deductions.
-- `worked_hours` is calculated from check-in/check-out.
-- `overtime_hours = max(worked_hours - contract working_hours_per_day, 0)`.
+- Only one attendance record exists per employee and local work date.
+- Attendance stores check-in, check-out, status, worked hours, and overtime hours—never money.
 - Check-out must be after check-in.
-- Overnight shifts, breaks, grace periods, lateness deductions, biometric devices, and overtime approval are out of scope.
-
-## 6. Leave
-
+- `worked_hours = check_out - check_in`.
+- `overtime_hours = max(worked_hours - contract working_hours_per_day, 0)`.
 - Leave requests use `pending`, `approved`, `rejected`, or `cancelled`.
-- Employees submit requests; HR approves or rejects them.
-- An employee cannot approve their own request.
-- End date cannot precede start date.
-- Overlapping pending or approved requests are rejected.
-- `requested_days` is calculated by the system and is not manually editable.
-- Only approved unpaid leave affects payroll.
-- Half days, leave balances, holiday calendars, carry-over, and complex cancellation rules are out of scope.
+- Employees submit leave; HR approves or rejects it; an employee cannot approve their own request.
+- Leave end date cannot precede start date, and pending/approved requests may not overlap.
+- The system derives `requested_days`; users cannot edit it directly.
+- Only approved unpaid leave inside the payroll month affects payroll.
+- Overnight shifts, breaks, grace periods, lateness deductions, half days, balances, holidays, and complex cancellations are out of scope.
 
-For the MVP, leave day counting follows the approved answer to Q-004.
+## 6. Payroll Inputs and Calculation
 
-## 7. Payroll Period
-
-- Payroll is monthly.
-- Use `month` and `year` as the unique period identity.
-- `period_start` and `period_end` are derived as the first and last calendar dates of that month.
-- Only one payroll run may exist for a month/year.
-- One payroll item exists per included employee.
-
-## 8. Payroll Calculation
-
-High-level formula:
+- Payroll period identity is unique by `month` and `year`; start/end dates are derived from that month.
+- Bonuses and manual deductions are included when active/approved and dated inside the payroll month.
+- Attendance services provide overtime, absence, and approved unpaid-leave totals. Payroll converts these facts into money.
+- One seeded/configured `TaxBracket` selects a matching demonstrative rule; this is not a progressive or legally compliant tax engine.
 
 ```text
 Gross = Basic Salary + Allowances + Overtime Pay + Bonuses
@@ -85,7 +74,7 @@ Absence Deduction
 Net Salary = Gross - Total Deductions
 ```
 
-Recommended MVP formula, pending Q-003 confirmation:
+Pending Q-003 confirmation:
 
 ```text
 Daily Rate = Basic Salary / 30
@@ -93,78 +82,38 @@ Hourly Rate = Daily Rate / Contract Working Hours Per Day
 Overtime Pay = Overtime Hours * Hourly Rate * 1.5
 Absence Deduction = Absence Days * Daily Rate
 Unpaid Leave Deduction = Unpaid Leave Days * Daily Rate
+Tax = Fixed Amount + (Gross * Percentage / 100)
 ```
 
-Allowances use the active contract's fixed monthly allowance. Bonuses and manual deductions are included when their effective date falls inside the payroll month and their status is active/approved.
+## 7. Snapshot and Workflow
 
-### Simple demonstrative tax
+- One `PayrollItem` exists per payroll and included employee.
+- `PayrollItem` stores every contract input, fact, monetary component, currency, and calculation version required to reproduce the result.
+- Payslips render from the saved item. They never recalculate from current contract data.
+- Payroll status is `Draft -> Calculated -> Reviewed -> Approved -> Paid`.
+- Status changes use explicit services and record the responsible user and timestamp.
+- Approved payroll cannot be recalculated or edited through normal flows.
+- Correction/reversal runs and enforced separation of duties are out of scope.
 
-`TaxBracket` selects one matching bracket using gross salary:
-
-```text
-min_amount <= gross_salary <= max_amount
-```
-
-`max_amount = NULL` means no upper limit.
-
-```text
-Tax = fixed_amount + (gross_salary * percentage / 100)
-```
-
-This is a simple demonstrative rule, not a progressive or legally compliant tax engine.
-
-## 9. Payroll Snapshot
-
-`PayrollItem` stores the values used for that employee and month:
-
-- basic salary and allowances;
-- overtime hours and amount;
-- bonuses;
-- absence and unpaid-leave days/deductions;
-- manual deductions and tax;
-- gross, total deductions, and net salary.
-
-Old payslips use these saved values. They must never recalculate from the employee's current contract.
-
-## 10. Payroll Workflow
-
-```text
-Draft -> Calculated -> Reviewed -> Approved -> Paid
-```
-
-- Payroll Officer may calculate, review, and approve in the MVP.
-- Admin may perform all payroll actions.
-- Each transition records the responsible user and timestamp where the model provides the field.
-- Approved payroll cannot be recalculated through the normal UI.
-- Correction/reversal workflows and separation of duties are out of scope.
-- If approved payroll is wrong during the demo, an Admin corrects the demo data and recreates the run before payment.
-
-## 11. Payments
+## 8. Payment
 
 - Payment is allowed only for an approved payroll item.
-- MVP payment amount must equal the payroll item's net salary.
-- Saving the completed payment marks the item paid.
-- Payroll becomes `Paid` after every payroll item has one completed full payment.
-- Partial payments, overpayments, failed-payment processing, refunds, and reversals are out of scope.
+- One completed payment must equal the item's net salary.
+- Saving that payment marks the item paid; payroll becomes `Paid` after every item is fully paid.
+- Partial, excessive, failed, refunded, and reversed payments are out of scope.
 
-## 12. Permissions
+## 9. Permissions
 
-- Admin: full access.
-- HR Manager: employees, contracts, attendance, and leave approval.
-- Payroll Officer: payroll inputs, calculation, review, approval, payslips, and payments.
-- Employee: own profile, attendance, leave requests, and payslips only.
+| Area | Admin | HR Manager | Payroll Officer | Employee |
+|---|---|---|---|---|
+| Employees/contracts | Manage | Manage | View | Own only |
+| Attendance/leave | Manage | Manage/approve | View | Own/submit |
+| Payroll inputs and runs | Manage | No | Manage | No |
+| Payslips | All | Limited | All | Own only |
+| Payments | Manage | No | Manage | No |
 
-Permissions are enforced server-side. Hiding a navigation item is not authorization.
+Authorization is enforced server-side and at object level. Navigation visibility is not authorization.
 
-## 13. Explicitly Out of Scope
+## 10. Explicitly Out of Scope
 
-- Real payroll/legal compliance.
-- Multiple companies, countries, currencies, or pay frequencies.
-- Proration and mid-period contract changes.
-- Progressive taxes, exemptions, benefits, and social contributions.
-- Complex shifts, breaks, holidays, and leave balances.
-- Separate reviewer/approver enforcement.
-- Payroll corrections, reversals, and retroactive adjustments.
-- Partial or failed payment workflows.
-- Bank integration, accounting integration, and notifications.
-- General-purpose audit-log subsystem.
+Recruitment, performance management, multiple companies/countries/currencies, advanced reports, complex shifts or leave, progressive taxes, legal compliance, proration, retroactive corrections, partial payments, bank/accounting integrations, notifications, and a general-purpose audit subsystem.

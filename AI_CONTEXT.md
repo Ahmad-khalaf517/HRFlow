@@ -1,141 +1,65 @@
 # HRFlow AI Context
 
-Use this file as the first context supplied to any AI assistant working on this repository. It is intentionally short. Detailed rules live in the linked documents and in the current task brief.
+Read this file before changing the repository. HRFlow is a seven-calendar-day Django HR/payroll MVP using synthetic data.
 
-## Instruction Priority
+## Goal and Priority
 
-When instructions conflict, use this order:
-
-1. The current human request and approved task brief.
-2. This file.
-3. Approved decisions in `docs/decisions/` and confirmed rules in `docs/business-rules.md`.
-4. Existing code, tests, and public service interfaces.
-5. Other project documentation.
-
-Do not resolve a conflict silently. Report it before changing code.
-
-## Product and Scope
-
-HRFlow is a focused HR and payroll Django MVP. The primary goal is one reliable flow:
+The required flow is:
 
 ```text
 Employee -> Contract -> Attendance/Leave -> Payroll -> Payslip -> Payment
 ```
 
-Recruitment, performance management, biometric integration, bank APIs, multi-company tenancy, multi-country compliance, and advanced accounting are outside the MVP.
+When instructions conflict, follow: current human request/task brief, this file, confirmed rules in `docs/business-rules.md`, existing code/tests/interfaces, then other documentation. Report conflicts instead of resolving them silently.
 
-This repository is currently a design specification. Keep the implementation deliberately small. The four unresolved items in `docs/open-questions.md` must not be invented during implementation.
+## Locked Architecture
 
-## Technology and Architecture
+- Python 3.12+, Django 5.x, PostgreSQL.
+- Django Templates and Tailwind CSS.
+- Alpine.js or HTMX only for a specific small interaction.
+- pytest, pytest-django, and Ruff.
+- Primary apps: `accounts`, `employees`, `attendance`, `payroll`.
+- Dependency direction: `accounts -> employees -> attendance -> payroll`.
 
-- Python 3.12+
-- Django 5.x
-- PostgreSQL
-- Django Templates and Tailwind CSS
-- Alpine.js only for small interactions
-- HTMX only where it clearly reduces complexity
-- pytest and pytest-django
-
-Primary Django apps:
-
-```text
-accounts
-employees
-attendance
-payroll
-```
-
-Do not add another primary app without explicit approval.
+Do not add another primary app or a large frontend framework without approval. Payroll consumes attendance through public service functions.
 
 ## Canonical Domain Names
 
-```text
-Department
-Position
-Employee
-Contract
-Attendance
-LeaveType
-LeaveRequest
-Bonus
-ManualDeduction
-TaxBracket
-Payroll
-PayrollItem
-Payslip
-Payment
-```
+`Department`, `Position`, `Employee`, `Contract`, `Attendance`, `LeaveType`, `LeaveRequest`, `Bonus`, `ManualDeduction`, `TaxBracket`, `Payroll`, `PayrollItem`, `Payslip`, `Payment`.
 
-Do not rename these or introduce synonyms for them without an approved decision.
+`Payslip` is the rendered business concept; a separate database model is not required for the MVP.
 
-## Non-Negotiable Invariants
+## Non-Negotiable Rules
 
-- Use `Decimal` and `DecimalField` for money; never use binary floating point.
-- Attendance stores work facts and hours, not monetary amounts.
-- Payroll services translate approved HR facts into money.
-- A `PayrollItem` is a historical snapshot. Old payslips never use current contract values.
-- Approved payroll cannot be recalculated or edited through normal flows.
-- One employee may have contract history, but only one contract may be active.
-- One attendance record exists per employee and local work date.
-- Employees may access only their own private HR and payslip data.
-- Every privileged workflow must enforce authorization on the server, not only in navigation or templates.
+- Use `Decimal`/`DecimalField` for money; never use float.
+- Attendance stores facts and hours, not money.
+- One active contract may exist per employee.
+- One attendance row may exist per employee and local work date.
+- `PayrollItem` is an immutable historical snapshot.
+- Approved payroll cannot be recalculated or edited normally.
+- Employees may access only their own private records and payslips.
+- Enforce permissions server-side and at object level.
+- Status transitions use services and record the actor/time.
 - Model changes require migrations and constraint tests.
-- Payroll status changes use explicit service operations and record the responsible user/timestamp.
-- Do not expand the MVP with proration, legal compliance, complex shifts/leave, correction runs, partial payments, or separation-of-duties workflows.
+- Use synthetic data only.
+- Do not add proration, complex shifts/leave, legal compliance, correction runs, partial payments, integrations, or separation-of-duties workflows.
 
-## Dependency Direction
+The decision table in `docs/business-rules.md` is authoritative. Do not implement a pending currency, rate, overtime, or leave-calendar policy.
 
-```text
-accounts -> employees -> attendance -> payroll
-```
+## Change Workflow
 
-Payroll should consume attendance through public service functions. Avoid circular imports and duplicated business logic.
+Before editing, read the task brief, relevant rules, implementation, and tests. Restate the bounded outcome, allowed files, acceptance criteria, and blockers.
 
-## Change Rules
+While editing, keep the diff small, preserve names/interfaces, keep views thin, put calculations/transitions in services, and avoid unrelated refactors.
 
-Before editing:
-
-1. Read this file, the task brief, relevant approved decisions, existing implementation, and related tests.
-2. Restate the goal, constraints, files in scope, and unresolved questions.
-3. Stop if an unresolved business decision would materially affect the result.
-
-While editing:
-
-- Keep the diff bounded to the task.
-- Preserve existing architecture and terminology.
-- Do not refactor unrelated code.
-- Add database constraints where they protect an invariant.
-- Keep views thin and calculations in services.
-- Never expose secrets, credentials, or real employee/payroll data.
-
-Before completion:
-
-- Run targeted tests and report the exact commands and results.
-- Inspect the diff for unrelated changes and sensitive data.
-- Report assumptions, risks, migrations, and manual checks.
-- Never claim a test or command was run when it was not.
-
-## Definition of Done
-
-A change is done only when:
-
-- acceptance criteria pass;
-- validation and permissions are enforced;
-- migrations are included when needed;
-- relevant automated tests pass;
-- the affected workflow is manually reviewable;
-- documentation is updated when behavior or an interface changed;
-- the diff has been human-reviewed before merge.
-
-## Data Safety
-
-Follow `docs/security-and-data-policy.md`. Consumer web AI tools may receive only approved, sanitized context. Never upload real employee records, salaries, bank information, leave reasons, credentials, production logs, database dumps, or private keys.
+Before completion, run targeted tests, inspect the full diff, check for sensitive data, and report exact results, assumptions, migrations, manual checks, and remaining risks. Never claim to have run a command that was not run.
 
 ## Required References
 
-- Business rules: `docs/business-rules.md`
-- Unresolved decisions: `docs/open-questions.md`
-- Security and AI data policy: `docs/security-and-data-policy.md`
-- Testing strategy: `docs/testing-strategy.md`
-- AI-assisted workflow: `docs/ai-agent-guide.md`
-- Task template: `docs/task-brief-template.md`
+- Seven-day scope and sequence: `docs/delivery-plan.md`
+- Canonical rules and decisions: `docs/business-rules.md`
+- Minimum data design: `docs/erd.md`
+- Executable PostgreSQL schema: `database/neon_schema.sql`
+- Verification: `docs/testing-strategy.md`
+- Security and AI data handling: `docs/security-and-data-policy.md`
+- Per-task scope: `docs/task-brief-template.md`
