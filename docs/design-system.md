@@ -1,175 +1,170 @@
----
-name: Deep Equity System
-colors:
-  surface: '#f8f9ff'
-  surface-dim: '#ccdbf3'
-  surface-bright: '#f8f9ff'
-  surface-container-lowest: '#ffffff'
-  surface-container-low: '#eff4ff'
-  surface-container: '#e6eeff'
-  surface-container-high: '#dce9ff'
-  surface-container-highest: '#d5e3fc'
-  on-surface: '#0d1c2e'
-  on-surface-variant: '#41484b'
-  inverse-surface: '#233144'
-  inverse-on-surface: '#eaf1ff'
-  outline: '#71787c'
-  outline-variant: '#c1c7cb'
-  surface-tint: '#3d6473'
-  primary: '#00222c'
-  on-primary: '#ffffff'
-  primary-container: '#0c3846'
-  on-primary-container: '#7ba1b2'
-  inverse-primary: '#a5ccde'
-  secondary: '#18677a'
-  on-secondary: '#ffffff'
-  secondary-container: '#a3e7fe'
-  on-secondary-container: '#1c697d'
-  tertiary: '#00222b'
-  on-tertiary: '#ffffff'
-  tertiary-container: '#003945'
-  on-tertiary-container: '#54a7be'
-  error: '#ba1a1a'
-  on-error: '#ffffff'
-  error-container: '#ffdad6'
-  on-error-container: '#93000a'
-  primary-fixed: '#c1e9fb'
-  primary-fixed-dim: '#a5ccde'
-  on-primary-fixed: '#001f29'
-  on-primary-fixed-variant: '#244c5a'
-  secondary-fixed: '#b2ebff'
-  secondary-fixed-dim: '#8dd0e7'
-  on-secondary-fixed: '#001f27'
-  on-secondary-fixed-variant: '#004e5f'
-  tertiary-fixed: '#b1ecff'
-  tertiary-fixed-dim: '#81d2eb'
-  on-tertiary-fixed: '#001f27'
-  on-tertiary-fixed-variant: '#004e5e'
-  background: '#f8f9ff'
-  on-background: '#0d1c2e'
-  surface-variant: '#d5e3fc'
-typography:
-  display:
-    fontFamily: Hanken Grotesk
-    fontSize: 32px
-    fontWeight: '700'
-    lineHeight: 40px
-    letterSpacing: -0.02em
-  headline-lg:
-    fontFamily: Hanken Grotesk
-    fontSize: 24px
-    fontWeight: '600'
-    lineHeight: 32px
-  headline-md:
-    fontFamily: Hanken Grotesk
-    fontSize: 20px
-    fontWeight: '600'
-    lineHeight: 28px
-  body-lg:
-    fontFamily: Hanken Grotesk
-    fontSize: 16px
-    fontWeight: '400'
-    lineHeight: 24px
-  body-md:
-    fontFamily: Hanken Grotesk
-    fontSize: 14px
-    fontWeight: '400'
-    lineHeight: 20px
-  body-sm:
-    fontFamily: Hanken Grotesk
-    fontSize: 13px
-    fontWeight: '400'
-    lineHeight: 18px
-  label-caps:
-    fontFamily: Hanken Grotesk
-    fontSize: 12px
-    fontWeight: '700'
-    lineHeight: 16px
-    letterSpacing: 0.05em
-  data-mono:
-    fontFamily: JetBrains Mono
-    fontSize: 13px
-    fontWeight: '400'
-    lineHeight: 18px
-rounded:
-  sm: 0.125rem
-  DEFAULT: 0.25rem
-  md: 0.375rem
-  lg: 0.5rem
-  xl: 0.75rem
-  full: 9999px
-spacing:
-  unit: 4px
-  container-padding: 24px
-  gutter: 16px
-  row-height-dense: 32px
-  row-height-standard: 48px
----
+# HRFlow — Deep Equity Design System
 
-## Brand & Style
-The design system is engineered for the high-stakes environment of HR and Payroll management. The brand personality is rooted in **precision, stability, and quiet authority**. It moves away from consumer-grade trends like glassmorphism or playfulness, favoring a **Modern Corporate** aesthetic that prioritizes data legibility and administrative efficiency.
+The shipped interface uses the **Deep Equity** system: a compact, stable administrative UI optimized for legibility and repeatable payroll/HR workflows.
 
-The visual language communicates trustworthiness through structural alignment and a disciplined color palette. The UI should evoke a sense of calm under pressure, ensuring that complex financial data and employee records are accessible without visual fatigue. The focus is on utilitarian beauty—where "good design" is defined by how quickly a user can reconcile a ledger or process a payroll run.
+The executable token and component source is `static/css/src/input.css`. This document explains how to apply it. Keep both files synchronized.
 
-## Colors
-The palette is a monochromatic progression of teals and blues designed to create a focused, "heads-down" working environment.
+## 1. Visual principles
 
-- **Primary (#0C3846):** Used for global navigation, primary actions, and high-level headers to establish authority.
-- **Secondary & Tertiary:** Used for interactive elements, active states, and icon accents to guide the eye.
-- **Surface Ice (#E4F4F8):** Acts as the primary background color for page sections to reduce the harshness of pure white while maintaining high contrast.
-- **Semantic Colors:** Chosen for WCAG AA compliance against both White and Surface Ice backgrounds. Use these sparingly for status indicators, validation messages, and critical alerts.
+- Prefer precision, stability, and quiet authority over decorative effects.
+- Use flat tonal layers and one-pixel borders; do not add gradients, glass effects, or routine drop shadows.
+- Keep layouts compact and aligned to a four-pixel rhythm.
+- Use semantic color only for status, validation, or critical feedback.
+- Reuse shared utilities before adding one-off class combinations.
+- Preserve readable focus, disabled, error, empty, and loading states.
 
-## Typography
-This design system utilizes **Hanken Grotesk** for its contemporary, sharp terminals and exceptional readability in dense layouts. For financial figures, IDs, and tabular data, **JetBrains Mono** is employed to ensure character alignment and prevent "jumping" numbers.
+## 2. Color tokens
 
-- **Headlines:** Use a tighter letter-spacing to maintain a professional, compact feel.
-- **Body Text:** The standard size is 14px (`body-md`) for internal tools, allowing for higher information density without sacrificing legibility.
-- **Data Tables:** Always use `data-mono` for currency and numeric values to facilitate easy vertical scanning and comparison.
+Use token utilities such as `bg-primary` and `text-on-surface`; do not copy arbitrary hex colors into templates.
 
-## Layout & Spacing
-The layout follows a **Fluid Grid** model with strict 4px increments (the "Base 4" system). This ensures components remain compact but comfortable.
+### Surfaces and text
 
-- **Desktop Layout:** 12-column grid with 16px gutters. Left-hand navigation is fixed at 240px.
-- **Density:** Provide two density modes. "Standard" for general browsing and "Compact" for large-scale data entry/payroll reconciliation where vertical space is at a premium.
-- **Alignment:** All form elements and data points should align to a strict vertical rhythm to emphasize the "precise" nature of the software.
+| Token | Value | Typical use |
+|---|---:|---|
+| `background`, `surface`, `surface-bright` | `#F8F9FF` | Page background |
+| `surface-dim` | `#CCDBF3` | Stronger tonal separation |
+| `surface-container-lowest` | `#FFFFFF` | Header and highest-contrast content |
+| `surface-container-low` | `#EFF4FF` | Hover or quiet container |
+| `surface-container` | `#E6EEFF` | Secondary container |
+| `surface-container-high` | `#DCE9FF` | Stronger container |
+| `surface-container-highest`, `surface-variant` | `#D5E3FC` | Highest tonal container |
+| `on-surface`, `on-background` | `#0D1C2E` | Primary text |
+| `on-surface-variant` | `#41484B` | Secondary text |
+| `outline` | `#71787C` | Strong border/text outline |
+| `outline-variant` | `#C1C7CB` | Default card/input border |
 
-## Elevation & Depth
-In alignment with the "no excessive shadows" requirement, this design system uses **Tonal Layering** and **Subtle Borders** instead of elevation.
+### Brand and semantic colors
 
-- **Flat Surface:** The main background is `Surface Ice`. 
-- **Raised Surface:** Content cards use `White` with a 1px border of `Light Blue (#9FD3E3)` or a subtle `Slate-200`.
-- **Active State:** Elements being hovered or selected do not rise; instead, they receive a 2px interior border or a subtle background shift to `Secondary Blue`.
-- **Dividers:** Use 1px solid lines in `Light Blue` for logical separation within cards and lists.
+| Token | Value | Typical use |
+|---|---:|---|
+| `primary` | `#00222C` | Sidebar, primary button, strong brand surface |
+| `on-primary` | `#FFFFFF` | Text on primary |
+| `primary-container` | `#0C3846` | Active navigation and primary hover |
+| `on-primary-container` | `#7BA1B2` | Quiet content on primary container |
+| `secondary` | `#18677A` | Focus border and secondary interaction |
+| `on-secondary` | `#FFFFFF` | Text on secondary |
+| `secondary-container` | `#A3E7FE` | Positive/informational badge background |
+| `on-secondary-container` | `#1C697D` | Badge text |
+| `tertiary` | `#00222B` | Reserved accent |
+| `tertiary-container` | `#003945` | Reserved accent container |
+| `error` | `#BA1A1A` | Error text/action |
+| `on-error` | `#FFFFFF` | Text on error |
+| `error-container` | `#FFDAD6` | Error message background |
+| `on-error-container` | `#93000A` | Error message text |
 
-## Shapes
-The shape language is primarily **Soft (0.25rem)**. This provides a professional edge that feels modern without being overly clinical or sharp. 
+The CSS also defines inverse and fixed color variants. Use them only when an interface state specifically needs them; consult `@theme` in `input.css` for the exact token.
 
-- **Inputs and Buttons:** Use `rounded` (4px).
-- **Cards and Containers:** Use `rounded` (4px). Avoid `rounded-lg` or `rounded-xl` to maintain a structured, spreadsheet-adjacent aesthetic.
-- **Avatars:** Use circles only for employee photos to provide a single point of organic contrast in the grid.
+## 3. Typography
 
-## Components
+Google Fonts currently loads Hanken Grotesk weights 400, 600, and 700 plus JetBrains Mono 400.
+
+| Utility | Size / line | Weight | Use |
+|---|---:|---:|---|
+| `text-display` | 32 / 40px | 700 | Dashboard totals and rare page emphasis |
+| `text-headline-lg` | 24 / 32px | 600 | Major page heading |
+| `text-headline-md` | 20 / 28px | 600 | Section/card heading |
+| `text-body-lg` | 16 / 24px | 400 | Prominent body copy |
+| `text-body-md` | 14 / 20px | 400 | Default application text |
+| `text-body-sm` | 13 / 18px | 400 | Supporting text, labels, hints |
+| `text-label-caps` | 12 / 16px | 700 | Table headers and badges; uppercase |
+| `text-data-mono` | 13 / 18px | 400 | Currency, identifiers, and aligned numeric data |
+
+Do not use monospace for ordinary prose. Use it consistently for financial values and IDs in tables.
+
+## 4. Spacing, shape, and layout
+
+- Base spacing unit: `4px` (`0.25rem`).
+- Default control/card radius: `4px` via `rounded`.
+- Small radius: `2px`; medium: `6px`; large: `8px`; extra large: `12px`.
+- Avoid `rounded-lg`/`rounded-xl` on routine controls and cards.
+- Main desktop sidebar: fixed `240px`; hidden below Tailwind's `md` breakpoint in the current shell.
+- Top header: `64px` high.
+- Page padding: `16px` on small screens and `24px` from `md` upward.
+- Default content gutter: `16px`.
+- Dense table row target: `32px`; standard table row target: `48px`.
+
+The current mobile shell hides the sidebar and does not yet provide a replacement navigation control. Treat mobile navigation as a scoped UI task, not as already implemented behavior.
+
+## 5. Shipped component utilities
+
+These utilities are defined in `static/css/src/input.css` and should be reused directly.
 
 ### Buttons
-- **Primary:** Solid `Deep Teal`, White text, 4px corner radius. No gradient.
-- **Secondary:** Outline `Deep Teal` with a 1px border.
-- **Ghost:** No border, `Deep Teal` text, light `Surface Ice` background on hover.
 
-### Input Fields
-- **Default State:** 1px border in `Light Blue`, `White` background.
-- **Focus State:** 2px border in `Secondary Blue`, no outer glow.
-- **Labels:** Always top-aligned, using `body-sm` weight 600 for clarity.
+- `btn-primary`: primary background, white text, primary-container hover.
+- `btn-secondary`: transparent background, primary outline/text, low-surface hover.
+- `btn-ghost`: no border, primary text, low-surface hover.
 
-### Data Tables
-- **Header:** Background `Deep Teal`, text `White`, `label-caps` typography.
-- **Rows:** Alternate row striping (Zebra) using `Surface Ice`. 1px horizontal borders only.
-- **Cells:** Vertical padding of 8px (Dense) or 12px (Standard).
+All include inline-flex alignment, 4px radius, compact padding, disabled opacity, and disabled pointer behavior.
 
-### Chips & Status Indicators
-- Use a "Subtle Tag" style: Light semantic background with high-contrast text (e.g., Light Green background with Dark Green text for "Paid").
+### Card
 
-### Lists
-- Multi-line lists for employee directories should use `body-md` for the name and `body-sm` in `Neutral` for the job title/department.
+`card` provides a white surface, `outline-variant` border, 4px radius, and 24px padding. It intentionally has no shadow.
 
-### Iconography
-- Use 20px or 24px **Outline Icons** with a consistent 1.5pt stroke weight. Do not use filled icons unless they represent an active/selected state in the navigation.
+### Input
+
+`input` provides a white background, one-pixel `outline-variant` border, body typography, and a two-pixel `secondary` focus border without an outer glow.
+
+Use `templates/components/field.html` for standard form labels, required markers, help text, widget styling, and errors.
+
+### Badge
+
+`badge` provides layout, compact spacing, radius, and label typography. Pair it with semantic token utilities, for example:
+
+```html
+<span class="badge bg-secondary-container text-on-secondary-container">Done</span>
+<span class="badge bg-error-container text-on-error-container">Failed</span>
+```
+
+## 6. Planned patterns
+
+The following conventions are approved but do not yet have shared utilities/components:
+
+- data tables with label-caps headers, numeric `text-data-mono` cells, horizontal dividers, and optional dense/standard spacing;
+- subtle semantic status chips;
+- multi-line employee list rows using body-md plus body-sm metadata;
+- 20px or 24px outline icons with an approximately 1.5px stroke;
+- pagination, modal, empty-state, and loading-state patterns.
+
+Create these only when a task needs them, then add a reusable component or utility and document it here.
+
+## 7. Template rules
+
+- Auth pages extend `templates/auth_base.html`.
+- Authenticated application pages extend `templates/base.html`.
+- Reuse `templates/components/field.html` for Django form fields.
+- Use the shared `{% block title %}`, `{% block page_title %}`, and `{% block content %}` structure.
+- Keep authorization in views/services; hiding navigation is not authorization.
+- Keep forms keyboard accessible, retain visible focus, and associate labels and errors with fields.
+
+## 8. Tailwind workflow
+
+Tailwind 4 uses CSS-first configuration; there is no JavaScript Tailwind config file.
+
+```powershell
+npm ci
+npm run watch:css
+```
+
+For a reviewable build:
+
+```powershell
+npm run build:css
+```
+
+Source: `static/css/src/input.css`  
+Generated artifact: `static/css/dist/output.css`
+
+The generated artifact is tracked. Any change to tokens, utilities, or template class names must include a rebuilt `output.css` and a visual check at relevant desktop/mobile widths.
+
+## 9. UI review checklist
+
+- Uses only design tokens or documented semantic colors.
+- Reuses shipped utilities/components.
+- Maintains the 4px rhythm and restrained radius.
+- Uses JetBrains Mono for financial/identifier data.
+- Includes hover, focus, disabled, validation, and empty states where relevant.
+- Has no routine gradients, glass effects, or shadows.
+- Works with keyboard navigation and readable contrast.
+- Rebuilds and commits `output.css`.
+- Preserves server-side permissions independent of navigation visibility.
