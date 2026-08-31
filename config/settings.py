@@ -84,19 +84,19 @@ WSGI_APPLICATION = "config.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 #
-# A single DATABASE_URL (e.g. from Neon) is the only supported configuration —
+# A single DATABASE_URL (e.g. from Supabase) is the only supported configuration —
 # no local database service is required. Include sslmode in the URL itself
-# (Neon connection strings already do: ?sslmode=require).
+# (Supabase connection strings already do: ?sslmode=require).
 
 DATABASE_URL = os.environ.get("DATABASE_URL")
 if not DATABASE_URL:
     raise RuntimeError(
         "DATABASE_URL is not set. Copy .env.example to .env and set it to your "
-        "PostgreSQL (e.g. Neon) connection string."
+        "PostgreSQL (e.g. Supabase) connection string."
     )
 
 # conn_max_age is left at Django's default (0 = close after each request).
-# Neon's own pooler already handles connection pooling; a persistent Django-side
+# Supabase's own pooler already handles connection pooling; a persistent Django-side
 # connection on top of it caused the test runner's CREATE/DROP DATABASE calls at
 # test-database setup/teardown to intermittently see the database "still in use".
 DATABASES = {"default": dj_database_url.parse(DATABASE_URL)}
