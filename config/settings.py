@@ -95,7 +95,11 @@ if not DATABASE_URL:
         "PostgreSQL (e.g. Neon) connection string."
     )
 
-DATABASES = {"default": dj_database_url.parse(DATABASE_URL, conn_max_age=600)}
+# conn_max_age is left at Django's default (0 = close after each request).
+# Neon's own pooler already handles connection pooling; a persistent Django-side
+# connection on top of it caused the test runner's CREATE/DROP DATABASE calls at
+# test-database setup/teardown to intermittently see the database "still in use".
+DATABASES = {"default": dj_database_url.parse(DATABASE_URL)}
 
 
 # Password validation
