@@ -326,10 +326,12 @@ class EmployeeDeactivateView(
         )
 
         employee.employment_status = "inactive"
+        employee.is_active = False
 
         employee.save(
             update_fields=[
                 "employment_status",
+                "is_active",
                 "updated_at",
             ]
         )
@@ -366,10 +368,12 @@ class EmployeeReactivateView(
         )
 
         employee.employment_status = "active"
+        employee.is_active = True
 
         employee.save(
             update_fields=[
                 "employment_status",
+                "is_active",
                 "updated_at",
             ]
         )
@@ -406,10 +410,12 @@ class EmployeeTerminateView(
         )
 
         employee.employment_status = "terminated"
+        employee.is_active = False
 
         employee.save(
             update_fields=[
                 "employment_status",
+                "is_active",
                 "updated_at",
             ]
         )
