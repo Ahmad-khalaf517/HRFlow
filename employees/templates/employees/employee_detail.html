@@ -1,0 +1,438 @@
+{% extends "base.html" %}
+
+{% block title %}
+Employee Details
+{% endblock %}
+
+
+{% block content %}
+
+<div class="space-y-6">
+
+    <!-- HEADER -->
+
+    <div class="flex items-center justify-between">
+
+        <div>
+
+            <h1 class="text-headline-lg text-on-surface">
+                Employee Details
+            </h1>
+
+            <p class="text-body-md text-on-surface-variant">
+                View employee information and employment details.
+            </p>
+
+        </div>
+
+
+        <div class="flex items-center gap-3">
+
+            <!-- EDIT EMPLOYEE -->
+
+            <a
+                href="{% url 'employees:employee-update' employee.pk %}"
+                class="rounded bg-primary px-4 py-2 text-body-md text-white"
+            >
+                Edit Employee
+            </a>
+
+
+            <!-- DEACTIVATE EMPLOYEE -->
+
+            <!-- EMPLOYEE STATUS ACTIONS -->
+
+
+            {% if employee.employment_status == "active" %}
+
+                <!-- DEACTIVATE -->
+
+                <form
+                    method="post"
+                    action="{% url 'employees:employee-deactivate' employee.pk %}"
+                    onsubmit="return confirm('Are you sure you want to deactivate this employee?');"
+                >
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="rounded border border-outline-variant px-4 py-2 text-body-md text-on-surface"
+                    >
+                        Deactivate
+                    </button>
+                </form>
+
+
+                <!-- TERMINATE -->
+
+
+                <form
+                    method="post"
+                    action="{% url 'employees:employee-terminate' employee.pk %}"
+                    onsubmit="return confirm('Are you sure you want to terminate this employee? This action will change their employment status to Terminated.');"
+                >
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="rounded border border-outline-variant bg-red-600 px-4 py-2 text-body-md text-red hover:bg-red-700"
+                    >
+                        Terminate
+                    </button>
+
+                </form>
+
+
+            {% elif employee.employment_status == "inactive" %}
+
+                <!-- REACTIVATE -->
+
+                <form
+                    method="post"
+                    action="{% url 'employees:employee-reactivate' employee.pk %}"
+                    onsubmit="return confirm('Are you sure you want to reactivate this employee?');"
+                >
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="rounded bg-primary px-4 py-2 text-body-md text-white"
+                    >
+                        Reactivate
+                    </button>
+                </form>
+
+
+            {% elif employee.employment_status == "terminated" %}
+
+                <!-- TERMINATED EMPLOYEE -->
+
+                <span
+                    class="rounded bg-error-container px-4 py-2 text-body-md text-on-error-container"
+                >
+                    Employee Terminated
+                </span>
+
+            {% endif %}
+
+            <!-- BACK -->
+
+            <a
+                href="{% url 'employees:employee-list' %}"
+                class="rounded border border-outline-variant px-4 py-2 text-body-md text-on-surface"
+            >
+                Back to Employees
+            </a>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- EMPLOYEE PROFILE -->
+
+    <div
+        class="rounded border border-outline-variant bg-surface-container-lowest p-6"
+    >
+
+        <div class="flex items-center gap-4">
+
+
+            <!-- AVATAR -->
+
+            <div
+                class="flex h-16 w-16 items-center justify-center rounded bg-secondary-container text-xl font-bold text-on-secondary-container"
+            >
+
+                {{ employee.first_name|first }}{{ employee.last_name|first }}
+
+            </div>
+
+
+            <!-- NAME -->
+
+            <div>
+
+                <h2 class="text-headline-md text-on-surface">
+
+                    {{ employee.first_name }}
+                    {{ employee.last_name }}
+
+                </h2>
+
+
+                <p class="text-body-md text-on-surface-variant">
+
+                    {{ employee.employee_number }}
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- PERSONAL INFORMATION -->
+
+    <div
+        class="rounded border border-outline-variant bg-surface-container-lowest p-6"
+    >
+
+        <h2 class="mb-6 text-headline-sm text-on-surface">
+            Personal Information
+        </h2>
+
+
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+
+
+            <div>
+
+                <p class="text-label-caps text-on-surface-variant">
+                    Email
+                </p>
+
+                <p class="text-body-md text-on-surface">
+                    {{ employee.email }}
+                </p>
+
+            </div>
+
+
+            <div>
+
+                <p class="text-label-caps text-on-surface-variant">
+                    Phone
+                </p>
+
+                <p class="text-body-md text-on-surface">
+
+                    {% if employee.phone %}
+                        {{ employee.phone }}
+                    {% else %}
+                        —
+                    {% endif %}
+
+                </p>
+
+            </div>
+
+
+            <div>
+
+                <p class="text-label-caps text-on-surface-variant">
+                    Date of Birth
+                </p>
+
+                <p class="text-body-md text-on-surface">
+
+                    {% if employee.date_of_birth %}
+                        {{ employee.date_of_birth|date:"M d, Y" }}
+                    {% else %}
+                        —
+                    {% endif %}
+
+                </p>
+
+            </div>
+
+
+            <div>
+
+                <p class="text-label-caps text-on-surface-variant">
+                    Address
+                </p>
+
+                <p class="text-body-md text-on-surface">
+
+                    {% if employee.address %}
+                        {{ employee.address }}
+                    {% else %}
+                        —
+                    {% endif %}
+
+                </p>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+
+    <!-- EMPLOYMENT INFORMATION -->
+
+    <div
+        class="rounded border border-outline-variant bg-surface-container-lowest p-6"
+    >
+
+        <h2 class="mb-6 text-headline-sm text-on-surface">
+            Employment Information
+        </h2>
+
+
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+
+
+            <div>
+
+                <p class="text-label-caps text-on-surface-variant">
+                    Department
+                </p>
+
+                <p class="text-body-md text-on-surface">
+
+                    {% if employee.department %}
+                        {{ employee.department.name }}
+                    {% else %}
+                        —
+                    {% endif %}
+
+                </p>
+
+            </div>
+
+
+            <div>
+
+                <p class="text-label-caps text-on-surface-variant">
+                    Position
+                </p>
+
+                <p class="text-body-md text-on-surface">
+
+                    {% if employee.position %}
+                        {{ employee.position.title }}
+                    {% else %}
+                        —
+                    {% endif %}
+
+                </p>
+
+            </div>
+
+
+            <div>
+
+                <p class="text-label-caps text-on-surface-variant">
+                    Hire Date
+                </p>
+
+                <p class="text-body-md text-on-surface">
+                    {{ employee.hire_date|date:"M d, Y" }}
+                </p>
+
+            </div>
+
+
+            <div>
+
+                <p class="text-label-caps text-on-surface-variant">
+                    Employment Status
+                </p>
+
+                <p class="mt-2 text-body-md text-on-surface">
+
+                    {% if employee.employment_status == "active" %}
+
+                        <span
+                            class="rounded bg-secondary-container px-3 py-1 text-sm text-on-secondary-container"
+                        >
+                            Active
+                        </span>
+
+                    {% elif employee.employment_status == "inactive" %}
+
+                        <span
+                            class="rounded bg-surface-container px-3 py-1 text-sm text-on-surface"
+                        >
+                            Inactive
+                        </span>
+
+                    {% elif employee.employment_status == "terminated" %}
+
+                        <span
+                            class="rounded bg-error-container px-3 py-1 text-sm text-on-error-container"
+                        >
+                            Terminated
+                        </span>
+
+                    {% endif %}
+
+                </p>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+
+    <!-- BANK INFORMATION -->
+
+    <div
+        class="rounded border border-outline-variant bg-surface-container-lowest p-6"
+    >
+
+        <h2 class="mb-6 text-headline-sm text-on-surface">
+            Bank Information
+        </h2>
+
+
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+
+
+            <div>
+
+                <p class="text-label-caps text-on-surface-variant">
+                    Bank Name
+                </p>
+
+                <p class="text-body-md text-on-surface">
+
+                    {% if employee.bank_name %}
+                        {{ employee.bank_name }}
+                    {% else %}
+                        —
+                    {% endif %}
+
+                </p>
+
+            </div>
+
+
+            <div>
+
+                <p class="text-label-caps text-on-surface-variant">
+                    Bank Account Number
+                </p>
+
+                <p class="text-body-md text-on-surface">
+
+                    {% if employee.bank_account_number %}
+                        {{ employee.bank_account_number }}
+                    {% else %}
+                        —
+                    {% endif %}
+
+                </p>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+</div>
+
+{% endblock %}

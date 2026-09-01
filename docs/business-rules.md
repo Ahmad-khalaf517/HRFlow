@@ -1,6 +1,6 @@
 # HRFlow — MVP Business Rules
 
-This is the canonical source for HR and payroll behavior. Planning documents may summarize these rules but must not redefine them.
+This is the canonical source for target HR and payroll behavior. Planning documents may summarize these rules but must not redefine them. The presence of a model, field default, or migration is not proof that a rule is implemented or approved; `erd.md` records the exact current schema and known gaps.
 
 ## 1. Decision Status
 
@@ -16,6 +16,8 @@ Payroll calculation work is blocked until Q-002 through Q-004 are approved. Do n
 Q-002 through Q-004 approved by Ahmad Khalaf on 2026-09-01 using the recommended defaults above, unblocking payroll calculation work (HRF-25). Q-001 remains Pending — resolve separately.
 
 The business owner may resolve all four by approving the recommended defaults. Record the approver and date in this section and change each accepted status to `Confirmed`.
+
+Repository security policy requires synthetic data during development even while the formal product-scope decision Q-001 remains pending. Never use real HR/payroll data to test the pending decision.
 
 ## 2. MVP Boundary
 
@@ -63,6 +65,8 @@ The business owner may resolve all four by approving the recommended defaults. R
 - Bonuses and manual deductions are included when active/approved and dated inside the payroll month.
 - Attendance services provide overtime, absence, and approved unpaid-leave totals. Payroll converts these facts into money.
 - One seeded/configured `TaxBracket` selects a matching demonstrative rule; this is not a progressive or legally compliant tax engine.
+
+The phrase `active/approved` above does not authorize inventing a new approval workflow. The current migrated models use `active`/`cancelled`; a task that adds an `approved` state or approval transition must first obtain an explicit owner decision.
 
 ```text
 Gross = Basic Salary + Allowances + Overtime Pay + Bonuses

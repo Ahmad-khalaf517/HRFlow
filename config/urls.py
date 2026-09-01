@@ -13,6 +13,7 @@ from . import views
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("accounts/", include("accounts.urls")),
+    path("employees/", include("employees.urls")),
     path("payroll/", include("payroll.urls")),
     path("", views.dashboard, name="home"),
 ]

@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="space-y-6">
+
+    <!-- Breadcrumb -->
+
+    <div class="text-sm text-on-surface-variant">
+
+        <a
+            href="{% url 'employees:department-list' %}"
+            class="hover:underline"
+        >
+            Departments
+        </a>
+
+        <span class="mx-2">
+            /
+        </span>
+
+        {{ department.name }}
+
+    </div>
+
+
+    <!-- Header -->
+
+    <div class="rounded border border-outline-variant bg-surface-container-lowest p-6">
+
+        <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+
+            <div>
+
+                <div class="flex items-center gap-3">
+
+                    <h1 class="text-headline-lg text-on-surface">
+
+                        {{ department.name }}
+
+                    </h1>
+
+
+                    {% if department.is_active %}
+
+                        <span class="rounded bg-secondary-container px-2 py-1 text-sm text-on-secondary-container">
+
+                            Active
+
+                        </span>
+
+                    {% else %}
+
+                        <span class="rounded border border-outline-variant px-2 py-1 text-sm text-on-surface-variant">
+
+                            Inactive
+
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+
+                {% if department.description %}
+
+                    <p class="mt-3 max-w-2xl text-body-md text-on-surface-variant">
+
+                        {{ department.description }}
+
+                    </p>
+
+                {% endif %}
+
+            </div>
+
+
+            <a
+                href="{% url 'employees:department-update' department.pk %}"
+                class="rounded bg-primary px-4 py-2 text-body-md font-medium text-white"
+            >
+                Edit Department
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- Information -->
+
+    <div class="grid gap-6 md:grid-cols-2">
+
+        <!-- Manager -->
+
+        <div class="rounded border border-outline-variant bg-surface-container-lowest p-5">
+
+            <p class="text-label-caps text-on-surface-variant">
+
+                Department Manager
+
+            </p>
+
+
+            <div class="mt-3 text-body-md text-on-surface">
+
+                {% if department.manager %}
+
+                    {{ department.manager.first_name }}
+                    {{ department.manager.last_name }}
+
+                {% else %}
+
+                    No manager assigned
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        <!-- Employees -->
+
+        <div class="rounded border border-outline-variant bg-surface-container-lowest p-5">
+
+            <p class="text-label-caps text-on-surface-variant">
+
+                Employees
+
+            </p>
+
+
+            <div class="mt-3 text-data-mono text-headline-md text-on-surface">
+
+                {{ department.employees.count }}
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Actions -->
+
+    {% if department.is_active %}
+
+        <div class="rounded border border-outline-variant bg-surface-container-lowest p-5">
+
+            <h2 class="text-headline-md text-on-surface">
+
+                Department Actions
+
+            </h2>
+
+
+            <p class="mt-1 text-body-md text-on-surface-variant">
+
+                Deactivating a department preserves historical employee and position data.
+
+            </p>
+
+
+            <form
+                method="post"
+                action="{% url 'employees:department-deactivate' department.pk %}"
+                class="mt-4"
+            >
+
+                {% csrf_token %}
+
+                <button
+                    type="submit"
+                    class="rounded border border-outline-variant px-4 py-2 text-body-md text-on-surface"
+                >
+                    Deactivate Department
+                </button>
+
+            </form>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

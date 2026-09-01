@@ -1,0 +1,382 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if object %}
+        Edit Contract
+    {% else %}
+        Add Contract
+    {% endif %}
+{% endblock %}
+
+
+{% block content %}
+
+<div class="max-w-4xl mx-auto">
+
+    <!-- HEADER -->
+
+    <div class="mb-6">
+
+        <h1 class="text-headline-lg text-on-surface">
+
+            {% if object %}
+                Edit Contract
+            {% else %}
+                Add Contract
+            {% endif %}
+
+        </h1>
+
+
+        <p class="mt-1 text-body-md text-on-surface-variant">
+
+            {% if object %}
+                Update the contract information below.
+            {% else %}
+                Create a new employee contract.
+            {% endif %}
+
+        </p>
+
+    </div>
+
+
+    <!-- FORM CARD -->
+
+    <div
+        class="rounded border border-outline-variant bg-surface-container-lowest p-6"
+    >
+
+        <form method="post">
+
+            {% csrf_token %}
+
+
+            <!-- NON FIELD ERRORS -->
+
+            {% if form.non_field_errors %}
+
+                <div class="mb-6 rounded border border-red-300 bg-red-50 p-4 text-red-700">
+
+                    {{ form.non_field_errors }}
+
+                </div>
+
+            {% endif %}
+
+
+            <!-- EMPLOYEE INFORMATION -->
+
+            <div class="mb-8">
+
+                <h2 class="mb-4 text-headline-md text-on-surface">
+                    Employee Information
+                </h2>
+
+
+                <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+
+
+                    <!-- EMPLOYEE -->
+
+                    <div>
+
+                        <label class="mb-2 block text-label-caps text-on-surface">
+                            Employee
+                        </label>
+
+                        {{ form.employee }}
+
+                        {% if form.employee.errors %}
+
+                            <p class="mt-1 text-sm text-red-600">
+                                {{ form.employee.errors.0 }}
+                            </p>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- CONTRACT TYPE -->
+
+                    <div>
+
+                        <label class="mb-2 block text-label-caps text-on-surface">
+                            Contract Type
+                        </label>
+
+                        {{ form.contract_type }}
+
+                        {% if form.contract_type.errors %}
+
+                            <p class="mt-1 text-sm text-red-600">
+                                {{ form.contract_type.errors.0 }}
+                            </p>
+
+                        {% endif %}
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+
+            <!-- CONTRACT PERIOD -->
+
+            <div class="mb-8 border-t border-outline-variant pt-6">
+
+                <h2 class="mb-4 text-headline-md text-on-surface">
+                    Contract Period
+                </h2>
+
+
+                <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+
+
+                    <!-- START DATE -->
+
+                    <div>
+
+                        <label class="mb-2 block text-label-caps text-on-surface">
+                            Start Date
+                        </label>
+
+                        {{ form.start_date }}
+
+                        {% if form.start_date.errors %}
+
+                            <p class="mt-1 text-sm text-red-600">
+                                {{ form.start_date.errors.0 }}
+                            </p>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- END DATE -->
+
+                    <div>
+
+                        <label class="mb-2 block text-label-caps text-on-surface">
+                            End Date
+                        </label>
+
+                        {{ form.end_date }}
+
+                        {% if form.end_date.errors %}
+
+                            <p class="mt-1 text-sm text-red-600">
+                                {{ form.end_date.errors.0 }}
+                            </p>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- PROBATION END DATE -->
+
+                    <div>
+
+                        <label class="mb-2 block text-label-caps text-on-surface">
+                            Probation End Date
+                        </label>
+
+                        {{ form.probation_end_date }}
+
+                        {% if form.probation_end_date.errors %}
+
+                            <p class="mt-1 text-sm text-red-600">
+                                {{ form.probation_end_date.errors.0 }}
+                            </p>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- STATUS -->
+
+                    <div>
+
+                        <label class="mb-2 block text-label-caps text-on-surface">
+                            Status
+                        </label>
+
+                        {{ form.status }}
+
+                        {% if form.status.errors %}
+
+                            <p class="mt-1 text-sm text-red-600">
+                                {{ form.status.errors.0 }}
+                            </p>
+
+                        {% endif %}
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+
+            <!-- SALARY INFORMATION -->
+
+            <div class="mb-8 border-t border-outline-variant pt-6">
+
+                <h2 class="mb-4 text-headline-md text-on-surface">
+                    Salary Information
+                </h2>
+
+
+                <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+
+
+                    <!-- BASIC SALARY -->
+
+                    <div>
+
+                        <label class="mb-2 block text-label-caps text-on-surface">
+                            Basic Salary
+                        </label>
+
+                        {{ form.basic_salary }}
+
+                        {% if form.basic_salary.errors %}
+
+                            <p class="mt-1 text-sm text-red-600">
+                                {{ form.basic_salary.errors.0 }}
+                            </p>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- ALLOWANCES -->
+
+                    <div>
+
+                        <label class="mb-2 block text-label-caps text-on-surface">
+                            Default Allowances
+                        </label>
+
+                        {{ form.allowances_default }}
+
+                        {% if form.allowances_default.errors %}
+
+                            <p class="mt-1 text-sm text-red-600">
+                                {{ form.allowances_default.errors.0 }}
+                            </p>
+
+                        {% endif %}
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+
+            <!-- WORKING SCHEDULE -->
+
+            <div class="mb-8 border-t border-outline-variant pt-6">
+
+                <h2 class="mb-4 text-headline-md text-on-surface">
+                    Working Schedule
+                </h2>
+
+
+                <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+
+
+                    <!-- WORKING HOURS -->
+
+                    <div>
+
+                        <label class="mb-2 block text-label-caps text-on-surface">
+                            Working Hours Per Day
+                        </label>
+
+                        {{ form.working_hours_per_day }}
+
+                        {% if form.working_hours_per_day.errors %}
+
+                            <p class="mt-1 text-sm text-red-600">
+                                {{ form.working_hours_per_day.errors.0 }}
+                            </p>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- WORKING DAYS -->
+
+                    <div>
+
+                        <label class="mb-2 block text-label-caps text-on-surface">
+                            Working Days Per Week
+                        </label>
+
+                        {{ form.working_days_per_week }}
+
+                        {% if form.working_days_per_week.errors %}
+
+                            <p class="mt-1 text-sm text-red-600">
+                                {{ form.working_days_per_week.errors.0 }}
+                            </p>
+
+                        {% endif %}
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+
+            <!-- ACTIONS -->
+
+            <div
+                class="flex justify-end gap-3 border-t border-outline-variant pt-6"
+            >
+
+                <a
+                    href="{% url 'employees:contract-list' %}"
+                    class="rounded border border-outline-variant px-4 py-2 text-on-surface"
+                >
+                    Cancel
+                </a>
+
+
+                <button
+                    type="submit"
+                    class="rounded bg-primary px-5 py-2 text-white"
+                >
+
+                    {% if object %}
+                        Save Changes
+                    {% else %}
+                        Create Contract
+                    {% endif %}
+
+                </button>
+
+            </div>
+
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,320 @@
+{% extends "base.html" %}
+
+{% block title %}
+Position Details
+{% endblock %}
+
+
+{% block content %}
+
+<div class="space-y-6">
+
+
+    <!-- HEADER -->
+
+    <div class="flex items-center justify-between">
+
+        <div>
+
+            <h1 class="text-headline-lg text-on-surface">
+
+                Position Details
+
+            </h1>
+
+            <p class="text-body-md text-on-surface-variant">
+
+                View job position information.
+
+            </p>
+
+        </div>
+
+
+        <div class="flex gap-3">
+
+            <a
+                href="{% url 'employees:position-update' position.pk %}"
+                class="rounded bg-primary px-4 py-2 text-white"
+            >
+                Edit Position
+            </a>
+
+
+            <a
+                href="{% url 'employees:position-list' %}"
+                class="rounded border border-outline-variant px-4 py-2"
+            >
+                Back to Positions
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- POSITION INFORMATION -->
+
+    <div class="rounded border border-outline-variant bg-surface-container-lowest p-6">
+
+        <h2 class="mb-6 text-headline-md text-on-surface">
+
+            Position Information
+
+        </h2>
+
+
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+
+
+            <!-- TITLE -->
+
+            <div>
+
+                <p class="text-label-caps text-on-surface-variant">
+
+                    POSITION TITLE
+
+                </p>
+
+                <p class="mt-1 text-body-lg text-on-surface">
+
+                    {{ position.title }}
+
+                </p>
+
+            </div>
+
+
+            <!-- DEPARTMENT -->
+
+            <div>
+
+                <p class="text-label-caps text-on-surface-variant">
+
+                    DEPARTMENT
+
+                </p>
+
+                <p class="mt-1 text-body-lg text-on-surface">
+
+                    {{ position.department.name }}
+
+                </p>
+
+            </div>
+
+
+            <!-- CODE -->
+
+            <div>
+
+                <p class="text-label-caps text-on-surface-variant">
+
+                    POSITION CODE
+
+                </p>
+
+                <p class="mt-1 text-body-lg text-on-surface">
+
+                    {% if position.code %}
+                        {{ position.code }}
+                    {% else %}
+                        —
+                    {% endif %}
+
+                </p>
+
+            </div>
+
+
+            <!-- STATUS -->
+
+            <div>
+
+                <p class="text-label-caps text-on-surface-variant">
+
+                    STATUS
+
+                </p>
+
+                <div class="mt-2">
+
+                    {% if position.is_active %}
+
+                        <span class="rounded bg-green-100 px-3 py-1 text-sm text-green-700">
+
+                            Active
+
+                        </span>
+
+                    {% else %}
+
+                        <span class="rounded bg-gray-100 px-3 py-1 text-sm text-gray-700">
+
+                            Inactive
+
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- DESCRIPTION -->
+
+        <div class="mt-8 border-t border-outline-variant pt-6">
+
+            <p class="text-label-caps text-on-surface-variant">
+
+                DESCRIPTION
+
+            </p>
+
+            <p class="mt-2 text-body-md text-on-surface">
+
+                {% if position.description %}
+
+                    {{ position.description }}
+
+                {% else %}
+
+                    No description provided.
+
+                {% endif %}
+
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- SALARY INFORMATION -->
+
+    <div class="rounded border border-outline-variant bg-surface-container-lowest p-6">
+
+        <h2 class="mb-6 text-headline-md text-on-surface">
+
+            Salary Range
+
+        </h2>
+
+
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+
+
+            <!-- MIN SALARY -->
+
+            <div>
+
+                <p class="text-label-caps text-on-surface-variant">
+
+                    MINIMUM SALARY
+
+                </p>
+
+                <p class="mt-1 text-body-lg text-on-surface">
+
+                    {% if position.min_salary %}
+
+                        {{ position.min_salary }}
+
+                    {% else %}
+
+                        —
+
+                    {% endif %}
+
+                </p>
+
+            </div>
+
+
+            <!-- MAX SALARY -->
+
+            <div>
+
+                <p class="text-label-caps text-on-surface-variant">
+
+                    MAXIMUM SALARY
+
+                </p>
+
+                <p class="mt-1 text-body-lg text-on-surface">
+
+                    {% if position.max_salary %}
+
+                        {{ position.max_salary }}
+
+                    {% else %}
+
+                        —
+
+                    {% endif %}
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ACTIONS -->
+
+    {% if position.is_active %}
+
+        <div class="rounded border border-red-200 bg-surface-container-lowest p-6">
+
+            <div class="flex items-center justify-between">
+
+                <div>
+
+                    <h2 class="text-headline-md text-on-surface">
+
+                        Deactivate Position
+
+                    </h2>
+
+                    <p class="mt-1 text-body-md text-on-surface-variant">
+
+                        Deactivated positions cannot be assigned to new employees.
+
+                    </p>
+
+                </div>
+
+
+                <form
+                    method="post"
+                    action="{% url 'employees:position-deactivate' position.pk %}"
+                    onsubmit="return confirm('Are you sure you want to deactivate this position?');"
+                >
+
+                    {% csrf_token %}
+
+                    <button
+                        type="submit"
+                        class="rounded bg-red-600 px-4 py-2 text-white"
+                    >
+                        Deactivate
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    {% endif %}
+
+
+</div>
+
+{% endblock %}

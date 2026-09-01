@@ -44,7 +44,7 @@ def dashboard(request):
     ]
 
     setup_steps = [
-        {"label": "Database connected (Neon)", "done": True},
+        {"label": "Database connected (Supabase)", "done": True},
         {"label": "Design system applied", "done": True},
         {"label": "Authentication", "done": True},
         {"label": "Employee management", "done": False},
