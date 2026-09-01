@@ -1,4 +1,5 @@
 {% load static %}
+{% load employees_extras %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,24 +21,26 @@
             </div>
             <nav class="flex-1 px-3 py-4 space-y-1">
                 <!-- Placeholder links: wired up as each module ships. Active section
-                     is derived from request.resolver_match.app_name, not hardcoded. -->
-                <a href="{% url 'home' %}" class="flex items-center gap-3 rounded px-3 py-2 text-body-md {% if request.resolver_match.app_name == 'employees' or request.resolver_match.app_name == 'payroll' %}text-on-primary-container hover:bg-primary-container{% else %}font-semibold bg-primary-container{% endif %}">
+                     is derived from request.resolver_match.url_name, one item at a
+                     time — employees' four sub-sections share app_name 'employees'
+                     but not the same url_name prefix. -->
+                <a href="{% url 'home' %}" class="flex items-center gap-3 rounded px-3 py-2 text-body-md {% if request.resolver_match.url_name == 'home' %}font-semibold bg-primary-container{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
                     Dashboard
                 </a>
-                <a href="{% url 'employees:employee-list' %}" class="flex items-center gap-3 rounded px-3 py-2 text-body-md {% if request.resolver_match.app_name == 'employees' %}font-semibold bg-primary-container{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
+                <a href="{% url 'employees:employee-list' %}" class="flex items-center gap-3 rounded px-3 py-2 text-body-md {% if request.resolver_match.url_name|startswith:'employee-' %}font-semibold bg-primary-container{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14.2c2.4.4 4.5 2.4 4.5 5.8"/></svg>
                     Employees
                 </a>
-                <a href="{% url 'employees:department-list' %}" class="flex items-center gap-3 rounded px-3 py-2 text-body-md {% if request.resolver_match.app_name == 'employees' %}font-semibold bg-primary-container{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
+                <a href="{% url 'employees:department-list' %}" class="flex items-center gap-3 rounded px-3 py-2 text-body-md {% if request.resolver_match.url_name|startswith:'department-' %}font-semibold bg-primary-container{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><path d="M3.5 8.5 12 3.5l8.5 5v9.5a1 1 0 0 1-1 1h-15a1 1 0 0 1-1-1Z"/><path d="M9 20v-6h6v6"/></svg>
                     Departments
                 </a>
-                <a href="{% url 'employees:position-list' %}" class="flex items-center gap-3 rounded px-3 py-2 text-body-md {% if request.resolver_match.app_name == 'employees' %}font-semibold bg-primary-container{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
+                <a href="{% url 'employees:position-list' %}" class="flex items-center gap-3 rounded px-3 py-2 text-body-md {% if request.resolver_match.url_name|startswith:'position-' %}font-semibold bg-primary-container{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><path d="M8 3.5h8v4l-4 3-4-3Z"/><path d="M4.5 20v-8.5a1.5 1.5 0 0 1 1.5-1.5h12a1.5 1.5 0 0 1 1.5 1.5V20Z"/></svg>
                     Positions
                 </a>
-                <a href="{% url 'employees:contract-list' %}" class="flex items-center gap-3 rounded px-3 py-2 text-body-md {% if request.resolver_match.app_name == 'employees' %}font-semibold bg-primary-container{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
+                <a href="{% url 'employees:contract-list' %}" class="flex items-center gap-3 rounded px-3 py-2 text-body-md {% if request.resolver_match.url_name|startswith:'contract-' %}font-semibold bg-primary-container{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><path d="M6 3.5h9l3 3v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-15a1 1 0 0 1 1-1Z"/><path d="M9 10h6M9 13.5h6M9 17h3.5"/></svg>
                     Contracts
                 </a>
