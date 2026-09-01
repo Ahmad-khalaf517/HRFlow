@@ -1,6 +1,11 @@
+from datetime import timedelta
+from decimal import ROUND_HALF_UP, Decimal
+
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import CheckConstraint, F, Q, UniqueConstraint
+from django.utils import timezone
 
 
 class Attendance(models.Model):
@@ -46,6 +51,53 @@ class Attendance(models.Model):
             ),
         ]
 
+    def _calculate_worked_hours(self):
+        if not self.employee:
+            self.worked_hours = Decimal("0")
+            self.overtime_hours = Decimal("0")
+            return
+
+        if not self.check_in or not self.check_out:
+            self.worked_hours = Decimal("0")
+            self.overtime_hours = Decimal("0")
+            return
+
+        delta = self._time_delta_seconds()
+        if delta <= 0:
+            raise ValidationError({"check_out": "Check-out must be after check-in."})
+
+        hours = Decimal(str(delta)) / Decimal("3600")
+        self.worked_hours = hours.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+
+        contract = self.employee.contracts.filter(status="active").order_by("-start_date").first()
+        contract_hours = (
+            Decimal(str(contract.working_hours_per_day)) if contract else Decimal("0")
+        )
+        overtime = self.worked_hours - contract_hours
+        self.overtime_hours = max(overtime, Decimal("0")).quantize(
+            Decimal("0.01"), rounding=ROUND_HALF_UP
+        )
+
+    def _time_delta_seconds(self):
+        from datetime import datetime
+
+        today = self.date or datetime.today().date()
+        check_in = datetime.combine(today, self.check_in)
+        check_out = datetime.combine(today, self.check_out)
+        return (check_out - check_in).total_seconds()
+
+    def clean(self):
+        super().clean()
+        if self.check_in and self.check_out and self.check_out <= self.check_in:
+            raise ValidationError({"check_out": "Check-out must be after check-in."})
+        self._calculate_worked_hours()
+
+    def save(self, *args, **kwargs):
+        if self.check_in and self.check_out and self.check_out <= self.check_in:
+            raise ValidationError({"check_out": "Check-out must be after check-in."})
+        self._calculate_worked_hours()
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"{self.employee} — {self.date}"
 
@@ -59,6 +111,16 @@ class LeaveType(models.Model):
 
     class Meta:
         ordering = ["name"]
+
+    def clean(self):
+        super().clean()
+        if not self.name or not self.name.strip():
+            raise ValidationError({"name": "Leave type name is required."})
+        self.name = self.name.strip()
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
@@ -106,6 +168,80 @@ class LeaveRequest(models.Model):
                 condition=Q(requested_days__gte=0), name="leaverequest_requested_days_gte_0"
             ),
         ]
+
+    @staticmethod
+    def _working_days_between(start_date, end_date):
+        current = start_date
+        count = 0
+        while current <= end_date:
+            if current.weekday() < 5:
+                count += 1
+            current += timedelta(days=1)
+        return count
+
+    def calculate_requested_days(self):
+        if not self.start_date or not self.end_date:
+            self.requested_days = Decimal("0")
+            return self.requested_days
+        if self.end_date < self.start_date:
+            self.requested_days = Decimal("0")
+            return self.requested_days
+        working_days = self._working_days_between(self.start_date, self.end_date)
+        self.requested_days = Decimal(working_days).quantize(Decimal("0.01"))
+        return self.requested_days
+
+    def can_transition_to(self, new_status):
+        allowed = {
+            "pending": {"approved", "rejected"},
+        }
+        return self.status in allowed and new_status in allowed[self.status]
+
+    def approve(self, user):
+        if self.status != "pending":
+            raise ValidationError("Only pending leave requests can be approved.")
+        self.status = "approved"
+        self.approved_by = user
+        self.approved_at = timezone.now()
+        self.save(update_fields=["status", "approved_by", "approved_at", "updated_at"])
+
+    def reject(self, user):
+        if self.status != "pending":
+            raise ValidationError("Only pending leave requests can be rejected.")
+        self.status = "rejected"
+        self.approved_by = user
+        self.approved_at = timezone.now()
+        self.save(update_fields=["status", "approved_by", "approved_at", "updated_at"])
+
+    def clean(self):
+        super().clean()
+        if self.start_date and self.end_date and self.end_date < self.start_date:
+            raise ValidationError({"end_date": "End date cannot precede start date."})
+
+        if (
+            self.employee
+            and self.start_date
+            and self.end_date
+            and self.status in {"pending", "approved"}
+        ):
+            overlapping = LeaveRequest.objects.filter(
+                employee=self.employee,
+                status__in=["pending", "approved"],
+                start_date__lte=self.end_date,
+                end_date__gte=self.start_date,
+            )
+            if self.pk:
+                overlapping = overlapping.exclude(pk=self.pk)
+            if overlapping.exists():
+                raise ValidationError(
+                    "Pending or approved leave requests may not overlap for the same employee."
+                )
+
+        self.calculate_requested_days()
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        self.calculate_requested_days()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.employee} — {self.leave_type} ({self.start_date} to {self.end_date})"

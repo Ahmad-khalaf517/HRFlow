@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}{% if leave_type %}Edit Leave Type · HRFlow{% else %}New Leave Type · HRFlow{% endif %}{% endblock %}
+
+{% block page_title %}
+    <h1 class="text-headline-lg text-on-surface">{% if leave_type %}Edit leave type{% else %}Create leave type{% endif %}</h1>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl space-y-6">
+    <div class="flex items-center justify-between gap-3">
+        <div>
+            <p class="text-label-caps text-on-surface-variant">Leave policy</p>
+            <p class="text-body-md text-on-surface-variant">Define the leave types available to employees.</p>
+        </div>
+        <a href="{% url 'attendance:leave_type_list' %}" class="btn-ghost">Cancel</a>
+    </div>
+
+    <form method="post" class="card space-y-6">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="rounded border border-error bg-error-container p-3 text-body-md text-on-error-container">
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+            {% include "components/field.html" with field=form.name %}
+            {% include "components/field.html" with field=form.annual_allowance %}
+            {% include "components/field.html" with field=form.is_paid %}
+            {% include "components/field.html" with field=form.requires_approval %}
+            {% include "components/field.html" with field=form.is_active %}
+        </div>
+
+        <div class="flex items-center justify-end gap-2 border-t border-outline-variant pt-4">
+            <a href="{% url 'attendance:leave_type_list' %}" class="btn-secondary">Cancel</a>
+            <button type="submit" class="btn-primary">{% if leave_type %}Update Leave Type{% else %}Save Leave Type{% endif %}</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

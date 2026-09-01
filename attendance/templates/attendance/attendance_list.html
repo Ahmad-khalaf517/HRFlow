@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Attendance · HRFlow{% endblock %}
+
+{% block page_title %}
+    <h1 class="text-headline-lg text-on-surface">{% if title %}{{ title }}{% else %}Attendance{% endif %}</h1>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl space-y-6">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+            <p class="text-label-caps text-on-surface-variant">Daily records</p>
+            <p class="text-body-md text-on-surface-variant">Employee attendance and work hours.</p>
+        </div>
+        <a href="{% url 'attendance:attendance_create' %}" class="btn-primary">Create Attendance</a>
+    </div>
+
+    {% if attendance_records %}
+        <div class="card overflow-hidden p-0">
+            <div class="overflow-x-auto">
+                <table class="min-w-full border-collapse">
+                    <thead class="bg-surface-container-lowest">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Employee</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Date</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Status</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Check in</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Check out</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Worked</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Overtime</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in attendance_records %}
+                            <tr class="border-t border-outline-variant">
+                                <td class="px-4 py-3 text-body-md text-on-surface">
+                                    <a href="{% url 'attendance:attendance_detail' record.pk %}" class="text-primary hover:underline">{{ record.employee }}</a>
+                                </td>
+                                <td class="px-4 py-3 text-body-md text-on-surface">{{ record.date }}</td>
+                                <td class="px-4 py-3">
+                                    {% if record.status == 'present' %}
+                                        <span class="badge bg-secondary-container text-on-secondary-container">Present</span>
+                                    {% elif record.status == 'absent' %}
+                                        <span class="badge bg-error-container text-on-error-container">Absent</span>
+                                    {% elif record.status == 'late' %}
+                                        <span class="badge bg-surface-container text-on-surface-variant">Late</span>
+                                    {% elif record.status == 'leave' %}
+                                        <span class="badge bg-surface-container text-on-surface-variant">Leave</span>
+                                    {% else %}
+                                        <span class="badge bg-surface-container text-on-surface-variant">{{ record.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-4 py-3 text-body-md text-on-surface">{{ record.check_in|default:"-" }}</td>
+                                <td class="px-4 py-3 text-body-md text-on-surface">{{ record.check_out|default:"-" }}</td>
+                                <td class="px-4 py-3 text-data-mono text-on-surface">{{ record.worked_hours }}</td>
+                                <td class="px-4 py-3 text-data-mono text-on-surface">{{ record.overtime_hours }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% else %}
+        <div class="card max-w-xl">
+            <h2 class="text-headline-md text-on-surface mb-2">No attendance records</h2>
+            <p class="text-body-md text-on-surface-variant mb-4">There are no attendance entries for this view yet.</p>
+            <a href="{% url 'attendance:attendance_create' %}" class="btn-primary">Create Attendance</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

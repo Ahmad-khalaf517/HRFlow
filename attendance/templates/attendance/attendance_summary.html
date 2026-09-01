@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Attendance Summary · HRFlow{% endblock %}
+
+{% block page_title %}
+    <h1 class="text-headline-lg text-on-surface">Attendance Summary</h1>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl space-y-6">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+            <p class="text-label-caps text-on-surface-variant">Overview</p>
+            <p class="text-body-md text-on-surface-variant">Monthly attendance totals based on recorded attendance facts.</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div class="card">
+            <p class="text-label-caps text-on-surface-variant">Present</p>
+            <p class="mt-3 text-display text-on-surface">{{ present_days }}</p>
+        </div>
+        <div class="card">
+            <p class="text-label-caps text-on-surface-variant">Absent</p>
+            <p class="mt-3 text-display text-on-surface">{{ absent_days }}</p>
+        </div>
+        <div class="card">
+            <p class="text-label-caps text-on-surface-variant">Worked Hours</p>
+            <p class="mt-3 text-display text-on-surface">{{ total_worked_hours }}</p>
+        </div>
+        <div class="card">
+            <p class="text-label-caps text-on-surface-variant">Overtime Hours</p>
+            <p class="mt-3 text-display text-on-surface">{{ total_overtime_hours }}</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="flex items-center justify-between gap-3 border-b border-outline-variant pb-4">
+            <div>
+                <p class="text-label-caps text-on-surface-variant">Records</p>
+                <h2 class="text-headline-md text-on-surface">{{ total_records }} attendance entries</h2>
+            </div>
+        </div>
+
+        {% if attendance_records %}
+            <div class="mt-4 overflow-x-auto">
+                <table class="min-w-full border-collapse">
+                    <thead class="bg-surface-container-lowest">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Employee</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Date</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Status</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Worked</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Overtime</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for attendance in attendance_records %}
+                            <tr class="border-t border-outline-variant">
+                                <td class="px-4 py-3 text-body-md text-on-surface">{{ attendance.employee }}</td>
+                                <td class="px-4 py-3 text-body-md text-on-surface">{{ attendance.date }}</td>
+                                <td class="px-4 py-3">
+                                    {% if attendance.status == 'present' %}
+                                        <span class="badge bg-secondary-container text-on-secondary-container">Present</span>
+                                    {% elif attendance.status == 'absent' %}
+                                        <span class="badge bg-error-container text-on-error-container">Absent</span>
+                                    {% else %}
+                                        <span class="badge bg-surface-container text-on-surface-variant">{{ attendance.get_status_display }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-4 py-3 text-data-mono text-on-surface">{{ attendance.worked_hours }}</td>
+                                <td class="px-4 py-3 text-data-mono text-on-surface">{{ attendance.overtime_hours }}</td>
+                                <td class="px-4 py-3">
+                                    <a href="{% url 'attendance:attendance_detail' attendance.pk %}" class="btn-secondary">View</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="mt-4 rounded border border-outline-variant bg-surface-container-low p-6">
+                <p class="text-body-md text-on-surface-variant">No attendance records are available for this summary.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

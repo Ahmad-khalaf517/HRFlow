@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Leave Types · HRFlow{% endblock %}
+
+{% block page_title %}
+    <h1 class="text-headline-lg text-on-surface">Leave Types</h1>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl space-y-6">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+            <p class="text-label-caps text-on-surface-variant">Policy</p>
+            <p class="text-body-md text-on-surface-variant">Manage the leave categories available in the system.</p>
+        </div>
+        <a href="{% url 'attendance:leave_type_create' %}" class="btn-primary">Create Leave Type</a>
+    </div>
+
+    {% if leave_types %}
+        <div class="card overflow-hidden p-0">
+            <div class="overflow-x-auto">
+                <table class="min-w-full border-collapse">
+                    <thead class="bg-surface-container-lowest">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Name</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Annual allowance</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Paid</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Approval</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Status</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for leave_type in leave_types %}
+                            <tr class="border-t border-outline-variant">
+                                <td class="px-4 py-3 text-body-md text-on-surface">{{ leave_type.name }}</td>
+                                <td class="px-4 py-3 text-data-mono text-on-surface">{{ leave_type.annual_allowance }} days</td>
+                                <td class="px-4 py-3">
+                                    {% if leave_type.is_paid %}
+                                        <span class="badge bg-secondary-container text-on-secondary-container">Paid</span>
+                                    {% else %}
+                                        <span class="badge bg-surface-container text-on-surface-variant">Unpaid</span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-4 py-3">
+                                    {% if leave_type.requires_approval %}
+                                        <span class="badge bg-surface-container text-on-surface-variant">Approval</span>
+                                    {% else %}
+                                        <span class="badge bg-surface-container text-on-surface-variant">Auto</span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-4 py-3">
+                                    {% if leave_type.is_active %}
+                                        <span class="badge bg-secondary-container text-on-secondary-container">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-error-container text-on-error-container">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-4 py-3">
+                                    <a href="{% url 'attendance:leave_type_update' leave_type.pk %}" class="btn-secondary">Edit</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% else %}
+        <div class="card max-w-xl">
+            <h2 class="text-headline-md text-on-surface mb-2">No leave types</h2>
+            <p class="text-body-md text-on-surface-variant mb-4">Create the first leave category to start processing requests.</p>
+            <a href="{% url 'attendance:leave_type_create' %}" class="btn-primary">Create Leave Type</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
