@@ -73,7 +73,7 @@ function Resolve-RepositoryFile {
     return $item
 }
 
-$requestedFiles = @('AI_CONTEXT.md', $TaskFile) + $IncludeFiles
+$requestedFiles = @('TEAM_CONTEXT.md', $TaskFile) + $IncludeFiles
 $resolvedFiles = @()
 $seenPaths = @{}
 

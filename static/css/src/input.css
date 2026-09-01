@@ -1,9 +1,11 @@
-@import "tailwindcss";
+@import "tailwindcss" source(none);
+@source "../../../templates";
+@source inline("btn-primary btn-secondary btn-ghost card input badge text-display text-headline-lg text-headline-md text-body-lg text-body-md text-body-sm text-label-caps text-data-mono");
 
 /*
- * Design tokens sourced from docs/design-system.md ("Deep Equity System").
- * Keep this file and that doc in sync — it is the single source of truth
- * for color, type, radius, and spacing values.
+ * Executable "Deep Equity" tokens live here; docs/design-system.md explains
+ * how to use them. Keep the implementation, TEAM_CONTEXT.md, and the design
+ * guide synchronized.
  */
 @theme {
     --font-sans: "Hanken Grotesk", ui-sans-serif, system-ui, sans-serif;

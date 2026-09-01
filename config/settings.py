@@ -1,7 +1,7 @@
 """
 Django settings for the HRFlow project.
 
-See docs/AI_CONTEXT.md for the project's architecture and invariants.
+See TEAM_CONTEXT.md for the project's architecture and invariants.
 """
 
 import os

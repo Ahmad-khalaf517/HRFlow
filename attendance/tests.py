@@ -9,7 +9,7 @@ from .models import Attendance
 
 
 class AttendanceConstraintTests(TestCase):
-    """docs/testing-strategy.md priority #2: one attendance record per employee/date."""
+    """docs/business-rules.md §5: one attendance record per employee/date."""
 
     def setUp(self):
         self.employee = Employee.objects.create(

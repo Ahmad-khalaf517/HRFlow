@@ -8,7 +8,7 @@ from .models import Contract, Employee
 
 
 class ContractConstraintTests(TestCase):
-    """docs/testing-strategy.md priority #1: only one active contract per employee."""
+    """docs/business-rules.md §4: only one active contract per employee."""
 
     def setUp(self):
         self.employee = Employee.objects.create(

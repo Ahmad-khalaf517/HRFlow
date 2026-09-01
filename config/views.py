@@ -3,7 +3,7 @@ Dashboard landing view.
 
 Lives here rather than in one of the domain apps because it reads across
 employees/attendance/payroll and no single app owns "the page you land on
-after login" — see AI_CONTEXT.md's dependency direction. Revisit if/when
+after login" — see TEAM_CONTEXT.md's dependency direction. Revisit if/when
 the project settles on a dedicated home for cross-app views.
 """
 

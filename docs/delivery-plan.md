@@ -1,103 +1,169 @@
-# HRFlow — Seven-Day Delivery Plan
+# HRFlow — Seven-Day Delivery Roadmap
 
-## 1. Outcome and Constraint
+## 1. Outcome and constraint
 
-Deliver one reliable demonstration flow in seven calendar days:
+Deliver one reliable synthetic-data demonstration flow in seven calendar days:
 
 ```text
 Employee -> Contract -> Attendance/Leave -> Payroll -> Payslip -> Payment
 ```
 
-This is a synthetic-data MVP, not a production payroll or legal-compliance system. Day 7 is reserved for manual review, fixes, and rehearsal; no new mandatory feature starts on Day 7.
+This is an MVP, not a production payroll or legal-compliance system. Day 7 is reserved for integration review, fixes, and rehearsal; no new mandatory feature starts on Day 7.
 
-## 2. Required Scope
+Pending decisions Q-002 through Q-004 in `business-rules.md` block payroll calculation work. Q-001 also awaits formal owner confirmation. Do not interpret schema defaults as decision approval.
 
-- Django authentication and four roles: Admin, HR Manager, Payroll Officer, and Employee.
-- Employee, department, position, and contract data. Department and position management may use Django Admin.
+## 2. Current repository baseline
+
+| Area | Present now | Still required |
+|---|---|---|
+| Foundation | Django project, Supabase database configuration, migrations, Tailwind build, base templates | Deployment hardening is outside this MVP task |
+| Accounts | Login/logout, Django sessions, four group names, auth tests | Permission assignment and object-level enforcement |
+| Employees | Models, migrations, Admin, active-contract uniqueness test | Custom workflows, forms, views, services, permissions |
+| Attendance | Models, migrations, Admin, employee/date uniqueness test | Worked/overtime calculation service and custom screens |
+| Leave | Models, migrations, Admin | Derived days, overlap prevention, approval transitions, permissions |
+| Payroll inputs | Bonus, deduction, tax models and Admin | Input validation/workflow decisions and tests |
+| Payroll processing | Payroll/PayrollItem models and core uniqueness tests | Calculation service, complete snapshot, immutability, guarded transitions |
+| Payslip/payment | Models and Admin | Printable own-record view, one-full-payment rule, transition service, tests |
+| Demo | Dashboard shell | Coherent synthetic fixtures and end-to-end scenario |
+
+The exact migrated schema and current gaps are recorded in `erd.md`.
+
+## 3. Required scope
+
+- Django authentication and four roles: Admin, HR Manager, Payroll Officer, Employee.
+- Employee, department, position, and contract data.
 - One active contract per employee.
 - Attendance facts, worked hours, overtime hours, and a simple monthly summary service.
 - Simple leave request and HR approval/rejection; only approved unpaid leave affects payroll.
-- Bonus and manual deduction inputs. Low-volume management may use Django Admin.
-- One seeded/configured demonstrative tax rule; a custom tax-management UI is not required.
-- Monthly payroll calculation using `Decimal`.
-- Immutable `PayrollItem` snapshots and explicit payroll statuses.
-- Printable HTML payslip with employee access limited to their own payslip.
+- Bonus and manual deduction inputs.
+- One configured demonstrative tax rule.
+- Monthly payroll calculation using `Decimal` after required decisions are confirmed.
+- Complete, immutable `PayrollItem` snapshots and explicit payroll statuses.
+- Printable HTML payslip with employee access limited to their own record.
 - One full completed payment per payroll item.
 - Synthetic seed data and one end-to-end demonstration scenario.
 
-## 3. Cut Line
+Use Django Admin for low-volume support data when a custom screen does not materially improve the demonstration.
 
-The following are optional and must not delay the required flow:
+## 4. Cut line
+
+These items are optional and must not delay the required flow:
 
 - PDF payslip generation;
 - dashboard charts or advanced totals;
 - CSV export and reports;
-- custom CRUD screens for support data already manageable in Django Admin;
-- HTMX or Alpine enhancements that are not necessary for the workflow;
-- advanced employee self-service pages;
-- notifications, integrations, legal compliance, proration, correction runs, and partial payments.
+- custom CRUD for support data already manageable in Django Admin;
+- nonessential HTMX or Alpine enhancements;
+- advanced employee self-service;
+- notifications, integrations, compliance, proration, corrections, and partial payments.
 
-If required work is unstable after Day 5, cut all optional work.
+If the required workflow is unstable after Day 5, cut every optional item.
 
-## 4. Architecture
+## 5. Architecture and ownership
 
-Use one Django monolith with four primary apps:
+Use one Django monolith:
 
 ```text
 accounts -> employees -> attendance -> payroll
 ```
 
-- `accounts`: authentication, roles, permissions.
+- `accounts`: authentication, role setup, and permission helpers.
 - `employees`: departments, positions, employees, contracts.
-- `attendance`: attendance, leave, and monthly fact services.
+- `attendance`: attendance, leave, and public monthly fact services.
 - `payroll`: adjustments, tax input, payroll, snapshots, payslips, payments.
 
-Payroll consumes attendance through public service functions. Views stay thin; calculations and status transitions live in services. Do not add another primary app without approval.
+Use this three-person ownership split:
 
-## 5. Work Packages
-
-| ID | Reviewable outcome | Depends on |
+| Person | Exclusive app ownership | First independent work |
 |---|---|---|
-| HRF-01 | Project setup, PostgreSQL, authentication, roles, base layout | Approved decisions |
-| HRF-02 | Employee and contract workflow with uniqueness/active-contract constraints | HRF-01 |
-| HRF-03 | Attendance capture and worked/overtime-hour calculations | HRF-02 |
-| HRF-04 | Leave request, approval, overlap validation, and unpaid-leave facts | HRF-02 |
-| HRF-05 | Bonus, manual deduction, and demonstrative tax inputs | HRF-02 |
-| HRF-06 | Payroll calculation service with one exact Decimal example and expected result | HRF-03, HRF-04, HRF-05 |
-| HRF-07 | Payroll runs, PayrollItem snapshots, and guarded status transitions | HRF-06 |
-| HRF-08 | Printable payslip and own-record authorization | HRF-07 |
-| HRF-09 | Full payment recording and Paid transition | HRF-07 |
-| HRF-10 | Synthetic seed data, manual integration review, UI consistency, and demo | HRF-08, HRF-09 |
+| Person 1 | `employees` models/migrations/workflows | Employee and contract forms, services, permissions, screens, tests |
+| Person 2 | `attendance` models/migrations/workflows | Attendance hour services plus leave submit/approve/overlap workflow |
+| Person 3 | `payroll` models/migrations/workflows | Bonus/deduction/tax inputs and payroll state scaffolding; calculation waits for decisions/interfaces |
 
-## 6. Seven-Day Sequence
+Shared integration, UI, and review rotate through a short integration queue; they are not a fourth parallel workstream. Only one person edits shared files such as `config/urls.py`, base templates, or design tokens at a time.
+
+The three owners may work in parallel after shared model names and service contracts are agreed. Payroll must not import attendance internals or calculate attendance facts itself.
+
+### Dependency-safe task starts
+
+Before parallel feature work begins:
+
+1. merge prerequisite model migrations before dependent branches are created;
+2. freeze the canonical model names and the smallest required public service signatures;
+3. give each task one owning app, a bounded file list, and explicit upstream task/migration IDs;
+4. keep shared settings, root URLs, base templates, CSS tokens, and cross-app interfaces in short coordination tasks owned by one person;
+5. pass facts across app boundaries through public services rather than importing another app's internal queries/forms/views;
+6. add contract tests for every public service consumed by another app;
+7. rebase or merge the integration branch frequently and never let two branches create competing migrations for the same app.
+
+Example boundary:
+
+```python
+# attendance/services.py owns attendance facts.
+get_employee_overtime_hours(employee, start_date, end_date)
+get_absence_days(employee, start_date, end_date)
+get_unpaid_leave_days(employee, start_date, end_date)
+
+# payroll imports these public functions; it does not query Attendance/LeaveRequest directly.
+```
+
+### Recommended first three-person wave
+
+| Person | Task | May start when | Merge dependency |
+|---|---|---|---|
+| 1 | HRF-002 employee/contract workflow | Immediately from the migrated baseline | Merge first if it changes shared employee interfaces |
+| 2 | HRF-003/004 attendance and leave services | Immediately using existing Employee/Contract models | Publish/test attendance public service signatures before payroll calculation |
+| 3 | HRF-005 adjustments/tax input workflow | Immediately using existing Employee model | Must not begin HRF-006 until Q-002–Q-004 and attendance contracts are ready |
+
+After this wave, Person 1 can review permissions/integration, Person 2 can finish attendance contract tests, and Person 3 can implement HRF-006/007 without reaching into another app's internals.
+
+## 6. Work packages
+
+| ID | Reviewable outcome | Depends on | Baseline state |
+|---|---|---|---|
+| HRF-001 | Project, PostgreSQL, authentication, roles, base layout | Owner decisions | Foundation present; permissions incomplete |
+| HRF-002 | Employee/contract workflow, validation, permissions | HRF-001 | Models/Admin present |
+| HRF-003 | Attendance capture and hour-calculation services | HRF-002 | Models/Admin present |
+| HRF-004 | Leave submit/approve/reject, overlap prevention, unpaid facts | HRF-002 | Models/Admin present |
+| HRF-005 | Bonus, deduction, and demonstrative tax inputs | HRF-002 | Models/Admin present |
+| HRF-006 | Decimal payroll calculation with exact expected example | HRF-003/004/005 and Q-002–Q-004 | Blocked |
+| HRF-007 | Complete immutable snapshots and guarded payroll transitions | HRF-006 | Partial models only |
+| HRF-008 | Printable payslip and own-record authorization | HRF-007 | File-metadata model only |
+| HRF-009 | Exact full payment and Paid transition | HRF-007 | Partial model only |
+| HRF-010 | Synthetic fixtures, integration review, UI consistency, demo | HRF-008/009 | Not started |
+
+Each work package gets its own completed `task-brief-template.md`, branch, tests, manual review notes, and focused pull request.
+
+## 7. Seven-day sequence
 
 | Day | Required outcome |
 |---|---|
-| 1 | Approve the four pending defaults; freeze ERD and interfaces; set up Django, PostgreSQL, authentication, roles, base UI, and initial synthetic fixtures |
-| 2 | Complete employees and contracts, including constraints, permissions, migrations, and manual workflow review |
-| 3 | Complete attendance and simplified leave facts/services and review their workflows manually |
-| 4 | Complete payroll inputs and the calculation service against one exact synthetic scenario |
-| 5 | Complete payroll runs, immutable item snapshots, statuses, and real module integration |
-| 6 | Complete payslip access, full payment, end-to-end workflow review, and required UI polish |
-| 7 | Run the complete manual scenario; fix defects; review permissions and data safety; rehearse the demo |
+| 1 | Confirm Q-001–Q-004, review the migrated schema/gaps, freeze public service contracts and ownership |
+| 2 | Complete employee/contract workflow, permissions, validation, tests, and migration changes |
+| 3 | Complete attendance and leave services/workflows, including overlap and approval rules |
+| 4 | Complete payroll inputs; after decisions are confirmed, implement the exact calculation service |
+| 5 | Complete snapshots, immutability guards, payroll statuses, and module integration |
+| 6 | Complete payslip authorization, payment workflow, synthetic fixtures, and UI consistency |
+| 7 | Run the full manual scenario, permission/security review, fixes, and demo rehearsal |
 
-## 7. Ownership and Integration
+If the calendar starts after some baseline work is complete, use the recovered capacity for tests, permission review, and integration—not optional scope until the end-to-end flow passes.
 
-Assign one accountable owner to each domain: employee, attendance, and payroll. Ownership does not prevent collaboration. Shared responsibilities are authentication, UI consistency, integration, manual review, seed data, documentation, and demo readiness.
-
-Freeze shared model names and public service signatures before dependent work. Merge small reviewed changes continuously; do not wait for the final days to integrate.
-
-## 8. Definition of Done
+## 8. Definition of done
 
 A work package is done only when:
 
-- its acceptance criteria pass;
-- validation, server-side permissions, and database constraints are present;
-- migrations are included when required;
-- the affected workflow has been manually exercised and its observed result recorded;
+- its exact acceptance criteria pass;
+- server-side permissions and object-access cases are tested;
+- model validation and database constraints exist where appropriate;
+- migrations are included and `makemigrations --check --dry-run` reports no drift;
+- unit/integration tests and `ruff check .` pass;
+- the affected workflow is manually exercised and its observed result recorded;
+- UI work follows `design-system.md` and includes rebuilt CSS;
 - the diff contains no unrelated changes, secrets, or real HR/payroll data;
-- another person has reviewed the change.
+- another person reviews it.
 
-## 9. Demo Scenario
+## 9. Demonstration scenario
 
-Use one coherent synthetic employee and payroll month. Record exact expected values for salary, overtime, bonus, unpaid leave, manual deduction, tax, gross, total deductions, and net salary. The final demonstration follows the required flow from employee creation through completed payment.
+After Q-001–Q-004 are confirmed, define one coherent synthetic employee and payroll month. Record exact expected values for salary, overtime, bonus, unpaid leave, manual deduction, tax, gross, total deductions, and net salary in the task acceptance criteria.
+
+The final demonstration must begin with employee/contract setup and end with the recorded completed payment. It must also demonstrate at least one denied object-access case for an employee user.

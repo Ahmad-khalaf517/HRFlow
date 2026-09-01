@@ -7,6 +7,8 @@ Use one completed brief for one reviewable change.
 - Ticket / title:
 - Owner:
 - Context commit:
+- Owning app:
+- Depends on tasks/migrations:
 - Required outcome:
 
 ## Scope
@@ -14,6 +16,8 @@ Use one completed brief for one reviewable change.
 - In scope:
 - Out of scope:
 - Files allowed to change:
+- Public interfaces added/changed:
+- Shared files requiring coordination:
 
 ## Binding Context
 
@@ -21,6 +25,7 @@ Use one completed brief for one reviewable change.
 - Relevant models/services/interfaces:
 - Permission or object-access rule:
 - Pending decision IDs: None / Q-___
+- Data classification: Synthetic only / No record data required
 
 Stop if a pending decision materially affects implementation.
 
@@ -42,10 +47,10 @@ Use exact expected values for calculations and exact allowed/denied cases for pe
 
 Provide only:
 
-- `AI_CONTEXT.md`;
+- `TEAM_CONTEXT.md`;
 - this completed brief;
 - relevant source files and public interfaces;
-- relevant sections of `business-rules.md` or `erd.md`.
+- any task-specific source that changed after the context file was generated.
 
 Never include real employee/payroll data, secrets, `.env` files, database dumps, or production logs.
 

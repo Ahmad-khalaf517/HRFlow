@@ -9,7 +9,7 @@ The following minimum rules still apply because they prevent easy mistakes and d
 ## 2. Never Put in Consumer Web AI
 
 - Real employee names, contact details, salaries, leave reasons, bank data, tax data, or payslips.
-- Passwords, cookies, API keys, access tokens, private keys, or `.env` files.
+- Passwords, cookies, API keys, access tokens, private keys, Supabase keys/connection URLs, `DATABASE_URL`, or `.env` files.
 - Production database rows, dumps, logs, or screenshots.
 - Proprietary code when company policy does not allow it.
 
@@ -36,6 +36,8 @@ Turning off model training or using a temporary chat does not authorize uploadin
 - Keep `DEBUG=False`, HTTPS, and secure cookies as deployment requirements.
 - Do not log passwords, tokens, bank data, or complete payroll objects.
 - Use only synthetic seed/demo data.
+
+`Employee.bank_account_number` is currently a plain database field for synthetic demonstration values only. It is not approved for real bank data and is a production-readiness blocker until a separate security design is completed.
 
 ## 5. Lightweight Traceability
 

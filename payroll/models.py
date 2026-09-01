@@ -2,7 +2,7 @@ from django.conf import settings
 from django.db import models
 from django.db.models import CheckConstraint, Q, UniqueConstraint
 
-# docs/erd.md doesn't enumerate status values for Bonus/ManualDeduction. business-rules.md §8 only
+# docs/erd.md records the migrated status values. business-rules.md §6 only
 # says they're included when "their status is active/approved" — read here as a simple
 # active/cancelled toggle, since no approval workflow is otherwise specified for either entity.
 # Revisit if a real approval flow is added.
@@ -75,7 +75,7 @@ class ManualDeduction(models.Model):
         ]
 
     # Do not use this model for absence/unpaid-leave deductions — those are derived
-    # during payroll processing (docs/erd.md §5).
+    # during payroll processing (docs/business-rules.md §6).
     def __str__(self):
         return f"{self.employee} — {self.get_deduction_type_display()} ({self.amount})"
 
@@ -122,7 +122,7 @@ class Payroll(models.Model):
     total_gross = models.DecimalField(max_digits=14, decimal_places=2, default=0)
     total_deductions = models.DecimalField(max_digits=14, decimal_places=2, default=0)
     total_net = models.DecimalField(max_digits=14, decimal_places=2, default=0)
-    # Q-002 (docs/open-questions.md) is still unresolved; USD is the doc's own recommended
+    # Q-002 (docs/business-rules.md §1) is still unresolved; USD is the doc's own recommended
     # default, used here only as the field default, not a confirmed policy decision.
     currency_code = models.CharField(max_length=3, default="USD")
     created_by = models.ForeignKey(
@@ -160,7 +160,7 @@ class PayrollItem(models.Model):
     """One employee's snapshot within one payroll run.
 
     Historical snapshot — never dynamically recalculated from current
-    Employee/Contract values (docs/business-rules.md §9).
+    Employee/Contract values (docs/business-rules.md §7).
     """
 
     payroll = models.ForeignKey(Payroll, on_delete=models.PROTECT, related_name="items")
