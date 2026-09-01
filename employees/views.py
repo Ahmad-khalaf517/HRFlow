@@ -302,6 +302,35 @@ class EmployeeDetailView(
         )
 
 
+class EmployeeContractsTabView(
+    LoginRequiredMixin,
+    DetailView,
+):
+
+    """
+    The employee profile's "Contract" tab: this employee's contract history.
+    """
+
+    model = Employee
+    template_name = "employees/employee_contracts_tab.html"
+    context_object_name = "employee"
+
+    def get_queryset(self):
+
+        return Employee.objects.select_related(
+            "department",
+            "position",
+        )
+
+    def get_context_data(self, **kwargs):
+
+        context = super().get_context_data(**kwargs)
+
+        context["contracts"] = self.object.contracts.all()
+
+        return context
+
+
 class EmployeeUpdateView(
     HRManagementRequiredMixin,
     SuccessMessageMixin,

@@ -16,6 +16,7 @@ from .views import (
     DepartmentListView,
     DepartmentUpdateView,
     # Employees
+    EmployeeContractsTabView,
     EmployeeCreateView,
     EmployeeDeactivateView,
     EmployeeDetailView,
@@ -173,6 +174,12 @@ urlpatterns = [
         "<int:pk>/",
         EmployeeDetailView.as_view(),
         name="employee-detail",
+    ),
+
+    path(
+        "<int:pk>/contract/",
+        EmployeeContractsTabView.as_view(),
+        name="employee-contract-tab",
     ),
 
     path(

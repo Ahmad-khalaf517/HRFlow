@@ -1,0 +1,85 @@
+{% comment %}
+Usage: {% include "employees/_employee_profile_header.html" with employee=employee %}
+Shared by the Overview and Contract tabs of the employee profile.
+{% endcomment %}
+
+<div class="rounded border border-outline-variant bg-surface-container-lowest p-6">
+
+    <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+
+        <div class="flex items-center gap-4">
+
+            <div class="flex h-16 w-16 items-center justify-center rounded bg-secondary-container text-xl font-bold text-on-secondary-container">
+                {{ employee.first_name|first }}{{ employee.last_name|first }}
+            </div>
+
+            <div>
+
+                <div class="flex items-center gap-3">
+                    <h1 class="text-headline-md text-on-surface">{{ employee.first_name }} {{ employee.last_name }}</h1>
+                    {% include "employees/_status_badge.html" with status=employee.employment_status %}
+                </div>
+
+                <p class="text-body-md text-on-surface-variant">
+                    {{ employee.employee_number }}
+                    {% if employee.position or employee.department %}
+                        ·
+                        {% if employee.position %}{{ employee.position.title }}{% endif %}
+                        {% if employee.position and employee.department %}·{% endif %}
+                        {% if employee.department %}{{ employee.department.name }}{% endif %}
+                    {% endif %}
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="flex flex-wrap items-center gap-3">
+
+            <a href="{% url 'employees:employee-update' employee.pk %}" class="btn-primary">
+                Edit Employee
+            </a>
+
+            {% if employee.employment_status == "active" %}
+
+                <form
+                    method="post"
+                    action="{% url 'employees:employee-deactivate' employee.pk %}"
+                    onsubmit="return confirm('Are you sure you want to deactivate this employee?');"
+                >
+                    {% csrf_token %}
+                    <button type="submit" class="btn-secondary">Deactivate</button>
+                </form>
+
+                <form
+                    method="post"
+                    action="{% url 'employees:employee-terminate' employee.pk %}"
+                    onsubmit="return confirm('Are you sure you want to terminate this employee? This action will change their employment status to Terminated.');"
+                >
+                    {% csrf_token %}
+                    <button type="submit" class="rounded bg-error px-4 py-2 text-body-md font-semibold text-on-error hover:opacity-90">Terminate</button>
+                </form>
+
+            {% elif employee.employment_status == "inactive" %}
+
+                <form
+                    method="post"
+                    action="{% url 'employees:employee-reactivate' employee.pk %}"
+                    onsubmit="return confirm('Are you sure you want to reactivate this employee?');"
+                >
+                    {% csrf_token %}
+                    <button type="submit" class="btn-primary">Reactivate</button>
+                </form>
+
+            {% endif %}
+
+            <a href="{% url 'employees:employee-list' %}" class="rounded border border-outline-variant px-4 py-2 text-body-md text-on-surface">
+                Back to Employees
+            </a>
+
+        </div>
+
+    </div>
+
+</div>

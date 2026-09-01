@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ employee.first_name }} {{ employee.last_name }} — Contract
+{% endblock %}
+
+
+{% block content %}
+
+<div class="space-y-6">
+
+    {% include "employees/_employee_profile_header.html" with employee=employee %}
+
+    {% include "employees/_employee_tabs.html" with employee=employee active="contract" %}
+
+
+    <div class="flex items-center justify-between">
+
+        <p class="text-body-md text-on-surface-variant">
+            Contract history for {{ employee.first_name }} {{ employee.last_name }}.
+        </p>
+
+        {% if user.groups.all %}
+
+            <a href="{% url 'employees:contract-create' %}" class="btn-primary">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M12 5v14M5 12h14"/></svg>
+                Add Contract
+            </a>
+
+        {% endif %}
+
+    </div>
+
+
+    <div class="overflow-hidden rounded border border-outline-variant bg-surface-container-lowest">
+
+        <div class="overflow-x-auto">
+
+            <table class="w-full">
+
+                <thead class="bg-primary text-on-primary">
+
+                    <tr>
+                        <th class="px-5 py-4 text-left text-label-caps">Contract Type</th>
+                        <th class="px-5 py-4 text-left text-label-caps">Start Date</th>
+                        <th class="px-5 py-4 text-left text-label-caps">End Date</th>
+                        <th class="px-5 py-4 text-left text-label-caps">Basic Salary</th>
+                        <th class="px-5 py-4 text-left text-label-caps">Status</th>
+                        <th class="px-5 py-4 text-right text-label-caps">Actions</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for contract in contracts %}
+
+                        <tr class="border-b border-outline-variant last:border-0">
+
+                            <td class="px-5 py-4 font-medium text-on-surface">
+                                {{ contract.get_contract_type_display }}
+                            </td>
+
+                            <td class="px-5 py-4 text-body-md text-on-surface">
+                                {{ contract.start_date|date:"M d, Y" }}
+                            </td>
+
+                            <td class="px-5 py-4 text-body-md text-on-surface">
+                                {% if contract.end_date %}{{ contract.end_date|date:"M d, Y" }}{% else %}—{% endif %}
+                            </td>
+
+                            <td class="px-5 py-4 text-data-mono text-on-surface">
+                                ${{ contract.basic_salary }}
+                            </td>
+
+                            <td class="px-5 py-4">
+                                {% include "employees/_status_badge.html" with status=contract.status %}
+                            </td>
+
+                            <td class="px-5 py-4 text-right">
+                                <a href="{% url 'employees:contract-detail' contract.pk %}" class="text-body-md font-semibold text-on-surface">
+                                    View
+                                </a>
+                            </td>
+
+                        </tr>
+
+                    {% empty %}
+
+                        <tr>
+                            <td colspan="6" class="px-5 py-10 text-center text-body-md text-on-surface-variant">
+                                No contracts on file for this employee.
+                            </td>
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

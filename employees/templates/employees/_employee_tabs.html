@@ -1,0 +1,11 @@
+{% comment %}Usage: {% include "employees/_employee_tabs.html" with employee=employee active="overview" %} — active is one of overview/contract{% endcomment %}
+<nav class="flex gap-1 border-b border-outline-variant">
+    <a href="{% url 'employees:employee-detail' employee.pk %}"
+       class="px-3 py-2 text-body-md {% if active == 'overview' %}text-primary font-semibold border-b-2 border-primary{% else %}text-on-surface-variant hover:text-on-surface{% endif %}">
+        Overview
+    </a>
+    <a href="{% url 'employees:employee-contract-tab' employee.pk %}"
+       class="px-3 py-2 text-body-md {% if active == 'contract' %}text-primary font-semibold border-b-2 border-primary{% else %}text-on-surface-variant hover:text-on-surface{% endif %}">
+        Contract
+    </a>
+</nav>
