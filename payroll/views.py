@@ -150,7 +150,9 @@ def run_create(request):
 
 @require_payroll_manager
 def run_detail(request, pk):
-    run = get_object_or_404(Payroll, pk=pk)
+    run = get_object_or_404(
+        Payroll.objects.select_related("created_by", "reviewed_by", "approved_by"), pk=pk
+    )
     items = run.items.select_related("employee").order_by("employee__last_name")
     return render(request, "payroll/run_detail.html", {"run": run, "items": items})
 

@@ -154,12 +154,18 @@ Employee Details
 
             <div>
 
-                <h2 class="text-headline-md text-on-surface">
+                <div class="flex items-center gap-3">
 
-                    {{ employee.first_name }}
-                    {{ employee.last_name }}
+                    <h2 class="text-headline-md text-on-surface">
 
-                </h2>
+                        {{ employee.first_name }}
+                        {{ employee.last_name }}
+
+                    </h2>
+
+                    {% include "employees/_status_badge.html" with status=employee.employment_status %}
+
+                </div>
 
 
                 <p class="text-body-md text-on-surface-variant">
