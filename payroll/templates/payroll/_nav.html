@@ -1,0 +1,19 @@
+{% comment %}Usage: {% include "payroll/_nav.html" with active="runs" %} — active is one of runs/bonuses/deductions/tax-brackets{% endcomment %}
+<nav class="flex gap-1 border-b border-outline-variant mb-4">
+    <a href="{% url 'payroll:run-list' %}"
+       class="px-3 py-2 text-body-md {% if active == 'runs' %}text-primary font-semibold border-b-2 border-primary{% else %}text-on-surface-variant hover:text-on-surface{% endif %}">
+        Payroll runs
+    </a>
+    <a href="{% url 'payroll:bonus-list' %}"
+       class="px-3 py-2 text-body-md {% if active == 'bonuses' %}text-primary font-semibold border-b-2 border-primary{% else %}text-on-surface-variant hover:text-on-surface{% endif %}">
+        Bonuses
+    </a>
+    <a href="{% url 'payroll:deduction-list' %}"
+       class="px-3 py-2 text-body-md {% if active == 'deductions' %}text-primary font-semibold border-b-2 border-primary{% else %}text-on-surface-variant hover:text-on-surface{% endif %}">
+        Deductions
+    </a>
+    <a href="{% url 'payroll:tax-bracket-list' %}"
+       class="px-3 py-2 text-body-md {% if active == 'tax-brackets' %}text-primary font-semibold border-b-2 border-primary{% else %}text-on-surface-variant hover:text-on-surface{% endif %}">
+        Tax brackets
+    </a>
+</nav>

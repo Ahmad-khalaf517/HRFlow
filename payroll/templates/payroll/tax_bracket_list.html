@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Tax brackets · HRFlow{% endblock %}
+
+{% block page_title %}
+<h1 class="text-headline-md text-on-surface">Tax configuration</h1>
+{% endblock %}
+
+{% block content %}
+{% include "payroll/_nav.html" with active="tax-brackets" %}
+<div class="max-w-4xl space-y-4">
+    <div class="flex items-end justify-between">
+        <p class="text-body-md text-on-surface-variant">Configure demonstrative tax brackets matched against gross salary.</p>
+        <a href="{% url 'payroll:tax-bracket-create' %}" class="btn-primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M12 5v14M5 12h14"/></svg>
+            Add bracket
+        </a>
+    </div>
+
+    <div class="card p-0 overflow-x-auto">
+        <table class="w-full text-left">
+            <thead>
+                <tr class="bg-primary text-on-primary">
+                    <th class="px-4 py-2 text-label-caps">Name</th>
+                    <th class="px-4 py-2 text-label-caps">Min amount</th>
+                    <th class="px-4 py-2 text-label-caps">Max amount</th>
+                    <th class="px-4 py-2 text-label-caps">Percentage</th>
+                    <th class="px-4 py-2 text-label-caps">Fixed amount</th>
+                    <th class="px-4 py-2 text-label-caps">Status</th>
+                    <th class="px-4 py-2 text-label-caps"></th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-outline-variant">
+                {% for bracket in brackets %}
+                <tr class="even:bg-surface-container-low">
+                    <td class="px-4 py-3 text-body-md text-on-surface">{{ bracket.name }}</td>
+                    <td class="px-4 py-3 text-data-mono text-on-surface">${{ bracket.min_amount }}</td>
+                    <td class="px-4 py-3 text-data-mono text-on-surface">{% if bracket.max_amount %}${{ bracket.max_amount }}{% else %}—{% endif %}</td>
+                    <td class="px-4 py-3 text-data-mono text-on-surface">{{ bracket.percentage }}%</td>
+                    <td class="px-4 py-3 text-data-mono text-on-surface">${{ bracket.fixed_amount }}</td>
+                    <td class="px-4 py-3">
+                        {% if bracket.is_active %}
+                            <span class="badge bg-secondary-container text-on-secondary-container">Active</span>
+                        {% else %}
+                            <span class="badge bg-surface-container text-on-surface-variant">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-4 py-3 text-right">
+                        <form method="post" action="{% url 'payroll:tax-bracket-toggle' bracket.pk %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-ghost">{% if bracket.is_active %}Deactivate{% else %}Activate{% endif %}</button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7" class="px-4 py-6 text-center text-body-md text-on-surface-variant">No tax brackets configured yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

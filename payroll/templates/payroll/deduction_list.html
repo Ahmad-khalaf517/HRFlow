@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Manual deductions · HRFlow{% endblock %}
+
+{% block page_title %}
+<h1 class="text-headline-md text-on-surface">Manual deductions</h1>
+{% endblock %}
+
+{% block content %}
+{% include "payroll/_nav.html" with active="deductions" %}
+<div class="max-w-4xl space-y-4">
+    <div class="flex items-end justify-between">
+        <p class="text-body-md text-on-surface-variant">Record and manage manual employee deductions included in payroll calculation.</p>
+        <a href="{% url 'payroll:deduction-create' %}" class="btn-primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M12 5v14M5 12h14"/></svg>
+            Record deduction
+        </a>
+    </div>
+
+    <div class="card p-0 overflow-x-auto">
+        <table class="w-full text-left">
+            <thead>
+                <tr class="bg-primary text-on-primary">
+                    <th class="px-4 py-2 text-label-caps">Employee</th>
+                    <th class="px-4 py-2 text-label-caps">Type</th>
+                    <th class="px-4 py-2 text-label-caps">Amount (USD)</th>
+                    <th class="px-4 py-2 text-label-caps">Effective date</th>
+                    <th class="px-4 py-2 text-label-caps">Status</th>
+                    <th class="px-4 py-2 text-label-caps"></th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-outline-variant">
+                {% for deduction in deductions %}
+                <tr class="even:bg-surface-container-low">
+                    <td class="px-4 py-3 text-body-md text-on-surface">{{ deduction.employee }}</td>
+                    <td class="px-4 py-3 text-body-md text-on-surface-variant">{{ deduction.get_deduction_type_display }}</td>
+                    <td class="px-4 py-3 text-data-mono text-on-surface">${{ deduction.amount }}</td>
+                    <td class="px-4 py-3 text-body-md text-on-surface-variant">{{ deduction.effective_date }}</td>
+                    <td class="px-4 py-3">
+                        {% if deduction.status == "active" %}
+                            <span class="badge bg-secondary-container text-on-secondary-container">Active</span>
+                        {% else %}
+                            <span class="badge bg-surface-container text-on-surface-variant">Cancelled</span>
+                        {% endif %}
+                    </td>
+                    <td class="px-4 py-3 text-right">
+                        {% if deduction.status == "active" %}
+                        <form method="post" action="{% url 'payroll:deduction-cancel' deduction.pk %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-ghost">Cancel</button>
+                        </form>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="px-4 py-6 text-center text-body-md text-on-surface-variant">No manual deductions recorded yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

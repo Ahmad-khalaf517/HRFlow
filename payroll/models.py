@@ -33,7 +33,13 @@ class Bonus(models.Model):
 
     class Meta:
         ordering = ["-effective_date"]
-        constraints = [CheckConstraint(condition=Q(amount__gte=0), name="bonus_amount_gte_0")]
+        constraints = [
+            CheckConstraint(
+                condition=Q(amount__gte=0),
+                name="bonus_amount_gte_0",
+                violation_error_message="Amount cannot be negative.",
+            )
+        ]
 
     def __str__(self):
         return f"{self.employee} — {self.amount} ({self.effective_date})"
@@ -71,7 +77,11 @@ class ManualDeduction(models.Model):
     class Meta:
         ordering = ["-effective_date"]
         constraints = [
-            CheckConstraint(condition=Q(amount__gte=0), name="manualdeduction_amount_gte_0")
+            CheckConstraint(
+                condition=Q(amount__gte=0),
+                name="manualdeduction_amount_gte_0",
+                violation_error_message="Amount cannot be negative.",
+            )
         ]
 
     # Do not use this model for absence/unpaid-leave deductions — those are derived
@@ -93,11 +103,20 @@ class TaxBracket(models.Model):
     class Meta:
         ordering = ["min_amount"]
         constraints = [
-            CheckConstraint(condition=Q(min_amount__gte=0), name="taxbracket_min_amount_gte_0"),
-            CheckConstraint(condition=Q(percentage__gte=0), name="taxbracket_percentage_gte_0"),
+            CheckConstraint(
+                condition=Q(min_amount__gte=0),
+                name="taxbracket_min_amount_gte_0",
+                violation_error_message="Min amount cannot be negative.",
+            ),
+            CheckConstraint(
+                condition=Q(percentage__gte=0),
+                name="taxbracket_percentage_gte_0",
+                violation_error_message="Percentage cannot be negative.",
+            ),
             CheckConstraint(
                 condition=Q(max_amount__isnull=True) | Q(max_amount__gte=models.F("min_amount")),
                 name="taxbracket_max_amount_gte_min_amount",
+                violation_error_message="Max amount must be greater than or equal to min amount.",
             ),
         ]
 
@@ -154,6 +173,11 @@ class Payroll(models.Model):
 
     def __str__(self):
         return f"Payroll {self.month:02d}/{self.year} ({self.get_status_display()})"
+
+    @property
+    def lifecycle_step(self):
+        """0-based index of `status` in STATUS_CHOICES order, for the lifecycle stepper UI."""
+        return [choice[0] for choice in self.STATUS_CHOICES].index(self.status)
 
 
 class PayrollItem(models.Model):

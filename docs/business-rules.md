@@ -9,9 +9,11 @@ Payroll calculation work is blocked until Q-002 through Q-004 are approved. Do n
 | ID | Decision | Recommended default | Status |
 |---|---|---|---|
 | Q-001 | HRFlow uses synthetic/demo data and is not used for real payroll | Approve | Pending |
-| Q-002 | Single currency shown in payroll and payslips | USD | Pending |
-| Q-003 | Daily rate = salary / 30; hourly rate = daily rate / contract hours; overtime = hourly rate × 1.5 | Approve | Pending |
-| Q-004 | Leave counts Monday-Friday only; weekends excluded; no holiday calendar | Approve | Pending |
+| Q-002 | Single currency shown in payroll and payslips | USD | Confirmed |
+| Q-003 | Daily rate = salary / 30; hourly rate = daily rate / contract hours; overtime = hourly rate × 1.5 | Approve | Confirmed |
+| Q-004 | Leave counts Monday-Friday only; weekends excluded; no holiday calendar | Approve | Confirmed |
+
+Q-002 through Q-004 approved by Ahmad Khalaf on 2026-09-01 using the recommended defaults above, unblocking payroll calculation work (HRF-25). Q-001 remains Pending — resolve separately.
 
 The business owner may resolve all four by approving the recommended defaults. Record the approver and date in this section and change each accepted status to `Confirmed`.
 

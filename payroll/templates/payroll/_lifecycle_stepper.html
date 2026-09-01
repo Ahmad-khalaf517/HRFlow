@@ -1,0 +1,78 @@
+{% comment %}
+Usage: {% include "payroll/_lifecycle_stepper.html" with current_step=run.lifecycle_step %}
+current_step: 0=Draft 1=Calculated 2=Reviewed 3=Approved 4=Paid
+Mirrors the Stitch "Payroll Lifecycle" stepper.
+{% endcomment %}
+<div class="card">
+    <p class="text-label-caps text-on-surface-variant mb-4">Payroll lifecycle</p>
+    <div class="flex items-start">
+        <div class="flex flex-col items-center gap-2">
+            <div class="w-9 h-9 rounded flex items-center justify-center border
+                {% if current_step > 0 %}bg-primary-container border-primary-container text-on-primary-container
+                {% elif current_step == 0 %}bg-secondary border-secondary text-on-secondary
+                {% else %}bg-surface-container-low border-outline-variant text-outline{% endif %}">
+                {% if current_step > 0 %}
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M5 12l4.5 4.5L19 7"/></svg>
+                {% else %}
+                <span class="w-2 h-2 rounded-full bg-current"></span>
+                {% endif %}
+            </div>
+            <span class="text-label-caps {% if current_step >= 0 %}text-on-surface{% else %}text-outline{% endif %}">Draft</span>
+        </div>
+        <div class="flex-1 h-px mt-[18px] {% if current_step > 0 %}bg-primary-container{% else %}bg-outline-variant{% endif %}"></div>
+
+        <div class="flex flex-col items-center gap-2">
+            <div class="w-9 h-9 rounded flex items-center justify-center border
+                {% if current_step > 1 %}bg-primary-container border-primary-container text-on-primary-container
+                {% elif current_step == 1 %}bg-secondary border-secondary text-on-secondary
+                {% else %}bg-surface-container-low border-outline-variant text-outline{% endif %}">
+                {% if current_step > 1 %}
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M5 12l4.5 4.5L19 7"/></svg>
+                {% else %}
+                <span class="w-2 h-2 rounded-full bg-current"></span>
+                {% endif %}
+            </div>
+            <span class="text-label-caps {% if current_step >= 1 %}text-on-surface{% else %}text-outline{% endif %}">Calculated</span>
+        </div>
+        <div class="flex-1 h-px mt-[18px] {% if current_step > 1 %}bg-primary-container{% else %}bg-outline-variant{% endif %}"></div>
+
+        <div class="flex flex-col items-center gap-2">
+            <div class="w-9 h-9 rounded flex items-center justify-center border
+                {% if current_step > 2 %}bg-primary-container border-primary-container text-on-primary-container
+                {% elif current_step == 2 %}bg-secondary border-secondary text-on-secondary
+                {% else %}bg-surface-container-low border-outline-variant text-outline{% endif %}">
+                {% if current_step > 2 %}
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M5 12l4.5 4.5L19 7"/></svg>
+                {% else %}
+                <span class="w-2 h-2 rounded-full bg-current"></span>
+                {% endif %}
+            </div>
+            <span class="text-label-caps {% if current_step >= 2 %}text-on-surface{% else %}text-outline{% endif %}">Reviewed</span>
+        </div>
+        <div class="flex-1 h-px mt-[18px] {% if current_step > 2 %}bg-primary-container{% else %}bg-outline-variant{% endif %}"></div>
+
+        <div class="flex flex-col items-center gap-2">
+            <div class="w-9 h-9 rounded flex items-center justify-center border
+                {% if current_step > 3 %}bg-primary-container border-primary-container text-on-primary-container
+                {% elif current_step == 3 %}bg-secondary border-secondary text-on-secondary
+                {% else %}bg-surface-container-low border-outline-variant text-outline{% endif %}">
+                {% if current_step > 3 %}
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M5 12l4.5 4.5L19 7"/></svg>
+                {% else %}
+                <span class="w-2 h-2 rounded-full bg-current"></span>
+                {% endif %}
+            </div>
+            <span class="text-label-caps {% if current_step >= 3 %}text-on-surface{% else %}text-outline{% endif %}">Approved</span>
+        </div>
+        <div class="flex-1 h-px mt-[18px] {% if current_step > 3 %}bg-primary-container{% else %}bg-outline-variant{% endif %}"></div>
+
+        <div class="flex flex-col items-center gap-2">
+            <div class="w-9 h-9 rounded flex items-center justify-center border
+                {% if current_step == 4 %}bg-secondary border-secondary text-on-secondary
+                {% else %}bg-surface-container-low border-outline-variant text-outline{% endif %}">
+                <span class="w-2 h-2 rounded-full bg-current"></span>
+            </div>
+            <span class="text-label-caps {% if current_step >= 4 %}text-on-surface{% else %}text-outline{% endif %}">Paid</span>
+        </div>
+    </div>
+</div>

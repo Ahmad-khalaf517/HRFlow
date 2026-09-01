@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}New payroll run · HRFlow{% endblock %}
+
+{% block page_title %}
+<h1 class="text-headline-md text-on-surface">New payroll run</h1>
+{% endblock %}
+
+{% block content %}
+<a href="{% url 'payroll:run-list' %}" class="inline-flex items-center gap-1 text-body-sm text-on-surface-variant hover:text-primary mb-4">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M15 5l-7 7 7 7"/></svg>
+    Back to payroll
+</a>
+<div class="max-w-sm">
+    <div class="card">
+        <p class="text-headline-md text-on-surface">Initialize payroll run</p>
+        <p class="text-body-sm text-on-surface-variant mt-1">Select the pay period to begin calculations.</p>
+        <hr class="border-outline-variant my-4">
+        {% if form.non_field_errors %}
+            <div class="mb-4 rounded border border-error bg-error-container px-3 py-2 text-body-sm text-on-error-container">
+                {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
+            </div>
+        {% endif %}
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {% include "components/field.html" with field=form.month %}
+            {% include "components/field.html" with field=form.year %}
+            <div class="flex justify-end gap-2 mt-2">
+                <a href="{% url 'payroll:run-list' %}" class="btn-secondary">Cancel</a>
+                <button type="submit" class="btn-primary">Create run</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

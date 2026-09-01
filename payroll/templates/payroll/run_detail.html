@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}Payroll {{ run.month|stringformat:"02d" }}/{{ run.year }} · HRFlow{% endblock %}
+
+{% block page_title %}
+<div class="flex items-center gap-3">
+    <h1 class="text-headline-md text-on-surface">Payroll {{ run.month|stringformat:"02d" }}/{{ run.year }}</h1>
+    {% include "payroll/_status_badge.html" with status=run.status %}
+</div>
+{% endblock %}
+
+{% block content %}
+{% include "payroll/_nav.html" with active="runs" %}
+<div class="max-w-6xl space-y-6">
+    <p class="text-body-md text-on-surface-variant -mt-2">Review totals and the employee-level breakdown for this payroll period.</p>
+
+    {% include "payroll/_lifecycle_stepper.html" with current_step=run.lifecycle_step %}
+
+    <!-- Totals -->
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div class="card">
+            <div class="flex items-center justify-between">
+                <p class="text-label-caps text-on-surface-variant">Total gross</p>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-outline"><path d="M3 7.5A1.5 1.5 0 0 1 4.5 6h13A1.5 1.5 0 0 1 19 7.5v10a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 3 17.5z"/><path d="M15.5 12.5h3.5a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-3.5a2 2 0 0 1 0-4Z"/></svg>
+            </div>
+            <p class="text-display text-on-surface mt-2 text-data-mono">${{ run.total_gross }}</p>
+        </div>
+        <div class="card">
+            <div class="flex items-center justify-between">
+                <p class="text-label-caps text-on-surface-variant">Total deductions</p>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-outline"><path d="M12 3.5v13M12 16.5l-4.5-4.5M12 16.5l4.5-4.5"/><path d="M4.5 20.5h15"/></svg>
+            </div>
+            <p class="text-display text-on-surface mt-2 text-data-mono">${{ run.total_deductions }}</p>
+        </div>
+        <div class="card">
+            <div class="flex items-center justify-between">
+                <p class="text-label-caps text-on-surface-variant">Total net</p>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-outline"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v8M9.5 10a2.5 2 0 0 1 2.5-1.5c1.4 0 2.5.8 2.5 1.8 0 2.2-5 1.2-5 3.4 0 1 1.1 1.8 2.5 1.8s2.5-.6 2.5-1.5"/></svg>
+            </div>
+            <p class="text-display text-on-surface mt-2 text-data-mono">${{ run.total_net }}</p>
+        </div>
+    </div>
+
+    {% if run.status == "approved" or run.status == "paid" %}
+    <div class="rounded border border-primary-container bg-surface-container-low px-4 py-3 flex items-center gap-3">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-primary shrink-0"><rect x="5" y="10.5" width="14" height="9" rx="1.5"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg>
+        <div>
+            <p class="text-body-md font-semibold text-on-surface">Payroll is locked</p>
+            <p class="text-body-sm text-on-surface-variant">Approved payroll cannot be recalculated or edited through normal flows.</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Status actions -->
+    <div class="card flex flex-wrap items-center gap-3">
+        <span class="text-body-sm text-on-surface-variant">Period: {{ run.period_start }} – {{ run.period_end }} · {{ run.currency_code }}</span>
+        <div class="flex-1"></div>
+        {% if run.status == "draft" or run.status == "calculated" %}
+        <form method="post" action="{% url 'payroll:run-calculate' run.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="btn-secondary">{% if run.status == "calculated" %}Recalculate{% else %}Calculate{% endif %}</button>
+        </form>
+        {% endif %}
+        {% if run.status == "calculated" %}
+        <form method="post" action="{% url 'payroll:run-review' run.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="btn-primary">Mark reviewed</button>
+        </form>
+        {% endif %}
+        {% if run.status == "reviewed" %}
+        <form method="post" action="{% url 'payroll:run-approve' run.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="btn-primary">Approve</button>
+        </form>
+        {% endif %}
+    </div>
+
+    <!-- Items -->
+    <div class="card p-0 overflow-x-auto">
+        <table class="w-full text-left">
+            <thead>
+                <tr class="bg-primary text-on-primary">
+                    <th class="px-3 py-2 text-label-caps">Employee</th>
+                    <th class="px-3 py-2 text-label-caps">Basic</th>
+                    <th class="px-3 py-2 text-label-caps">Overtime</th>
+                    <th class="px-3 py-2 text-label-caps">Bonus</th>
+                    <th class="px-3 py-2 text-label-caps">Gross</th>
+                    <th class="px-3 py-2 text-label-caps">Absence ded.</th>
+                    <th class="px-3 py-2 text-label-caps">Unpaid leave ded.</th>
+                    <th class="px-3 py-2 text-label-caps">Manual ded.</th>
+                    <th class="px-3 py-2 text-label-caps">Tax</th>
+                    <th class="px-3 py-2 text-label-caps">Total ded.</th>
+                    <th class="px-3 py-2 text-label-caps">Net</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-outline-variant">
+                {% for item in items %}
+                <tr class="even:bg-surface-container-low">
+                    <td class="px-3 py-3 text-body-md text-on-surface">{{ item.employee }}</td>
+                    <td class="px-3 py-3 text-data-mono text-on-surface">${{ item.basic_salary }}</td>
+                    <td class="px-3 py-3 text-data-mono text-on-surface">${{ item.overtime_amount }}</td>
+                    <td class="px-3 py-3 text-data-mono text-on-surface">${{ item.bonus_amount }}</td>
+                    <td class="px-3 py-3 text-data-mono text-on-surface font-semibold">${{ item.gross_salary }}</td>
+                    <td class="px-3 py-3 text-data-mono text-on-surface-variant">${{ item.absence_deduction }}</td>
+                    <td class="px-3 py-3 text-data-mono text-on-surface-variant">${{ item.unpaid_leave_deduction }}</td>
+                    <td class="px-3 py-3 text-data-mono text-on-surface-variant">${{ item.manual_deduction_amount }}</td>
+                    <td class="px-3 py-3 text-data-mono text-on-surface-variant">${{ item.tax_amount }}</td>
+                    <td class="px-3 py-3 text-data-mono text-on-surface">${{ item.total_deductions }}</td>
+                    <td class="px-3 py-3 text-data-mono text-on-surface font-semibold">${{ item.net_salary }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="11" class="px-3 py-6 text-center text-body-md text-on-surface-variant">Not calculated yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

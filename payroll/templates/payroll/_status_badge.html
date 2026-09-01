@@ -1,0 +1,14 @@
+{% comment %}Usage: {% include "payroll/_status_badge.html" with status=run.status %}{% endcomment %}
+{% if status == "draft" %}
+    <span class="badge bg-surface-container text-on-surface-variant">Draft</span>
+{% elif status == "calculated" %}
+    <span class="badge bg-secondary-container text-on-secondary-container">Calculated</span>
+{% elif status == "reviewed" %}
+    <span class="badge bg-tertiary-container text-on-tertiary-container">Reviewed</span>
+{% elif status == "approved" %}
+    <span class="badge bg-primary-container text-on-primary-container">Approved</span>
+{% elif status == "paid" %}
+    <span class="badge bg-secondary-container text-on-secondary-container">Paid</span>
+{% else %}
+    <span class="badge bg-surface-container text-on-surface-variant">{{ status }}</span>
+{% endif %}

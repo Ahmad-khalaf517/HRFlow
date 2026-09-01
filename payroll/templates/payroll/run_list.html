@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Payroll runs · HRFlow{% endblock %}
+
+{% block page_title %}
+<h1 class="text-headline-md text-on-surface">Payroll runs</h1>
+{% endblock %}
+
+{% block content %}
+{% include "payroll/_nav.html" with active="runs" %}
+<div class="max-w-6xl space-y-4">
+    <div class="flex items-end justify-between">
+        <p class="text-body-md text-on-surface-variant">Manage, process, and review organization payroll cycles.</p>
+        <a href="{% url 'payroll:run-create' %}" class="btn-primary">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M12 5v14M5 12h14"/></svg>
+            New payroll run
+        </a>
+    </div>
+
+    <div class="card p-0 overflow-x-auto">
+        <table class="w-full text-left">
+            <thead>
+                <tr class="bg-primary text-on-primary">
+                    <th class="px-4 py-2 text-label-caps">Period</th>
+                    <th class="px-4 py-2 text-label-caps">Status</th>
+                    <th class="px-4 py-2 text-label-caps">Employees</th>
+                    <th class="px-4 py-2 text-label-caps">Total gross (USD)</th>
+                    <th class="px-4 py-2 text-label-caps">Total deductions (USD)</th>
+                    <th class="px-4 py-2 text-label-caps">Total net (USD)</th>
+                    <th class="px-4 py-2 text-label-caps">Created</th>
+                    <th class="px-4 py-2 text-label-caps"></th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-outline-variant">
+                {% for run in runs %}
+                <tr class="even:bg-surface-container-low hover:bg-surface-container cursor-pointer" onclick="window.location='{% url "payroll:run-detail" run.pk %}'">
+                    <td class="px-4 py-3 text-body-md text-on-surface">
+                        <a href="{% url 'payroll:run-detail' run.pk %}" class="hover:underline">{{ run.month|stringformat:"02d" }}/{{ run.year }}</a>
+                    </td>
+                    <td class="px-4 py-3">{% include "payroll/_status_badge.html" with status=run.status %}</td>
+                    <td class="px-4 py-3 text-data-mono text-on-surface-variant">{{ run.item_count }}</td>
+                    <td class="px-4 py-3 text-data-mono text-on-surface">${{ run.total_gross }}</td>
+                    <td class="px-4 py-3 text-data-mono text-on-surface">${{ run.total_deductions }}</td>
+                    <td class="px-4 py-3 text-data-mono text-on-surface font-semibold">${{ run.total_net }}</td>
+                    <td class="px-4 py-3 text-body-sm text-on-surface-variant">{{ run.created_at|date:"M d, Y" }}</td>
+                    <td class="px-4 py-3 text-right">
+                        <a href="{% url 'payroll:run-detail' run.pk %}" class="inline-flex text-on-surface-variant hover:text-primary" aria-label="View payroll {{ run.month|stringformat:'02d' }}/{{ run.year }}">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="2.5"/></svg>
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="8" class="px-4 py-6 text-center text-body-md text-on-surface-variant">No payroll runs yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

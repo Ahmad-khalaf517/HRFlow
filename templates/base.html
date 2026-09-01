@@ -14,17 +14,37 @@
     <div class="min-h-screen flex">
         <!-- Sidebar: fixed 240px per docs/design-system.md -->
         <aside class="w-[240px] shrink-0 bg-primary text-on-primary hidden md:flex md:flex-col">
-            <div class="h-16 flex items-center px-6 border-b border-white/10">
+            <div class="h-16 flex items-center gap-2 px-6 border-b border-white/10">
+                <span class="w-7 h-7 rounded bg-secondary text-on-secondary flex items-center justify-center text-body-sm font-bold shrink-0">H</span>
                 <span class="text-headline-md">HRFlow</span>
             </div>
             <nav class="flex-1 px-3 py-4 space-y-1">
-                <!-- Placeholder links: wired up as each module ships -->
-                <a href="{% url 'home' %}" class="block rounded px-3 py-2 text-body-md font-semibold bg-primary-container">Dashboard</a>
-                <a href="#" class="block rounded px-3 py-2 text-body-md text-on-primary-container hover:bg-primary-container">Employees</a>
-                <a href="#" class="block rounded px-3 py-2 text-body-md text-on-primary-container hover:bg-primary-container">Attendance</a>
-                <a href="#" class="block rounded px-3 py-2 text-body-md text-on-primary-container hover:bg-primary-container">Leave</a>
-                <a href="#" class="block rounded px-3 py-2 text-body-md text-on-primary-container hover:bg-primary-container">Payroll</a>
-                <a href="#" class="block rounded px-3 py-2 text-body-md text-on-primary-container hover:bg-primary-container">Payslips</a>
+                <!-- Placeholder links: wired up as each module ships. Active section
+                     is derived from request.resolver_match.app_name, not hardcoded. -->
+                <a href="{% url 'home' %}" class="flex items-center gap-3 rounded px-3 py-2 text-body-md {% if request.resolver_match.app_name == 'payroll' %}text-on-primary-container hover:bg-primary-container{% else %}font-semibold bg-primary-container{% endif %}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                    Dashboard
+                </a>
+                <a href="#" class="flex items-center gap-3 rounded px-3 py-2 text-body-md text-on-primary-container hover:bg-primary-container">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14.2c2.4.4 4.5 2.4 4.5 5.8"/></svg>
+                    Employees
+                </a>
+                <a href="#" class="flex items-center gap-3 rounded px-3 py-2 text-body-md text-on-primary-container hover:bg-primary-container">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
+                    Attendance
+                </a>
+                <a href="#" class="flex items-center gap-3 rounded px-3 py-2 text-body-md text-on-primary-container hover:bg-primary-container">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><rect x="3.5" y="5" width="17" height="15.5" rx="1.5"/><path d="M3.5 9.5h17M8 3v3M16 3v3"/></svg>
+                    Leave
+                </a>
+                <a href="{% url 'payroll:run-list' %}" class="flex items-center gap-3 rounded px-3 py-2 text-body-md {% if request.resolver_match.app_name == 'payroll' %}font-semibold bg-primary-container{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><path d="M3 7.5A1.5 1.5 0 0 1 4.5 6h13A1.5 1.5 0 0 1 19 7.5v10a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 3 17.5z"/><path d="M15.5 12.5h3.5a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-3.5a2 2 0 0 1 0-4Z"/></svg>
+                    Payroll
+                </a>
+                <a href="#" class="flex items-center gap-3 rounded px-3 py-2 text-body-md text-on-primary-container hover:bg-primary-container">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><path d="M6 3.5h9l3 3v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-15a1 1 0 0 1 1-1Z"/><path d="M9 10h6M9 13.5h6M9 17h3.5"/></svg>
+                    Payslips
+                </a>
             </nav>
         </aside>
 
@@ -37,6 +57,7 @@
                 </div>
                 <div class="flex items-center gap-3 text-body-sm text-on-surface-variant">
                     {% if request.user.is_authenticated %}
+                        <span class="w-7 h-7 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center text-body-sm font-semibold shrink-0">{{ request.user.get_username|slice:":1"|upper }}</span>
                         <span>{{ request.user.get_username }}</span>
                         <form method="post" action="{% url 'logout' %}">
                             {% csrf_token %}
@@ -50,16 +71,97 @@
 
             <!-- Page content -->
             <main class="flex-1 p-4 md:p-6">
-                {% if messages %}
-                    <div class="mb-4 space-y-2">
-                        {% for message in messages %}
-                            <div class="card text-body-md">{{ message }}</div>
-                        {% endfor %}
-                    </div>
-                {% endif %}
                 {% block content %}{% endblock %}
             </main>
         </div>
     </div>
+
+    {% if messages %}
+    <div id="toast-stack" class="fixed top-4 right-4 z-50 flex w-full max-w-sm flex-col gap-2" aria-live="polite" aria-atomic="true">
+        {% for message in messages %}
+        <div class="toast-enter flex items-start gap-3 rounded border border-outline-variant bg-white px-4 py-3
+            {% if message.tags == 'error' %}border-l-4 border-l-error{% else %}border-l-4 border-l-secondary{% endif %}">
+            {% if message.tags == 'error' %}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0 text-error"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v5M12 16h.01"/></svg>
+            {% else %}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0 text-secondary"><circle cx="12" cy="12" r="8.5"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg>
+            {% endif %}
+            <p class="flex-1 text-body-md text-on-surface">{{ message }}</p>
+            <button type="button" class="toast-close text-outline hover:text-on-surface" aria-label="Dismiss notification">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M6 6l12 12M18 6L6 18"/></svg>
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <script>
+    (function () {
+        // Toasts: auto-dismiss after 5s, or on manual close.
+        document.querySelectorAll('#toast-stack > div').forEach(function (toast) {
+            var timer = setTimeout(function () { dismissToast(toast); }, 5000);
+            var closeBtn = toast.querySelector('.toast-close');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', function () {
+                    clearTimeout(timer);
+                    dismissToast(toast);
+                });
+            }
+        });
+        function dismissToast(toast) {
+            toast.classList.remove('toast-enter');
+            toast.classList.add('toast-leave');
+            toast.addEventListener('animationend', function () { toast.remove(); }, { once: true });
+        }
+
+        // Loading state: disable + spin the submit button on any POST form, so
+        // slow round-trips (this app's dev DB is a remote Supabase instance) give
+        // immediate feedback and a double-submit can't happen.
+        document.addEventListener('submit', function (event) {
+            var form = event.target;
+            if (form.method && form.method.toLowerCase() !== 'post') return;
+            var btn = form.querySelector('button[type="submit"]');
+            if (!btn || btn.disabled) return;
+            var label = btn.textContent.trim();
+            btn.disabled = true;
+            btn.innerHTML =
+                '<svg class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
+                '<circle cx="12" cy="12" r="9" stroke-opacity="0.25"/><path d="M21 12a9 9 0 0 0-9-9" stroke-linecap="round"/></svg>' +
+                '<span>' + label + '</span>';
+        });
+
+        // Skeleton: swap the content area for a placeholder the instant an internal
+        // link is clicked, so a slow full-page navigation doesn't leave a dead screen.
+        var SKELETON_HTML =
+            '<div class="animate-pulse space-y-4" role="status" aria-live="polite">' +
+            '<span class="sr-only">Loading…</span>' +
+            '<div class="h-4 w-64 rounded bg-surface-container-low"></div>' +
+            '<div class="card space-y-3">' +
+            '<div class="h-3 w-1/3 rounded bg-surface-container-low"></div>' +
+            '<div class="h-3 w-1/2 rounded bg-surface-container-low"></div>' +
+            '</div>' +
+            '<div class="card overflow-hidden p-0">' +
+            '<div class="h-10 bg-surface-container-low"></div>' +
+            Array.from({ length: 5 }).map(function () {
+                return '<div class="flex h-12 items-center border-t border-outline-variant px-4">' +
+                       '<div class="h-3 w-full max-w-md rounded bg-surface-container-low"></div></div>';
+            }).join('') +
+            '</div>' +
+            '</div>';
+
+        document.addEventListener('click', function (event) {
+            if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+            var link = event.target.closest('a[href]');
+            if (!link || event.defaultPrevented) return;
+            if (link.target && link.target !== '_self') return;
+            var href = link.getAttribute('href');
+            if (!href || href.charAt(0) === '#' || href.indexOf('mailto:') === 0 || href.indexOf('tel:') === 0) return;
+            if (link.origin !== window.location.origin) return;
+            if (link.pathname + link.search === window.location.pathname + window.location.search) return;
+            var main = document.querySelector('main');
+            if (main) main.innerHTML = SKELETON_HTML;
+        });
+    })();
+    </script>
 </body>
 </html>
