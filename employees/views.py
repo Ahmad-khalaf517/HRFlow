@@ -1,8 +1,9 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import Q
-from django.http import HttpResponseForbidden, HttpResponseNotAllowed
-from django.shortcuts import get_object_or_404, redirect
+from django.http import HttpResponseNotAllowed
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import (
@@ -39,12 +40,18 @@ class HRManagementRequiredMixin(LoginRequiredMixin):
 
     def dispatch(self, request, *args, **kwargs):
 
+        if not request.user.is_authenticated:
+            return super().dispatch(request, *args, **kwargs)
+
         if not request.user.groups.filter(
             name__in=self.allowed_groups
         ).exists():
 
-            return HttpResponseForbidden(
-                "You do not have permission to perform this action."
+            return render(
+                request,
+                "employees/access_denied.html",
+                {"reason": "Only Admin or HR Manager may perform this action."},
+                status=403,
             )
 
         return super().dispatch(request, *args, **kwargs)
@@ -113,12 +120,14 @@ class DepartmentDetailView(LoginRequiredMixin, DetailView):
 
 class DepartmentCreateView(
     HRManagementRequiredMixin,
+    SuccessMessageMixin,
     CreateView,
 ):
 
     model = Department
     form_class = DepartmentForm
     template_name = "employees/department_form.html"
+    success_message = "Department created."
 
     success_url = reverse_lazy(
         "employees:department-list"
@@ -127,12 +136,14 @@ class DepartmentCreateView(
 
 class DepartmentUpdateView(
     HRManagementRequiredMixin,
+    SuccessMessageMixin,
     UpdateView,
 ):
 
     model = Department
     form_class = DepartmentForm
     template_name = "employees/department_form.html"
+    success_message = "Department updated."
 
     success_url = reverse_lazy(
         "employees:department-list"
@@ -163,6 +174,8 @@ class DepartmentDeactivateView(
                 "updated_at",
             ]
         )
+
+        messages.success(request, "Department deactivated.")
 
         return redirect(
             "employees:department-list"
@@ -257,12 +270,14 @@ class EmployeeListView(LoginRequiredMixin, ListView):
 
 class EmployeeCreateView(
     HRManagementRequiredMixin,
+    SuccessMessageMixin,
     CreateView,
 ):
 
     model = Employee
     form_class = EmployeeForm
     template_name = "employees/employee_form.html"
+    success_message = "Employee created."
 
     success_url = reverse_lazy(
         "employees:employee-list"
@@ -289,12 +304,14 @@ class EmployeeDetailView(
 
 class EmployeeUpdateView(
     HRManagementRequiredMixin,
+    SuccessMessageMixin,
     UpdateView,
 ):
 
     model = Employee
     form_class = EmployeeForm
     template_name = "employees/employee_form.html"
+    success_message = "Employee updated."
 
     def get_success_url(self):
 
@@ -335,6 +352,8 @@ class EmployeeDeactivateView(
                 "updated_at",
             ]
         )
+
+        messages.success(request, "Employee deactivated.")
 
         return redirect(
 
@@ -378,6 +397,8 @@ class EmployeeReactivateView(
             ]
         )
 
+        messages.success(request, "Employee reactivated.")
+
         return redirect(
 
             "employees:employee-detail",
@@ -419,6 +440,8 @@ class EmployeeTerminateView(
                 "updated_at",
             ]
         )
+
+        messages.success(request, "Employee terminated.")
 
         return redirect(
 
@@ -535,12 +558,14 @@ class PositionDetailView(
 
 class PositionCreateView(
     HRManagementRequiredMixin,
+    SuccessMessageMixin,
     CreateView,
 ):
 
     model = Position
     form_class = PositionForm
     template_name = "employees/position_form.html"
+    success_message = "Position created."
 
     success_url = reverse_lazy(
         "employees:position-list"
@@ -549,12 +574,14 @@ class PositionCreateView(
 
 class PositionUpdateView(
     HRManagementRequiredMixin,
+    SuccessMessageMixin,
     UpdateView,
 ):
 
     model = Position
     form_class = PositionForm
     template_name = "employees/position_form.html"
+    success_message = "Position updated."
 
     success_url = reverse_lazy(
         "employees:position-list"
@@ -585,6 +612,8 @@ class PositionDeactivateView(
                 "updated_at",
             ]
         )
+
+        messages.success(request, "Position deactivated.")
 
         return redirect(
             "employees:position-list"
@@ -688,11 +717,13 @@ class ContractDetailView(LoginRequiredMixin, DetailView):
 
 class ContractCreateView(
     HRManagementRequiredMixin,
+    SuccessMessageMixin,
     CreateView,
 ):
     model = Contract
     form_class = ContractForm
     template_name = "employees/contract_form.html"
+    success_message = "Contract created."
     success_url = reverse_lazy(
         "employees:contract-list"
     )
@@ -700,11 +731,13 @@ class ContractCreateView(
 
 class ContractUpdateView(
     HRManagementRequiredMixin,
+    SuccessMessageMixin,
     UpdateView,
 ):
     model = Contract
     form_class = ContractForm
     template_name = "employees/contract_form.html"
+    success_message = "Contract updated."
 
     def get_success_url(self):
 
@@ -739,6 +772,8 @@ class ContractDeactivateView(
                 "updated_at",
             ]
         )
+
+        messages.success(request, "Contract deactivated.")
 
         return redirect(
             "employees:contract-detail",
@@ -793,6 +828,8 @@ class ContractReactivateView(
             ]
         )
 
+        messages.success(request, "Contract reactivated.")
+
         return redirect(
             "employees:contract-detail",
             pk=contract.pk,
@@ -828,6 +865,8 @@ class ContractTerminateView(
                 "updated_at",
             ]
         )
+
+        messages.success(request, "Contract terminated.")
 
         return redirect(
             "employees:contract-detail",

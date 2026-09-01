@@ -140,23 +140,7 @@ Position Details
 
                 <div class="mt-2">
 
-                    {% if position.is_active %}
-
-                        <span class="rounded bg-green-100 px-3 py-1 text-sm text-green-700">
-
-                            Active
-
-                        </span>
-
-                    {% else %}
-
-                        <span class="rounded bg-gray-100 px-3 py-1 text-sm text-gray-700">
-
-                            Inactive
-
-                        </span>
-
-                    {% endif %}
+                    {% include "employees/_active_badge.html" with is_active=position.is_active %}
 
                 </div>
 
@@ -220,7 +204,7 @@ Position Details
 
                 <p class="mt-1 text-body-lg text-on-surface">
 
-                    {% if position.min_salary %}
+                    {% if position.min_salary is not None %}
 
                         {{ position.min_salary }}
 
@@ -247,7 +231,7 @@ Position Details
 
                 <p class="mt-1 text-body-lg text-on-surface">
 
-                    {% if position.max_salary %}
+                    {% if position.max_salary is not None %}
 
                         {{ position.max_salary }}
 
@@ -270,7 +254,7 @@ Position Details
 
     {% if position.is_active %}
 
-        <div class="rounded border border-red-200 bg-surface-container-lowest p-6">
+        <div class="rounded border border-error-container bg-surface-container-lowest p-6">
 
             <div class="flex items-center justify-between">
 
@@ -301,7 +285,7 @@ Position Details
 
                     <button
                         type="submit"
-                        class="rounded bg-red-600 px-4 py-2 text-white"
+                        class="rounded bg-error px-4 py-2 text-on-error hover:opacity-90"
                     >
                         Deactivate
                     </button>

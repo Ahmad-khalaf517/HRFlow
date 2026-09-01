@@ -1,0 +1,7 @@
+{% comment %}Usage: {% include "employees/_active_badge.html" with is_active=department.is_active %}
+For the boolean is_active flag on Department and Position.{% endcomment %}
+{% if is_active %}
+    <span class="badge bg-secondary-container text-on-secondary-container">Active</span>
+{% else %}
+    <span class="badge bg-surface-container text-on-surface-variant">Inactive</span>
+{% endif %}

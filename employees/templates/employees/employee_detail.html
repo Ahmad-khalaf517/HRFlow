@@ -56,7 +56,7 @@ Employee Details
 
                     <button
                         type="submit"
-                        class="rounded border border-outline-variant px-4 py-2 text-body-md text-on-surface"
+                        class="btn-secondary"
                     >
                         Deactivate
                     </button>
@@ -75,7 +75,7 @@ Employee Details
 
                     <button
                         type="submit"
-                        class="rounded border border-outline-variant bg-red-600 px-4 py-2 text-body-md text-red hover:bg-red-700"
+                        class="rounded bg-error px-4 py-2 text-body-md font-semibold text-on-error hover:opacity-90"
                     >
                         Terminate
                     </button>
@@ -96,7 +96,7 @@ Employee Details
 
                     <button
                         type="submit"
-                        class="rounded bg-primary px-4 py-2 text-body-md text-white"
+                        class="btn-primary"
                     >
                         Reactivate
                     </button>
@@ -182,7 +182,7 @@ Employee Details
         class="rounded border border-outline-variant bg-surface-container-lowest p-6"
     >
 
-        <h2 class="mb-6 text-headline-sm text-on-surface">
+        <h2 class="mb-6 text-headline-md text-on-surface">
             Personal Information
         </h2>
 
@@ -272,7 +272,7 @@ Employee Details
         class="rounded border border-outline-variant bg-surface-container-lowest p-6"
     >
 
-        <h2 class="mb-6 text-headline-sm text-on-surface">
+        <h2 class="mb-6 text-headline-md text-on-surface">
             Employment Information
         </h2>
 
@@ -339,31 +339,7 @@ Employee Details
 
                 <p class="mt-2 text-body-md text-on-surface">
 
-                    {% if employee.employment_status == "active" %}
-
-                        <span
-                            class="rounded bg-secondary-container px-3 py-1 text-sm text-on-secondary-container"
-                        >
-                            Active
-                        </span>
-
-                    {% elif employee.employment_status == "inactive" %}
-
-                        <span
-                            class="rounded bg-surface-container px-3 py-1 text-sm text-on-surface"
-                        >
-                            Inactive
-                        </span>
-
-                    {% elif employee.employment_status == "terminated" %}
-
-                        <span
-                            class="rounded bg-error-container px-3 py-1 text-sm text-on-error-container"
-                        >
-                            Terminated
-                        </span>
-
-                    {% endif %}
+                    {% include "employees/_status_badge.html" with status=employee.employment_status %}
 
                 </p>
 
@@ -382,7 +358,7 @@ Employee Details
         class="rounded border border-outline-variant bg-surface-container-lowest p-6"
     >
 
-        <h2 class="mb-6 text-headline-sm text-on-surface">
+        <h2 class="mb-6 text-headline-md text-on-surface">
             Bank Information
         </h2>
 

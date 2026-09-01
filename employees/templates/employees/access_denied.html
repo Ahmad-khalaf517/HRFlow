@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Access denied · HRFlow{% endblock %}
+
+{% block page_title %}
+<h1 class="text-headline-md text-on-surface">Employees</h1>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto mt-12">
+    <div class="card text-center">
+        <div class="w-12 h-12 rounded-full bg-error-container text-on-error-container flex items-center justify-center mx-auto mb-4">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6"><rect x="5" y="10.5" width="14" height="9" rx="1.5"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/></svg>
+        </div>
+        <p class="text-headline-md text-on-surface">Access denied</p>
+        <p class="text-body-md text-on-surface-variant mt-2">{{ reason }}</p>
+        <a href="{% url 'home' %}" class="btn-primary mt-6 inline-flex">Back to dashboard</a>
+    </div>
+</div>
+{% endblock %}

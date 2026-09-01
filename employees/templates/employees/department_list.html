@@ -21,8 +21,9 @@
 
     <a
         href="{% url 'employees:department-create' %}"
-        class="rounded bg-primary px-4 py-2 text-body-md font-medium text-white"
+        class="btn-primary"
     >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M12 5v14M5 12h14"/></svg>
         Add Department
     </a>
 
@@ -94,27 +95,27 @@
 
             <table class="w-full border-collapse">
 
-                <thead>
+                <thead class="bg-primary text-on-primary">
 
-                    <tr class="border-b border-outline-variant">
+                    <tr>
 
-                        <th class="px-5 py-3 text-left text-label-caps text-on-surface-variant">
+                        <th class="px-5 py-3 text-left text-label-caps">
                             Department
                         </th>
 
-                        <th class="px-5 py-3 text-left text-label-caps text-on-surface-variant">
+                        <th class="px-5 py-3 text-left text-label-caps">
                             Manager
                         </th>
 
-                        <th class="px-5 py-3 text-left text-label-caps text-on-surface-variant">
+                        <th class="px-5 py-3 text-left text-label-caps">
                             Employees
                         </th>
 
-                        <th class="px-5 py-3 text-left text-label-caps text-on-surface-variant">
+                        <th class="px-5 py-3 text-left text-label-caps">
                             Status
                         </th>
 
-                        <th class="px-5 py-3 text-right text-label-caps text-on-surface-variant">
+                        <th class="px-5 py-3 text-right text-label-caps">
                             Actions
                         </th>
 
@@ -180,19 +181,7 @@
                             <!-- Status -->
                             <td class="px-5 py-4">
 
-                                {% if department.is_active %}
-
-                                    <span class="rounded bg-secondary-container px-2 py-1 text-sm text-on-secondary-container">
-                                        Active
-                                    </span>
-
-                                {% else %}
-
-                                    <span class="rounded border border-outline-variant px-2 py-1 text-sm text-on-surface-variant">
-                                        Inactive
-                                    </span>
-
-                                {% endif %}
+                                {% include "employees/_active_badge.html" with is_active=department.is_active %}
 
                             </td>
 

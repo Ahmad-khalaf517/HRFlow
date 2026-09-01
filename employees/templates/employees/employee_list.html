@@ -28,8 +28,9 @@ Employees
     <div>
         <a
             href="{% url 'employees:employee-create' %}"
-            class="bg-primary text-white px-4 py-2 rounded"
+            class="btn-primary"
         >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M12 5v14M5 12h14"/></svg>
             Add Employee
         </a>
     </div>
@@ -192,31 +193,31 @@ Employees
 
                 <!-- TABLE HEADER -->
 
-                <thead>
+                <thead class="bg-primary text-on-primary">
 
-                    <tr class="border-b border-outline-variant">
+                    <tr>
 
-                        <th class="px-5 py-4 text-left text-label-caps text-on-surface-variant">
+                        <th class="px-5 py-4 text-left text-label-caps">
                             Employee
                         </th>
 
-                        <th class="px-5 py-4 text-left text-label-caps text-on-surface-variant">
+                        <th class="px-5 py-4 text-left text-label-caps">
                             ID
                         </th>
 
-                        <th class="px-5 py-4 text-left text-label-caps text-on-surface-variant">
+                        <th class="px-5 py-4 text-left text-label-caps">
                             Department & Role
                         </th>
 
-                        <th class="px-5 py-4 text-left text-label-caps text-on-surface-variant">
+                        <th class="px-5 py-4 text-left text-label-caps">
                             Status
                         </th>
 
-                        <th class="px-5 py-4 text-left text-label-caps text-on-surface-variant">
+                        <th class="px-5 py-4 text-left text-label-caps">
                             Join Date
                         </th>
 
-                        <th class="px-5 py-4 text-right text-label-caps text-on-surface-variant">
+                        <th class="px-5 py-4 text-right text-label-caps">
                             Actions
                         </th>
 
@@ -350,41 +351,7 @@ Employees
 
                         <td class="px-5 py-4">
 
-
-                            {% if employee.employment_status == "active" %}
-
-                                <span
-                                    class="rounded bg-secondary-container px-3 py-1 text-sm text-on-secondary-container"
-                                >
-
-                                    Active
-
-                                </span>
-
-
-                            {% elif employee.employment_status == "inactive" %}
-
-                                <span
-                                    class="rounded bg-secondary-container px-3 py-1 text-sm text-on-secondary-container"
-                                >
-
-                                    Inactive
-
-                                </span>
-
-
-                            {% elif employee.employment_status == "terminated" %}
-
-                                <span
-                                    class="rounded bg-secondary-container px-3 py-1 text-sm text-on-secondary-container"
-                                >
-
-                                    Terminated
-
-                                </span>
-
-                            {% endif %}
-
+                            {% include "employees/_status_badge.html" with status=employee.employment_status %}
 
                         </td>
 

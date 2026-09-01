@@ -1,0 +1,12 @@
+{% comment %}Usage: {% include "employees/_status_badge.html" with status=employee.employment_status %}
+Shared by Employee.employment_status and Contract.status — both use the same
+active/inactive/terminated vocabulary.{% endcomment %}
+{% if status == "active" %}
+    <span class="badge bg-secondary-container text-on-secondary-container">Active</span>
+{% elif status == "inactive" %}
+    <span class="badge bg-surface-container text-on-surface-variant">Inactive</span>
+{% elif status == "terminated" %}
+    <span class="badge bg-error-container text-on-error-container">Terminated</span>
+{% else %}
+    <span class="badge bg-surface-container text-on-surface-variant">{{ status }}</span>
+{% endif %}

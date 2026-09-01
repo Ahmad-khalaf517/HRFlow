@@ -1,6 +1,7 @@
 @import "tailwindcss" source(none);
 @source "../../../templates";
 @source "../../../payroll/templates";
+@source "../../../employees/templates";
 @source inline("btn-primary btn-secondary btn-ghost card input badge text-display text-headline-lg text-headline-md text-body-lg text-body-md text-body-sm text-label-caps text-data-mono animate-spin animate-pulse sr-only");
 
 /*

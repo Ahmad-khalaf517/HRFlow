@@ -126,12 +126,12 @@
             toast.addEventListener('animationend', function () { toast.remove(); }, { once: true });
         }
 
-        // Loading state: disable + spin the submit button on any POST form, so
-        // slow round-trips (this app's dev DB is a remote Supabase instance) give
-        // immediate feedback and a double-submit can't happen.
+        // Loading state: disable + spin the submit button on any form (POST or a
+        // GET filter/search bar), so slow round-trips (this app's dev DB is a
+        // remote Supabase instance) give immediate feedback and a double-submit
+        // can't happen.
         document.addEventListener('submit', function (event) {
             var form = event.target;
-            if (form.method && form.method.toLowerCase() !== 'post') return;
             var btn = form.querySelector('button[type="submit"]');
             if (!btn || btn.disabled) return;
             var label = btn.textContent.trim();

@@ -30,8 +30,9 @@ Contracts
 
             <a
                 href="{% url 'employees:contract-create' %}"
-                class="rounded bg-primary px-4 py-2 text-body-md text-white"
+                class="btn-primary"
             >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M12 5v14M5 12h14"/></svg>
                 Add Contract
             </a>
 
@@ -178,7 +179,7 @@ Contracts
             <table class="w-full">
 
                 <thead
-                    class="border-b border-outline-variant bg-surface-container"
+                    class="bg-primary text-on-primary"
                 >
 
                     <tr>
@@ -294,31 +295,7 @@ Contracts
 
                             <td class="px-5 py-4">
 
-                                {% if contract.status == "active" %}
-
-                                    <span
-                                        class="rounded bg-green-100 px-3 py-1 text-sm text-green-700"
-                                    >
-                                        Active
-                                    </span>
-
-                                {% elif contract.status == "inactive" %}
-
-                                    <span
-                                        class="rounded bg-gray-100 px-3 py-1 text-sm text-gray-700"
-                                    >
-                                        Inactive
-                                    </span>
-
-                                {% else %}
-
-                                    <span
-                                        class="rounded bg-red-100 px-3 py-1 text-sm text-red-700"
-                                    >
-                                        Terminated
-                                    </span>
-
-                                {% endif %}
+                                {% include "employees/_status_badge.html" with status=contract.status %}
 
                             </td>
 

@@ -57,7 +57,7 @@ Contract Details
         class="rounded border border-outline-variant bg-surface-container-lowest p-6"
     >
 
-        <h2 class="mb-6 text-headline-sm text-on-surface">
+        <h2 class="mb-6 text-headline-md text-on-surface">
             Employee Information
         </h2>
 
@@ -145,7 +145,7 @@ Contract Details
         class="rounded border border-outline-variant bg-surface-container-lowest p-6"
     >
 
-        <h2 class="mb-6 text-headline-sm text-on-surface">
+        <h2 class="mb-6 text-headline-md text-on-surface">
             Contract Information
         </h2>
 
@@ -175,31 +175,7 @@ Contract Details
                 </p>
 
 
-                {% if contract.status == "active" %}
-
-                    <span
-                        class="rounded bg-green-100 px-3 py-1 text-sm text-green-700"
-                    >
-                        Active
-                    </span>
-
-                {% elif contract.status == "inactive" %}
-
-                    <span
-                        class="rounded bg-gray-100 px-3 py-1 text-sm text-gray-700"
-                    >
-                        Inactive
-                    </span>
-
-                {% else %}
-
-                    <span
-                        class="rounded bg-red-100 px-3 py-1 text-sm text-red-700"
-                    >
-                        Terminated
-                    </span>
-
-                {% endif %}
+                {% include "employees/_status_badge.html" with status=contract.status %}
 
             </div>
 
@@ -276,7 +252,7 @@ Contract Details
         class="rounded border border-outline-variant bg-surface-container-lowest p-6"
     >
 
-        <h2 class="mb-6 text-headline-sm text-on-surface">
+        <h2 class="mb-6 text-headline-md text-on-surface">
             Salary Information
         </h2>
 
@@ -325,7 +301,7 @@ Contract Details
         class="rounded border border-outline-variant bg-surface-container-lowest p-6"
     >
 
-        <h2 class="mb-6 text-headline-sm text-on-surface">
+        <h2 class="mb-6 text-headline-md text-on-surface">
             Working Schedule
         </h2>
 
@@ -376,7 +352,7 @@ Contract Details
             class="rounded border border-outline-variant bg-surface-container-lowest p-6"
         >
 
-            <h2 class="mb-4 text-headline-sm text-on-surface">
+            <h2 class="mb-4 text-headline-md text-on-surface">
                 Contract Actions
             </h2>
 
@@ -397,7 +373,7 @@ Contract Details
 
                         <button
                             type="submit"
-                            class="rounded bg-gray-600 px-4 py-2 text-white"
+                            class="btn-secondary"
                         >
                             Deactivate Contract
                         </button>
@@ -416,7 +392,7 @@ Contract Details
 
                         <button
                             type="submit"
-                            class="rounded bg-red-600 px-4 py-2 text-white"
+                            class="rounded bg-error px-4 py-2 text-body-md font-semibold text-on-error hover:opacity-90"
                         >
                             Terminate Contract
                         </button>
@@ -437,7 +413,7 @@ Contract Details
 
                         <button
                             type="submit"
-                            class="rounded bg-green-600 px-4 py-2 text-white"
+                            class="btn-primary"
                         >
                             Reactivate Contract
                         </button>
@@ -456,7 +432,7 @@ Contract Details
 
                         <button
                             type="submit"
-                            class="rounded bg-red-600 px-4 py-2 text-white"
+                            class="rounded bg-error px-4 py-2 text-body-md font-semibold text-on-error hover:opacity-90"
                         >
                             Terminate Contract
                         </button>
