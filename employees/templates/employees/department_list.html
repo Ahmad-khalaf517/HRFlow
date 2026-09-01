@@ -1,0 +1,317 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="space-y-6">
+
+    <!-- Page Header -->
+    <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+
+        <div>
+            <h1 class="text-headline-lg text-on-surface">
+                Departments
+            </h1>
+
+            <p class="mt-1 text-body-md text-on-surface-variant">
+                Manage organizational departments and their managers.
+            </p>
+        </div>
+
+        <div class="flex items-center gap-3">
+
+    <a
+        href="{% url 'employees:department-create' %}"
+        class="rounded bg-primary px-4 py-2 text-body-md font-medium text-white"
+    >
+        Add Department
+    </a>
+
+</div>
+    </div>
+
+
+    <!-- Filters -->
+    <div class="rounded border border-outline-variant bg-surface-container-lowest p-4">
+
+        <form method="get"
+              class="flex flex-col gap-3 md:flex-row md:items-center">
+
+            <!-- Search -->
+            <input
+                type="text"
+                name="search"
+                value="{{ request.GET.search }}"
+                placeholder="Search departments..."
+                class="w-full rounded border border-outline-variant bg-surface-container-lowest px-3 py-2 text-body-md text-on-surface md:max-w-md"
+            >
+
+            <!-- Status -->
+            <select
+                name="status"
+                class="rounded border border-outline-variant bg-surface-container-lowest px-3 py-2 text-body-md text-on-surface"
+            >
+                <option value="">
+                    All Statuses
+                </option>
+
+                <option
+                    value="active"
+                    {% if request.GET.status == "active" %}
+                        selected
+                    {% endif %}
+                >
+                    Active
+                </option>
+
+                <option
+                    value="inactive"
+                    {% if request.GET.status == "inactive" %}
+                        selected
+                    {% endif %}
+                >
+                    Inactive
+                </option>
+
+            </select>
+
+
+            <button
+                type="submit"
+                class="rounded bg-primary px-4 py-2 text-body-md font-medium text-white"
+            >
+                Filter
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <!-- Table -->
+    <div class="overflow-hidden rounded border border-outline-variant bg-surface-container-lowest">
+
+        <div class="overflow-x-auto">
+
+            <table class="w-full border-collapse">
+
+                <thead>
+
+                    <tr class="border-b border-outline-variant">
+
+                        <th class="px-5 py-3 text-left text-label-caps text-on-surface-variant">
+                            Department
+                        </th>
+
+                        <th class="px-5 py-3 text-left text-label-caps text-on-surface-variant">
+                            Manager
+                        </th>
+
+                        <th class="px-5 py-3 text-left text-label-caps text-on-surface-variant">
+                            Employees
+                        </th>
+
+                        <th class="px-5 py-3 text-left text-label-caps text-on-surface-variant">
+                            Status
+                        </th>
+
+                        <th class="px-5 py-3 text-right text-label-caps text-on-surface-variant">
+                            Actions
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for department in departments %}
+
+                        <tr class="border-b border-outline-variant last:border-b-0">
+
+                            <!-- Department -->
+                            <td class="px-5 py-4">
+
+                                <a
+                                    href="{% url 'employees:department-detail' department.pk %}"
+                                    class="font-medium text-on-surface hover:underline"
+                                >
+                                    {{ department.name }}
+                                </a>
+
+                                {% if department.description %}
+
+                                    <p class="mt-1 max-w-md truncate text-sm text-on-surface-variant">
+                                        {{ department.description }}
+                                    </p>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- Manager -->
+                            <td class="px-5 py-4 text-body-md text-on-surface">
+
+                                {% if department.manager %}
+
+                                    {{ department.manager.first_name }}
+                                    {{ department.manager.last_name }}
+
+                                {% else %}
+
+                                    <span class="text-on-surface-variant">
+                                        —
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- Employee Count -->
+                            <td class="px-5 py-4 text-data-mono text-on-surface">
+
+                                {{ department.employees.count }}
+
+                            </td>
+
+
+                            <!-- Status -->
+                            <td class="px-5 py-4">
+
+                                {% if department.is_active %}
+
+                                    <span class="rounded bg-secondary-container px-2 py-1 text-sm text-on-secondary-container">
+                                        Active
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="rounded border border-outline-variant px-2 py-1 text-sm text-on-surface-variant">
+                                        Inactive
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- Actions -->
+                            <td class="px-5 py-4">
+
+                                <div class="flex justify-end gap-3">
+
+                                    <a
+                                        href="{% url 'employees:department-detail' department.pk %}"
+                                        class="text-sm font-medium text-on-surface"
+                                    >
+                                        View
+                                    </a>
+
+                                    <a
+                                        href="{% url 'employees:department-update' department.pk %}"
+                                        class="text-sm font-medium text-on-surface"
+                                    >
+                                        Edit
+                                    </a>
+
+                                    {% if department.is_active %}
+
+                                        <form
+                                            method="post"
+                                            action="{% url 'employees:department-deactivate' department.pk %}"
+                                        >
+
+                                            {% csrf_token %}
+
+                                            <button
+                                                type="submit"
+                                                class="text-sm font-medium text-on-surface-variant"
+                                            >
+                                                Deactivate
+                                            </button>
+
+                                        </form>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    {% empty %}
+
+                        <tr>
+
+                            <td
+                                colspan="5"
+                                class="px-5 py-12 text-center text-body-md text-on-surface-variant"
+                            >
+                                No departments found.
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <!-- Pagination -->
+
+    {% if is_paginated %}
+
+        <div class="flex items-center justify-between">
+
+            <div class="text-sm text-on-surface-variant">
+
+                Page {{ page_obj.number }}
+                of {{ page_obj.paginator.num_pages }}
+
+            </div>
+
+
+            <div class="flex gap-2">
+
+                {% if page_obj.has_previous %}
+
+                    <a
+                        href="?page={{ page_obj.previous_page_number }}&search={{ request.GET.search }}&status={{ request.GET.status }}"
+                        class="rounded border border-outline-variant px-3 py-2 text-sm text-on-surface"
+                    >
+                        Previous
+                    </a>
+
+                {% endif %}
+
+
+                {% if page_obj.has_next %}
+
+                    <a
+                        href="?page={{ page_obj.next_page_number }}&search={{ request.GET.search }}&status={{ request.GET.status }}"
+                        class="rounded border border-outline-variant px-3 py-2 text-sm text-on-surface"
+                    >
+                        Next
+                    </a>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    {% endif %}
+
+
+</div>
+
+{% endblock %}

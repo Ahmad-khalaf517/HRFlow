@@ -6,6 +6,7 @@ from django.db.models import CheckConstraint, F, Q, UniqueConstraint
 class Department(models.Model):
     name = models.CharField(max_length=150, unique=True)
     description = models.TextField(blank=True, default="")
+
     manager = models.ForeignKey(
         "Employee",
         null=True,
@@ -13,6 +14,9 @@ class Department(models.Model):
         on_delete=models.SET_NULL,
         related_name="departments_managed",
     )
+
+    is_active = models.BooleanField(default=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -22,29 +26,73 @@ class Department(models.Model):
     def __str__(self):
         return self.name
 
-
+    
 class Position(models.Model):
-    department = models.ForeignKey(Department, on_delete=models.PROTECT, related_name="positions")
-    title = models.CharField(max_length=150)
-    code = models.CharField(max_length=50, blank=True, default="")
-    description = models.TextField(blank=True, default="")
-    min_salary = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
-    max_salary = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
-    is_active = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+
+    department = models.ForeignKey(
+        Department,
+        on_delete=models.PROTECT,
+        related_name="positions",
+    )
+
+    title = models.CharField(
+        max_length=150,
+    )
+
+    code = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True,
+    )
+
+    description = models.TextField(
+        blank=True,
+        null=True,
+    )
+
+    min_salary = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        blank=True,
+        null=True,
+    )
+
+    max_salary = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        blank=True,
+        null=True,
+    )
+
+    is_active = models.BooleanField(
+        default=True,
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True,
+    )
 
     class Meta:
-        ordering = ["department__name", "title"]
+
         constraints = [
-            UniqueConstraint(
-                fields=["department", "title"], name="position_unique_department_title"
-            ),
+            models.UniqueConstraint(
+                fields=[
+                    "department",
+                    "title",
+                ],
+                name="unique_position_title_per_department",
+            )
         ]
 
     def __str__(self):
-        return f"{self.title} ({self.department.name})"
-
+        return (
+            f"{self.title} "
+            f"({self.department.name})"
+        )
 
 class Employee(models.Model):
     EMPLOYMENT_STATUS_CHOICES = [

@@ -1,0 +1,413 @@
+{% extends "base.html" %}
+
+{% block title %}
+Contracts
+{% endblock %}
+
+
+{% block content %}
+
+<div class="space-y-6">
+
+    <!-- HEADER -->
+
+    <div class="flex items-center justify-between">
+
+        <div>
+
+            <h1 class="text-headline-lg text-on-surface">
+                Contracts
+            </h1>
+
+            <p class="text-body-md text-on-surface-variant">
+                Manage employee contracts and employment terms.
+            </p>
+
+        </div>
+
+
+        {% if user.groups.all %}
+
+            <a
+                href="{% url 'employees:contract-create' %}"
+                class="rounded bg-primary px-4 py-2 text-body-md text-white"
+            >
+                Add Contract
+            </a>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- FILTERS -->
+
+    <div
+        class="rounded border border-outline-variant bg-surface-container-lowest p-5"
+    >
+
+        <form method="get">
+
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
+
+
+                <!-- SEARCH -->
+
+                <div>
+
+                    <label
+                        class="mb-2 block text-label-caps text-on-surface"
+                    >
+                        Search
+                    </label>
+
+                    <input
+                        type="text"
+                        name="search"
+                        value="{{ request.GET.search }}"
+                        placeholder="Employee name or number"
+                        class="w-full rounded border border-outline-variant bg-surface px-3 py-2"
+                    >
+
+                </div>
+
+
+                <!-- CONTRACT TYPE -->
+
+                <div>
+
+                    <label
+                        class="mb-2 block text-label-caps text-on-surface"
+                    >
+                        Contract Type
+                    </label>
+
+                    <select
+                        name="contract_type"
+                        class="w-full rounded border border-outline-variant bg-surface px-3 py-2"
+                    >
+
+                        <option value="">
+                            All Types
+                        </option>
+
+                        {% for value, label in contract_type_choices %}
+
+                            <option
+                                value="{{ value }}"
+                                {% if request.GET.contract_type == value %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ label }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <!-- STATUS -->
+
+                <div>
+
+                    <label
+                        class="mb-2 block text-label-caps text-on-surface"
+                    >
+                        Status
+                    </label>
+
+                    <select
+                        name="status"
+                        class="w-full rounded border border-outline-variant bg-surface px-3 py-2"
+                    >
+
+                        <option value="">
+                            All Statuses
+                        </option>
+
+                        {% for value, label in status_choices %}
+
+                            <option
+                                value="{{ value }}"
+                                {% if request.GET.status == value %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ label }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <!-- FILTER BUTTON -->
+
+                <div class="flex items-end">
+
+                    <button
+                        type="submit"
+                        class="w-full rounded bg-primary px-4 py-2 text-white"
+                    >
+                        Filter
+                    </button>
+
+                </div>
+
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+    <!-- CONTRACT TABLE -->
+
+    <div
+        class="overflow-hidden rounded border border-outline-variant bg-surface-container-lowest"
+    >
+
+        <div class="overflow-x-auto">
+
+            <table class="w-full">
+
+                <thead
+                    class="border-b border-outline-variant bg-surface-container"
+                >
+
+                    <tr>
+
+                        <th class="px-5 py-4 text-left text-label-caps">
+                            Employee
+                        </th>
+
+                        <th class="px-5 py-4 text-left text-label-caps">
+                            Contract Type
+                        </th>
+
+                        <th class="px-5 py-4 text-left text-label-caps">
+                            Start Date
+                        </th>
+
+                        <th class="px-5 py-4 text-left text-label-caps">
+                            End Date
+                        </th>
+
+                        <th class="px-5 py-4 text-left text-label-caps">
+                            Basic Salary
+                        </th>
+
+                        <th class="px-5 py-4 text-left text-label-caps">
+                            Status
+                        </th>
+
+                        <th class="px-5 py-4 text-right text-label-caps">
+                            Actions
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for contract in contracts %}
+
+                        <tr
+                            class="border-b border-outline-variant last:border-0"
+                        >
+
+                            <!-- EMPLOYEE -->
+
+                            <td class="px-5 py-4">
+
+                                <div class="font-medium text-on-surface">
+
+                                    {{ contract.employee.first_name }}
+                                    {{ contract.employee.last_name }}
+
+                                </div>
+
+                                <div
+                                    class="text-sm text-on-surface-variant"
+                                >
+
+                                    {{ contract.employee.employee_number }}
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- CONTRACT TYPE -->
+
+                            <td class="px-5 py-4 text-body-md">
+
+                                {{ contract.get_contract_type_display }}
+
+                            </td>
+
+
+                            <!-- START DATE -->
+
+                            <td class="px-5 py-4 text-body-md">
+
+                                {{ contract.start_date|date:"M d, Y" }}
+
+                            </td>
+
+
+                            <!-- END DATE -->
+
+                            <td class="px-5 py-4 text-body-md">
+
+                                {% if contract.end_date %}
+
+                                    {{ contract.end_date|date:"M d, Y" }}
+
+                                {% else %}
+
+                                    —
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- SALARY -->
+
+                            <td class="px-5 py-4 text-body-md">
+
+                                {{ contract.basic_salary }}
+
+                            </td>
+
+
+                            <!-- STATUS -->
+
+                            <td class="px-5 py-4">
+
+                                {% if contract.status == "active" %}
+
+                                    <span
+                                        class="rounded bg-green-100 px-3 py-1 text-sm text-green-700"
+                                    >
+                                        Active
+                                    </span>
+
+                                {% elif contract.status == "inactive" %}
+
+                                    <span
+                                        class="rounded bg-gray-100 px-3 py-1 text-sm text-gray-700"
+                                    >
+                                        Inactive
+                                    </span>
+
+                                {% else %}
+
+                                    <span
+                                        class="rounded bg-red-100 px-3 py-1 text-sm text-red-700"
+                                    >
+                                        Terminated
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- ACTIONS -->
+
+                            <td class="px-5 py-4 text-right">
+
+                                <a
+                                    href="{% url 'employees:contract-detail' contract.pk %}"
+                                    class="text-primary hover:underline"
+                                >
+                                    View
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                    {% empty %}
+
+                        <tr>
+
+                            <td
+                                colspan="7"
+                                class="px-5 py-10 text-center text-on-surface-variant"
+                            >
+
+                                No contracts found.
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <!-- PAGINATION -->
+
+    {% if is_paginated %}
+
+        <div class="flex items-center justify-center gap-3">
+
+
+            {% if page_obj.has_previous %}
+
+                <a
+                    href="?page={{ page_obj.previous_page_number }}"
+                    class="rounded border border-outline-variant px-4 py-2"
+                >
+                    Previous
+                </a>
+
+            {% endif %}
+
+
+            <span class="text-body-md text-on-surface">
+
+                Page {{ page_obj.number }}
+                of {{ page_obj.paginator.num_pages }}
+
+            </span>
+
+
+            {% if page_obj.has_next %}
+
+                <a
+                    href="?page={{ page_obj.next_page_number }}"
+                    class="rounded border border-outline-variant px-4 py-2"
+                >
+                    Next
+                </a>
+
+            {% endif %}
+
+
+        </div>
+
+    {% endif %}
+
+
+</div>
+
+{% endblock %}

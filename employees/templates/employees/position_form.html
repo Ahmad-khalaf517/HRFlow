@@ -1,0 +1,287 @@
+{% extends "base.html" %}
+
+{% block title %}
+
+    {% if object %}
+        Edit Position
+    {% else %}
+        Add Position
+    {% endif %}
+
+{% endblock %}
+
+
+{% block content %}
+
+<div class="max-w-3xl mx-auto">
+
+    <!-- HEADER -->
+
+    <div class="mb-6">
+
+        <h1 class="text-headline-lg text-on-surface">
+
+            {% if object %}
+                Edit Position
+            {% else %}
+                Add Position
+            {% endif %}
+
+        </h1>
+
+        <p class="mt-1 text-body-md text-on-surface-variant">
+
+            {% if object %}
+                Update the position information below.
+            {% else %}
+                Create a new job position.
+            {% endif %}
+
+        </p>
+
+    </div>
+
+
+    <!-- FORM -->
+
+    <div class="rounded border border-outline-variant bg-surface-container-lowest p-6">
+
+        <form method="post">
+
+            {% csrf_token %}
+
+
+            <!-- NON FIELD ERRORS -->
+
+            {% if form.non_field_errors %}
+
+                <div class="mb-6 rounded border border-red-300 bg-red-50 p-4 text-red-700">
+
+                    {{ form.non_field_errors }}
+
+                </div>
+
+            {% endif %}
+
+
+            <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+
+
+                <!-- DEPARTMENT -->
+
+                <div>
+
+                    <label class="mb-2 block text-label-caps text-on-surface">
+
+                        Department
+
+                    </label>
+
+                    {{ form.department }}
+
+                    {% if form.department.errors %}
+
+                        <p class="mt-1 text-sm text-red-600">
+
+                            {{ form.department.errors.0 }}
+
+                        </p>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- TITLE -->
+
+                <div>
+
+                    <label class="mb-2 block text-label-caps text-on-surface">
+
+                        Position Title
+
+                    </label>
+
+                    {{ form.title }}
+
+                    {% if form.title.errors %}
+
+                        <p class="mt-1 text-sm text-red-600">
+
+                            {{ form.title.errors.0 }}
+
+                        </p>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- CODE -->
+
+                <div>
+
+                    <label class="mb-2 block text-label-caps text-on-surface">
+
+                        Position Code
+
+                    </label>
+
+                    {{ form.code }}
+
+                    {% if form.code.errors %}
+
+                        <p class="mt-1 text-sm text-red-600">
+
+                            {{ form.code.errors.0 }}
+
+                        </p>
+
+                    {% endif %}
+
+                </div>
+
+
+                <!-- STATUS -->
+
+                <div>
+
+                    <label class="mb-2 block text-label-caps text-on-surface">
+
+                        Status
+
+                    </label>
+
+                    {{ form.is_active }}
+
+                </div>
+
+            </div>
+
+
+            <!-- DESCRIPTION -->
+
+            <div class="mt-6">
+
+                <label class="mb-2 block text-label-caps text-on-surface">
+
+                    Description
+
+                </label>
+
+                {{ form.description }}
+
+                {% if form.description.errors %}
+
+                    <p class="mt-1 text-sm text-red-600">
+
+                        {{ form.description.errors.0 }}
+
+                    </p>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- SALARY RANGE -->
+
+            <div class="mt-8 border-t border-outline-variant pt-6">
+
+                <h2 class="mb-4 text-headline-md text-on-surface">
+
+                    Salary Range
+
+                </h2>
+
+                <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+
+
+                    <!-- MIN SALARY -->
+
+                    <div>
+
+                        <label class="mb-2 block text-label-caps text-on-surface">
+
+                            Minimum Salary
+
+                        </label>
+
+                        {{ form.min_salary }}
+
+                        {% if form.min_salary.errors %}
+
+                            <p class="mt-1 text-sm text-red-600">
+
+                                {{ form.min_salary.errors.0 }}
+
+                            </p>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <!-- MAX SALARY -->
+
+                    <div>
+
+                        <label class="mb-2 block text-label-caps text-on-surface">
+
+                            Maximum Salary
+
+                        </label>
+
+                        {{ form.max_salary }}
+
+                        {% if form.max_salary.errors %}
+
+                            <p class="mt-1 text-sm text-red-600">
+
+                                {{ form.max_salary.errors.0 }}
+
+                            </p>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ACTIONS -->
+
+            <div class="mt-8 flex justify-end gap-3 border-t border-outline-variant pt-6">
+
+                <a
+                    href="{% url 'employees:position-list' %}"
+                    class="rounded border border-outline-variant px-4 py-2 text-on-surface"
+                >
+                    Cancel
+                </a>
+
+
+                <button
+                    type="submit"
+                    class="rounded bg-primary px-5 py-2 text-white"
+                >
+
+                    {% if object %}
+                        Save Changes
+                    {% else %}
+                        Create Position
+                    {% endif %}
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -17,15 +17,54 @@
             <div class="h-16 flex items-center px-6 border-b border-white/10">
                 <span class="text-headline-md">HRFlow</span>
             </div>
-            <nav class="flex-1 px-3 py-4 space-y-1">
-                <!-- Placeholder links: wired up as each module ships -->
-                <a href="{% url 'home' %}" class="block rounded px-3 py-2 text-body-md font-semibold bg-primary-container">Dashboard</a>
-                <a href="#" class="block rounded px-3 py-2 text-body-md text-on-primary-container hover:bg-primary-container">Employees</a>
-                <a href="#" class="block rounded px-3 py-2 text-body-md text-on-primary-container hover:bg-primary-container">Attendance</a>
-                <a href="#" class="block rounded px-3 py-2 text-body-md text-on-primary-container hover:bg-primary-container">Leave</a>
-                <a href="#" class="block rounded px-3 py-2 text-body-md text-on-primary-container hover:bg-primary-container">Payroll</a>
-                <a href="#" class="block rounded px-3 py-2 text-body-md text-on-primary-container hover:bg-primary-container">Payslips</a>
-            </nav>
+                <nav class="flex-1 px-3 py-4 space-y-1">
+
+                    <a href="{% url 'home' %}"
+                    class="block rounded px-3 py-2 text-body-md text-on-primary-container hover:bg-primary-container">
+                        Dashboard
+                    </a>
+
+                    <a href="{% url 'employees:employee-list' %}"
+                    class="block rounded px-3 py-2 text-body-md text-on-primary-container hover:bg-primary-container">
+                        Employees
+                    </a>
+
+                    <a href="{% url 'employees:department-list' %}"
+                    class="block rounded px-3 py-2 text-body-md text-on-primary-container hover:bg-primary-container">
+                        Departments
+                    </a>
+
+                    <a href="{% url 'employees:position-list' %}"
+                    class="block rounded px-3 py-2 text-body-md text-on-primary-container hover:bg-primary-container">
+                        Positions
+                    </a>
+
+                    <a href="{% url 'employees:contract-list' %}"
+                    class="block rounded px-3 py-2 text-body-md text-on-primary-container hover:bg-primary-container">
+                        Contracts
+                    </a>
+
+                    <a href="#"
+                    class="block rounded px-3 py-2 text-body-md text-on-primary-container hover:bg-primary-container">
+                        Attendance
+                    </a>
+
+                    <a href="#"
+                    class="block rounded px-3 py-2 text-body-md text-on-primary-container hover:bg-primary-container">
+                        Leave
+                    </a>
+
+                    <a href="#"
+                    class="block rounded px-3 py-2 text-body-md text-on-primary-container hover:bg-primary-container">
+                        Payroll
+                    </a>
+
+                    <a href="#"
+                    class="block rounded px-3 py-2 text-body-md text-on-primary-container hover:bg-primary-container">
+                        Payslips
+                    </a>
+
+                </nav>
         </aside>
 
         <!-- Main column -->

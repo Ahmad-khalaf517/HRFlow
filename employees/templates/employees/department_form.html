@@ -1,0 +1,193 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="mx-auto max-w-3xl">
+
+    <!-- Header -->
+
+    <div class="mb-6">
+
+        {% if form.instance.pk %}
+
+            <h1 class="text-headline-lg text-on-surface">
+
+                Edit Department
+
+            </h1>
+
+            <p class="mt-1 text-body-md text-on-surface-variant">
+
+                Update department information.
+
+            </p>
+
+        {% else %}
+
+            <h1 class="text-headline-lg text-on-surface">
+
+                Add Department
+
+            </h1>
+
+            <p class="mt-1 text-body-md text-on-surface-variant">
+
+                Create a new department for the organization.
+
+            </p>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- Form Card -->
+
+    <div class="rounded border border-outline-variant bg-surface-container-lowest p-6">
+
+        <form method="post">
+
+            {% csrf_token %}
+
+
+            {% if form.non_field_errors %}
+
+                <div class="mb-5 rounded border border-outline-variant p-4 text-sm text-on-surface">
+
+                    {{ form.non_field_errors }}
+
+                </div>
+
+            {% endif %}
+
+
+            <!-- Department Name -->
+
+            <div class="mb-5">
+
+                <label
+                    for="{{ form.name.id_for_label }}"
+                    class="mb-2 block text-label-caps text-on-surface-variant"
+                >
+
+                    Department Name
+
+                </label>
+
+
+                {{ form.name }}
+
+
+                {% for error in form.name.errors %}
+
+                    <p class="mt-1 text-sm text-on-surface">
+
+                        {{ error }}
+
+                    </p>
+
+                {% endfor %}
+
+            </div>
+
+
+            <!-- Description -->
+
+            <div class="mb-5">
+
+                <label
+                    for="{{ form.description.id_for_label }}"
+                    class="mb-2 block text-label-caps text-on-surface-variant"
+                >
+
+                    Description
+
+                </label>
+
+
+                {{ form.description }}
+
+
+                {% for error in form.description.errors %}
+
+                    <p class="mt-1 text-sm text-on-surface">
+
+                        {{ error }}
+
+                    </p>
+
+                {% endfor %}
+
+            </div>
+
+
+            <!-- Manager -->
+
+            <div class="mb-6">
+
+                <label
+                    for="{{ form.manager.id_for_label }}"
+                    class="mb-2 block text-label-caps text-on-surface-variant"
+                >
+
+                    Department Manager
+
+                </label>
+
+
+                {{ form.manager }}
+
+
+                {% for error in form.manager.errors %}
+
+                    <p class="mt-1 text-sm text-on-surface">
+
+                        {{ error }}
+
+                    </p>
+
+                {% endfor %}
+
+            </div>
+
+
+            <!-- Actions -->
+
+            <div class="flex items-center justify-end gap-3 border-t border-outline-variant pt-5">
+
+                <a
+                    href="{% url 'employees:department-list' %}"
+                    class="rounded border border-outline-variant px-4 py-2 text-body-md text-on-surface"
+                >
+
+                    Cancel
+
+                </a>
+
+
+                <button
+                    type="submit"
+                    class="rounded bg-primary px-4 py-2 text-body-md font-medium text-white"
+                >
+
+                    {% if form.instance.pk %}
+
+                        Save Changes
+
+                    {% else %}
+
+                        Create Department
+
+                    {% endif %}
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

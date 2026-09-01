@@ -1,0 +1,479 @@
+{% extends "base.html" %}
+
+{% block title %}
+Contract Details
+{% endblock %}
+
+
+{% block content %}
+
+<div class="space-y-6">
+
+    <!-- HEADER -->
+
+    <div class="flex items-center justify-between">
+
+        <div>
+
+            <h1 class="text-headline-lg text-on-surface">
+                Contract Details
+            </h1>
+
+            <p class="text-body-md text-on-surface-variant">
+                View employee contract and employment terms.
+            </p>
+
+        </div>
+
+
+        <div class="flex gap-3">
+
+            <a
+                href="{% url 'employees:contract-list' %}"
+                class="rounded border border-outline-variant px-4 py-2 text-body-md text-on-surface"
+            >
+                Back to Contracts
+            </a>
+
+            {% if user.groups.all %}
+
+                <a
+                    href="{% url 'employees:contract-update' contract.pk %}"
+                    class="rounded bg-primary px-4 py-2 text-body-md text-white"
+                >
+                    Edit Contract
+                </a>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+
+    <!-- EMPLOYEE INFORMATION -->
+
+    <div
+        class="rounded border border-outline-variant bg-surface-container-lowest p-6"
+    >
+
+        <h2 class="mb-6 text-headline-sm text-on-surface">
+            Employee Information
+        </h2>
+
+
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+
+
+            <div>
+
+                <p class="text-label-caps text-on-surface-variant">
+                    Employee
+                </p>
+
+                <p class="text-body-md text-on-surface">
+
+                    {{ contract.employee.first_name }}
+                    {{ contract.employee.last_name }}
+
+                </p>
+
+            </div>
+
+
+            <div>
+
+                <p class="text-label-caps text-on-surface-variant">
+                    Employee Number
+                </p>
+
+                <p class="text-body-md text-on-surface">
+
+                    {{ contract.employee.employee_number }}
+
+                </p>
+
+            </div>
+
+
+            <div>
+
+                <p class="text-label-caps text-on-surface-variant">
+                    Department
+                </p>
+
+                <p class="text-body-md text-on-surface">
+
+                    {% if contract.employee.department %}
+                        {{ contract.employee.department.name }}
+                    {% else %}
+                        —
+                    {% endif %}
+
+                </p>
+
+            </div>
+
+
+            <div>
+
+                <p class="text-label-caps text-on-surface-variant">
+                    Position
+                </p>
+
+                <p class="text-body-md text-on-surface">
+
+                    {% if contract.employee.position %}
+                        {{ contract.employee.position.title }}
+                    {% else %}
+                        —
+                    {% endif %}
+
+                </p>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <!-- CONTRACT INFORMATION -->
+
+    <div
+        class="rounded border border-outline-variant bg-surface-container-lowest p-6"
+    >
+
+        <h2 class="mb-6 text-headline-sm text-on-surface">
+            Contract Information
+        </h2>
+
+
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+
+
+            <div>
+
+                <p class="text-label-caps text-on-surface-variant">
+                    Contract Type
+                </p>
+
+                <p class="text-body-md text-on-surface">
+
+                    {{ contract.get_contract_type_display }}
+
+                </p>
+
+            </div>
+
+
+            <div>
+
+                <p class="text-label-caps text-on-surface-variant">
+                    Status
+                </p>
+
+
+                {% if contract.status == "active" %}
+
+                    <span
+                        class="rounded bg-green-100 px-3 py-1 text-sm text-green-700"
+                    >
+                        Active
+                    </span>
+
+                {% elif contract.status == "inactive" %}
+
+                    <span
+                        class="rounded bg-gray-100 px-3 py-1 text-sm text-gray-700"
+                    >
+                        Inactive
+                    </span>
+
+                {% else %}
+
+                    <span
+                        class="rounded bg-red-100 px-3 py-1 text-sm text-red-700"
+                    >
+                        Terminated
+                    </span>
+
+                {% endif %}
+
+            </div>
+
+
+            <div>
+
+                <p class="text-label-caps text-on-surface-variant">
+                    Start Date
+                </p>
+
+                <p class="text-body-md text-on-surface">
+
+                    {{ contract.start_date|date:"M d, Y" }}
+
+                </p>
+
+            </div>
+
+
+            <div>
+
+                <p class="text-label-caps text-on-surface-variant">
+                    End Date
+                </p>
+
+                <p class="text-body-md text-on-surface">
+
+                    {% if contract.end_date %}
+
+                        {{ contract.end_date|date:"M d, Y" }}
+
+                    {% else %}
+
+                        —
+
+                    {% endif %}
+
+                </p>
+
+            </div>
+
+
+            <div>
+
+                <p class="text-label-caps text-on-surface-variant">
+                    Probation End Date
+                </p>
+
+                <p class="text-body-md text-on-surface">
+
+                    {% if contract.probation_end_date %}
+
+                        {{ contract.probation_end_date|date:"M d, Y" }}
+
+                    {% else %}
+
+                        —
+
+                    {% endif %}
+
+                </p>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <!-- SALARY INFORMATION -->
+
+    <div
+        class="rounded border border-outline-variant bg-surface-container-lowest p-6"
+    >
+
+        <h2 class="mb-6 text-headline-sm text-on-surface">
+            Salary Information
+        </h2>
+
+
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+
+
+            <div>
+
+                <p class="text-label-caps text-on-surface-variant">
+                    Basic Salary
+                </p>
+
+                <p class="text-body-md text-on-surface">
+
+                    {{ contract.basic_salary }}
+
+                </p>
+
+            </div>
+
+
+            <div>
+
+                <p class="text-label-caps text-on-surface-variant">
+                    Default Allowances
+                </p>
+
+                <p class="text-body-md text-on-surface">
+
+                    {{ contract.allowances_default }}
+
+                </p>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <!-- WORKING SCHEDULE -->
+
+    <div
+        class="rounded border border-outline-variant bg-surface-container-lowest p-6"
+    >
+
+        <h2 class="mb-6 text-headline-sm text-on-surface">
+            Working Schedule
+        </h2>
+
+
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+
+
+            <div>
+
+                <p class="text-label-caps text-on-surface-variant">
+                    Working Hours Per Day
+                </p>
+
+                <p class="text-body-md text-on-surface">
+
+                    {{ contract.working_hours_per_day }}
+
+                </p>
+
+            </div>
+
+
+            <div>
+
+                <p class="text-label-caps text-on-surface-variant">
+                    Working Days Per Week
+                </p>
+
+                <p class="text-body-md text-on-surface">
+
+                    {{ contract.working_days_per_week }}
+
+                </p>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+
+    <!-- CONTRACT ACTIONS -->
+
+    {% if user.groups.all %}
+
+        <div
+            class="rounded border border-outline-variant bg-surface-container-lowest p-6"
+        >
+
+            <h2 class="mb-4 text-headline-sm text-on-surface">
+                Contract Actions
+            </h2>
+
+
+            <div class="flex flex-wrap gap-3">
+
+
+                {% if contract.status == "active" %}
+
+                    <!-- DEACTIVATE -->
+
+                    <form
+                        method="post"
+                        action="{% url 'employees:contract-deactivate' contract.pk %}"
+                    >
+
+                        {% csrf_token %}
+
+                        <button
+                            type="submit"
+                            class="rounded bg-gray-600 px-4 py-2 text-white"
+                        >
+                            Deactivate Contract
+                        </button>
+
+                    </form>
+
+
+                    <!-- TERMINATE -->
+
+                    <form
+                        method="post"
+                        action="{% url 'employees:contract-terminate' contract.pk %}"
+                    >
+
+                        {% csrf_token %}
+
+                        <button
+                            type="submit"
+                            class="rounded bg-red-600 px-4 py-2 text-white"
+                        >
+                            Terminate Contract
+                        </button>
+
+                    </form>
+
+
+                {% elif contract.status == "inactive" %}
+
+                    <!-- REACTIVATE -->
+
+                    <form
+                        method="post"
+                        action="{% url 'employees:contract-reactivate' contract.pk %}"
+                    >
+
+                        {% csrf_token %}
+
+                        <button
+                            type="submit"
+                            class="rounded bg-green-600 px-4 py-2 text-white"
+                        >
+                            Reactivate Contract
+                        </button>
+
+                    </form>
+
+
+                    <!-- TERMINATE -->
+
+                    <form
+                        method="post"
+                        action="{% url 'employees:contract-terminate' contract.pk %}"
+                    >
+
+                        {% csrf_token %}
+
+                        <button
+                            type="submit"
+                            class="rounded bg-red-600 px-4 py-2 text-white"
+                        >
+                            Terminate Contract
+                        </button>
+
+                    </form>
+
+
+                {% endif %}
+
+
+            </div>
+
+        </div>
+
+    {% endif %}
+
+
+</div>
+
+{% endblock %}

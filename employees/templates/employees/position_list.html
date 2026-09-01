@@ -1,0 +1,375 @@
+{% extends "base.html" %}
+
+{% block title %}
+Positions
+{% endblock %}
+
+{% block content %}
+
+<div class="space-y-6">
+
+    <!-- HEADER -->
+
+    <div class="flex items-center justify-between">
+
+        <div>
+
+            <h1 class="text-headline-lg text-on-surface">
+                Positions
+            </h1>
+
+            <p class="text-body-md text-on-surface-variant">
+                Manage job positions and organizational roles.
+            </p>
+
+        </div>
+
+        <a
+            href="{% url 'employees:position-create' %}"
+            class="rounded bg-primary px-4 py-2 text-body-md text-white"
+        >
+            Add Position
+        </a>
+
+    </div>
+
+
+    <!-- FILTERS -->
+
+    <div class="rounded border border-outline-variant bg-surface-container-lowest p-5">
+
+        <form method="get">
+
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
+
+                <!-- SEARCH -->
+
+                <div>
+
+                    <label class="mb-2 block text-label-caps text-on-surface">
+                        Search
+                    </label>
+
+                    <input
+                        type="text"
+                        name="search"
+                        value="{{ request.GET.search }}"
+                        placeholder="Position title or code"
+                        class="w-full rounded border border-outline-variant bg-surface px-3 py-2"
+                    >
+
+                </div>
+
+
+                <!-- DEPARTMENT -->
+
+                <div>
+
+                    <label class="mb-2 block text-label-caps text-on-surface">
+                        Department
+                    </label>
+
+                    <select
+                        name="department"
+                        class="w-full rounded border border-outline-variant bg-surface px-3 py-2"
+                    >
+
+                        <option value="">
+                            All Departments
+                        </option>
+
+                        {% for department in departments %}
+
+                            <option
+                                value="{{ department.id }}"
+                                {% if request.GET.department == department.id|stringformat:"s" %}
+                                    selected
+                                {% endif %}
+                            >
+                                {{ department.name }}
+                            </option>
+
+                        {% endfor %}
+
+                    </select>
+
+                </div>
+
+
+                <!-- STATUS -->
+
+                <div>
+
+                    <label class="mb-2 block text-label-caps text-on-surface">
+                        Status
+                    </label>
+
+                    <select
+                        name="status"
+                        class="w-full rounded border border-outline-variant bg-surface px-3 py-2"
+                    >
+
+                        <option value="">
+                            All Statuses
+                        </option>
+
+                        <option
+                            value="active"
+                            {% if request.GET.status == "active" %}
+                                selected
+                            {% endif %}
+                        >
+                            Active
+                        </option>
+
+                        <option
+                            value="inactive"
+                            {% if request.GET.status == "inactive" %}
+                                selected
+                            {% endif %}
+                        >
+                            Inactive
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- FILTER -->
+
+                <div class="flex items-end">
+
+                    <button
+                        type="submit"
+                        class="w-full rounded bg-primary px-4 py-2 text-white"
+                    >
+                        Filter
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+    <!-- POSITIONS TABLE -->
+
+    <div class="overflow-hidden rounded border border-outline-variant bg-surface-container-lowest">
+
+        <div class="overflow-x-auto">
+
+            <table class="w-full">
+
+                <thead class="border-b border-outline-variant bg-surface-container">
+
+                    <tr>
+
+                        <th class="px-5 py-4 text-left text-label-caps">
+                            Position
+                        </th>
+
+                        <th class="px-5 py-4 text-left text-label-caps">
+                            Department
+                        </th>
+
+                        <th class="px-5 py-4 text-left text-label-caps">
+                            Code
+                        </th>
+
+                        <th class="px-5 py-4 text-left text-label-caps">
+                            Salary Range
+                        </th>
+
+                        <th class="px-5 py-4 text-left text-label-caps">
+                            Status
+                        </th>
+
+                        <th class="px-5 py-4 text-right text-label-caps">
+                            Actions
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for position in positions %}
+
+                        <tr class="border-b border-outline-variant last:border-0">
+
+                            <!-- POSITION -->
+
+                            <td class="px-5 py-4">
+
+                                <div class="font-medium text-on-surface">
+
+                                    {{ position.title }}
+
+                                </div>
+
+                            </td>
+
+
+                            <!-- DEPARTMENT -->
+
+                            <td class="px-5 py-4 text-body-md">
+
+                                {{ position.department.name }}
+
+                            </td>
+
+
+                            <!-- CODE -->
+
+                            <td class="px-5 py-4 text-body-md">
+
+                                {% if position.code %}
+                                    {{ position.code }}
+                                {% else %}
+                                    —
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- SALARY RANGE -->
+
+                            <td class="px-5 py-4 text-body-md">
+
+                                {% if position.min_salary or position.max_salary %}
+
+                                    {% if position.min_salary %}
+                                        {{ position.min_salary }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+
+                                    -
+
+                                    {% if position.max_salary %}
+                                        {{ position.max_salary }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
+
+                                {% else %}
+
+                                    —
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- STATUS -->
+
+                            <td class="px-5 py-4">
+
+                                {% if position.is_active %}
+
+                                    <span class="rounded bg-green-100 px-3 py-1 text-sm text-green-700">
+                                        Active
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="rounded bg-gray-100 px-3 py-1 text-sm text-gray-700">
+                                        Inactive
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- ACTIONS -->
+
+                            <td class="px-5 py-4 text-right">
+
+                                <a
+                                    href="{% url 'employees:position-detail' position.pk %}"
+                                    class="text-primary hover:underline"
+                                >
+                                    View
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                    {% empty %}
+
+                        <tr>
+
+                            <td
+                                colspan="6"
+                                class="px-5 py-10 text-center text-on-surface-variant"
+                            >
+
+                                No positions found.
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <!-- PAGINATION -->
+
+    {% if is_paginated %}
+
+        <div class="flex items-center justify-center gap-3">
+
+            {% if page_obj.has_previous %}
+
+                <a
+                    href="?page={{ page_obj.previous_page_number }}"
+                    class="rounded border border-outline-variant px-4 py-2"
+                >
+                    Previous
+                </a>
+
+            {% endif %}
+
+
+            <span class="text-body-md">
+
+                Page {{ page_obj.number }}
+                of {{ page_obj.paginator.num_pages }}
+
+            </span>
+
+
+            {% if page_obj.has_next %}
+
+                <a
+                    href="?page={{ page_obj.next_page_number }}"
+                    class="rounded border border-outline-variant px-4 py-2"
+                >
+                    Next
+                </a>
+
+            {% endif %}
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
