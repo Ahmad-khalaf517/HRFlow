@@ -25,6 +25,7 @@ from .models import Bonus, ManualDeduction, Payroll, PayrollItem, TaxBracket
 
 TWO_PLACES = Decimal("0.01")
 OVERTIME_MULTIPLIER = Decimal("1.5")
+CALCULATION_VERSION = "mvp-1"
 
 RECALCULATABLE_STATUSES = ("draft", "calculated")
 PAYROLL_MANAGER_GROUPS = ["Admin", "Payroll Officer"]
@@ -80,17 +81,22 @@ def create_payroll_run(month: int, year: int, created_by) -> Payroll:
 
 @transaction.atomic
 def calculate_payroll(payroll: Payroll, actor) -> Payroll:
+    # Lock and refresh before inspecting status; callers may hold stale model instances.
+    Payroll.objects.select_for_update().get(pk=payroll.pk)
+    payroll.refresh_from_db()
     if payroll.status not in RECALCULATABLE_STATUSES:
         raise ValidationError(
             f"Payroll in '{payroll.get_status_display()}' status cannot be (re)calculated."
         )
 
     employees = Employee.objects.filter(is_active=True, employment_status="active")
+    included_ids = []
 
     for employee in employees:
         contract = employee.contracts.filter(status="active").first()
         if contract is None:
             continue
+        included_ids.append(employee.pk)
 
         overtime_hours = get_employee_overtime_hours(
             employee, payroll.period_start, payroll.period_end
@@ -100,12 +106,16 @@ def calculate_payroll(payroll: Payroll, actor) -> Payroll:
             employee, payroll.period_start, payroll.period_end
         )
 
+        if any(value < 0 for value in (
+            contract.basic_salary, contract.allowances_default,
+            overtime_hours, absence_days, unpaid_leave_days,
+        )):
+            raise ValidationError("Payroll inputs cannot be negative.")
+        if contract.working_hours_per_day <= 0:
+            raise ValidationError("Contract working hours must be greater than zero.")
+
         daily_rate = contract.basic_salary / Decimal(30)
-        hourly_rate = (
-            daily_rate / contract.working_hours_per_day
-            if contract.working_hours_per_day
-            else Decimal(0)
-        )
+        hourly_rate = daily_rate / contract.working_hours_per_day
 
         overtime_amount = _money(overtime_hours * hourly_rate * OVERTIME_MULTIPLIER)
         absence_deduction = _money(absence_days * daily_rate)
@@ -129,6 +139,8 @@ def calculate_payroll(payroll: Payroll, actor) -> Payroll:
         )
 
         bracket = get_matching_tax_bracket(gross_salary)
+        if bracket and (bracket.fixed_amount < 0 or bracket.percentage < 0):
+            raise ValidationError("Tax inputs cannot be negative.")
         tax_amount = (
             _money(bracket.fixed_amount + gross_salary * bracket.percentage / Decimal(100))
             if bracket
@@ -139,11 +151,46 @@ def calculate_payroll(payroll: Payroll, actor) -> Payroll:
             absence_deduction + unpaid_leave_deduction + manual_deduction_amount + tax_amount
         )
         net_salary = _money(gross_salary - total_deductions)
+        if net_salary < 0:
+            raise ValidationError("Deductions cannot exceed gross salary.")
 
         PayrollItem.objects.update_or_create(
             payroll=payroll,
             employee=employee,
             defaults={
+                "contract": contract,
+                "employee_number_snapshot": employee.employee_number,
+                "employee_name_snapshot": f"{employee.first_name} {employee.last_name}".strip(),
+                "currency_code": payroll.currency_code,
+                "calculation_version": CALCULATION_VERSION,
+                "calculation_inputs": {
+                    "contract": {
+                        "id": contract.pk,
+                        "start_date": contract.start_date.isoformat(),
+                        "end_date": contract.end_date.isoformat() if contract.end_date else None,
+                        "type": contract.contract_type,
+                        "basic_salary": str(contract.basic_salary),
+                        "allowances": str(contract.allowances_default),
+                        "working_hours_per_day": str(contract.working_hours_per_day),
+                        "working_days_per_week": contract.working_days_per_week,
+                    },
+                    "period_start": payroll.period_start.isoformat(),
+                    "period_end": payroll.period_end.isoformat(),
+                    "daily_divisor": "30",
+                    "daily_rate": str(daily_rate),
+                    "hourly_rate": str(hourly_rate),
+                    "overtime_multiplier": str(OVERTIME_MULTIPLIER),
+                    "tax": {
+                        "id": bracket.pk,
+                        "min_amount": str(bracket.min_amount),
+                        "max_amount": (
+                            str(bracket.max_amount) if bracket.max_amount is not None else None
+                        ),
+                        "percentage": str(bracket.percentage),
+                        "fixed_amount": str(bracket.fixed_amount),
+                    } if bracket else None,
+                    "attendance_source": "mock-attendance-v1",
+                },
                 "basic_salary": contract.basic_salary,
                 "allowances": contract.allowances_default,
                 "overtime_hours": overtime_hours,
@@ -161,6 +208,8 @@ def calculate_payroll(payroll: Payroll, actor) -> Payroll:
             },
         )
 
+    # Recalculation must not retain an employee who no longer qualifies for this run.
+    payroll.items.exclude(employee_id__in=included_ids).delete()
     totals = payroll.items.aggregate(
         total_gross=Sum("gross_salary"),
         total_deductions=Sum("total_deductions"),
@@ -176,7 +225,10 @@ def calculate_payroll(payroll: Payroll, actor) -> Payroll:
     return payroll
 
 
+@transaction.atomic
 def mark_reviewed(payroll: Payroll, actor) -> Payroll:
+    Payroll.objects.select_for_update().get(pk=payroll.pk)
+    payroll.refresh_from_db()
     if payroll.status != "calculated":
         raise ValidationError("Only calculated payroll can be moved to Reviewed.")
     payroll.status = "reviewed"
@@ -186,7 +238,10 @@ def mark_reviewed(payroll: Payroll, actor) -> Payroll:
     return payroll
 
 
+@transaction.atomic
 def approve_payroll(payroll: Payroll, actor) -> Payroll:
+    Payroll.objects.select_for_update().get(pk=payroll.pk)
+    payroll.refresh_from_db()
     if payroll.status != "reviewed":
         raise ValidationError("Only reviewed payroll can be approved.")
     if not user_in_groups(actor, PAYROLL_MANAGER_GROUPS):

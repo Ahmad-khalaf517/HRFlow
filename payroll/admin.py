@@ -22,14 +22,27 @@ class TaxBracketAdmin(admin.ModelAdmin):
     list_display = ["name", "min_amount", "max_amount", "percentage", "fixed_amount", "is_active"]
 
 
+class PayrollRecordAdmin(admin.ModelAdmin):
+    """Payroll records are maintained by their guarded workflow services."""
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
 @admin.register(Payroll)
-class PayrollAdmin(admin.ModelAdmin):
+class PayrollAdmin(PayrollRecordAdmin):
     list_display = ["month", "year", "status", "total_gross", "total_deductions", "total_net"]
     list_filter = ["status", "year"]
 
 
 @admin.register(PayrollItem)
-class PayrollItemAdmin(admin.ModelAdmin):
+class PayrollItemAdmin(PayrollRecordAdmin):
     list_display = ["payroll", "employee", "gross_salary", "total_deductions", "net_salary"]
     search_fields = ["employee__employee_number", "employee__first_name", "employee__last_name"]
 

@@ -1,5 +1,6 @@
 from django.conf import settings
-from django.db import models
+from django.core.exceptions import ValidationError
+from django.db import models, transaction
 from django.db.models import CheckConstraint, Q, UniqueConstraint
 
 # docs/erd.md records the migrated status values. business-rules.md §6 only
@@ -10,6 +11,8 @@ ADJUSTMENT_STATUS_CHOICES = [
     ("active", "Active"),
     ("cancelled", "Cancelled"),
 ]
+
+LOCKED_PAYROLL_STATUSES = ("approved", "paid")
 
 
 class Bonus(models.Model):
@@ -141,8 +144,7 @@ class Payroll(models.Model):
     total_gross = models.DecimalField(max_digits=14, decimal_places=2, default=0)
     total_deductions = models.DecimalField(max_digits=14, decimal_places=2, default=0)
     total_net = models.DecimalField(max_digits=14, decimal_places=2, default=0)
-    # Q-002 (docs/business-rules.md §1) is still unresolved; USD is the doc's own recommended
-    # default, used here only as the field default, not a confirmed policy decision.
+    # Q-002 confirmed in docs/business-rules.md on 2026-09-01.
     currency_code = models.CharField(max_length=3, default="USD")
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="payrolls_created"
@@ -174,6 +176,28 @@ class Payroll(models.Model):
     def __str__(self):
         return f"Payroll {self.month:02d}/{self.year} ({self.get_status_display()})"
 
+    @transaction.atomic
+    def save(self, *args, **kwargs):
+        previous = type(self).objects.select_for_update().filter(pk=self.pk).first()
+        if previous and previous.status in LOCKED_PAYROLL_STATUSES:
+            changed = any(
+                getattr(previous, field.attname) != getattr(self, field.attname)
+                for field in self._meta.concrete_fields
+                if field.name != "status"
+            )
+            # The later payment service may advance approved -> paid without editing amounts.
+            allowed_statuses = (previous.status, "paid")
+            if changed or self.status not in allowed_statuses:
+                raise ValidationError("Approved payroll cannot be edited.")
+        return super().save(*args, **kwargs)
+
+    @transaction.atomic
+    def delete(self, *args, **kwargs):
+        current = type(self).objects.select_for_update().get(pk=self.pk)
+        if current.status in LOCKED_PAYROLL_STATUSES:
+            raise ValidationError("Approved payroll cannot be deleted.")
+        return super().delete(*args, **kwargs)
+
     @property
     def lifecycle_step(self):
         """0-based index of `status` in STATUS_CHOICES order, for the lifecycle stepper UI."""
@@ -191,6 +215,17 @@ class PayrollItem(models.Model):
     employee = models.ForeignKey(
         "employees.Employee", on_delete=models.PROTECT, related_name="payroll_items"
     )
+    # Empty values identify legacy items; migrations must not invent historical inputs.
+    contract = models.ForeignKey(
+        "employees.Contract", on_delete=models.PROTECT, null=True, blank=True,
+        related_name="payroll_items",
+    )
+    employee_number_snapshot = models.CharField(max_length=30, blank=True, default="")
+    employee_name_snapshot = models.CharField(max_length=201, blank=True, default="")
+    currency_code = models.CharField(max_length=3, blank=True, default="")
+    calculation_version = models.CharField(max_length=50, blank=True, default="")
+    # Decimal inputs/rates are strings to preserve precision without JSON floats.
+    calculation_inputs = models.JSONField(default=dict, blank=True)
     basic_salary = models.DecimalField(max_digits=12, decimal_places=2)
     allowances = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     overtime_hours = models.DecimalField(max_digits=5, decimal_places=2, default=0)
@@ -214,10 +249,47 @@ class PayrollItem(models.Model):
             UniqueConstraint(
                 fields=["payroll", "employee"], name="payrollitem_unique_payroll_employee"
             ),
+            CheckConstraint(
+                condition=(
+                    Q(basic_salary__gte=0) & Q(allowances__gte=0)
+                    & Q(overtime_hours__gte=0) & Q(overtime_amount__gte=0)
+                    & Q(bonus_amount__gte=0) & Q(gross_salary__gte=0)
+                    & Q(absence_days__gte=0) & Q(absence_deduction__gte=0)
+                    & Q(unpaid_leave_days__gte=0) & Q(unpaid_leave_deduction__gte=0)
+                    & Q(manual_deduction_amount__gte=0) & Q(tax_amount__gte=0)
+                    & Q(total_deductions__gte=0) & Q(net_salary__gte=0)
+                ),
+                name="payrollitem_nonnegative_values",
+            ),
         ]
 
     def __str__(self):
         return f"{self.employee} — {self.payroll}"
+
+    def _lock_mutable_parents(self):
+        parent_ids = {self.payroll_id}
+        if self.pk:
+            old_parent = type(self).objects.filter(pk=self.pk).values_list(
+                "payroll_id", flat=True
+            ).first()
+            if old_parent:
+                parent_ids.add(old_parent)
+        parents = Payroll.objects.select_for_update().filter(pk__in=parent_ids).order_by("pk")
+        if any(parent.status in LOCKED_PAYROLL_STATUSES for parent in parents):
+            raise ValidationError("Approved payroll items cannot be changed.")
+
+    @transaction.atomic
+    def save(self, *args, **kwargs):
+        self._lock_mutable_parents()
+        for field in self._meta.fields:
+            if isinstance(field, models.DecimalField) and getattr(self, field.name) < 0:
+                raise ValidationError({field.name: "Payroll values cannot be negative."})
+        return super().save(*args, **kwargs)
+
+    @transaction.atomic
+    def delete(self, *args, **kwargs):
+        self._lock_mutable_parents()
+        return super().delete(*args, **kwargs)
 
 
 class Payslip(models.Model):

@@ -285,6 +285,12 @@ Default ordering: newest year and month first.
 ```text
 payroll                       FK -> Payroll, PROTECT, related_name=items
 employee                      FK -> Employee, PROTECT, related_name=payroll_items
+contract                      FK -> Contract?, PROTECT, related_name=payroll_items
+employee_number_snapshot      varchar(30) = ""
+employee_name_snapshot        varchar(201) = ""
+currency_code                 varchar(3) = ""
+calculation_version           varchar(50) = ""
+calculation_inputs            JSON = {} (Decimal inputs stored as strings)
 basic_salary                  decimal(12,2)
 allowances                    decimal(12,2) = 0
 overtime_hours                decimal(5,2) = 0
@@ -303,7 +309,11 @@ created_at                    datetime
 updated_at                    datetime
 ```
 
-Constraint: unique `(payroll, employee)`. There are currently no nonnegative checks or database immutability trigger on this table.
+Constraints: unique `(payroll, employee)`; all monetary values and fact totals are
+nonnegative. Migration 0003 adds snapshot inputs without backfilling unknown
+historical facts. Normal model saves/deletes reject approved/paid item changes;
+Payroll and PayrollItem are read-only in Admin. There is no database immutability
+trigger: direct SQL and bulk ORM writes are not an authorized editing interface.
 
 Default ordering: payroll, then employee.
 
@@ -370,7 +380,7 @@ These are documentation of current gaps, not authorization to implement them out
 |---|---|
 | Pending/approved leave requests cannot overlap | No model validation or PostgreSQL exclusion constraint exists yet |
 | One full payment per payroll item | `Payment.payroll_item` allows multiple rows; exact-net/approved-payroll rules are not enforced |
-| PayrollItem is a complete immutable snapshot | No currency, calculation version, contract identity/rate details, or database immutability enforcement |
+| PayrollItem is a complete immutable snapshot | New calculations store identity/currency/version/contract/rate/tax inputs. Legacy inputs remain unknown. Model/Admin guards exist; no database immutability trigger |
 | Negative monetary values are rejected | Checks exist only for selected fields; many totals/snapshot amounts lack checks |
 | Period dates derive from month/year | Dates are stored directly; calendar consistency is not constrained |
 | Role permissions are enforced | Group names exist, but permissions and object-level rules are not assigned |
