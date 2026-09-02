@@ -2,6 +2,7 @@
 @source "../../../templates";
 @source "../../../payroll/templates";
 @source "../../../employees/templates";
+@source "../../../attendance/templates";
 @source inline("btn-primary btn-secondary btn-ghost card input badge text-display text-headline-lg text-headline-md text-body-lg text-body-md text-body-sm text-label-caps text-data-mono animate-spin animate-pulse sr-only");
 
 /*
@@ -165,6 +166,11 @@
     @apply inline-flex items-center justify-center gap-2 rounded px-4 py-2 text-body-md font-semibold
            transition-colors disabled:opacity-50 disabled:pointer-events-none
            text-primary bg-transparent hover:bg-surface-container-low;
+}
+@utility btn-danger {
+    @apply inline-flex items-center justify-center gap-2 rounded px-4 py-2 text-body-md font-semibold
+           transition-colors disabled:opacity-50 disabled:pointer-events-none
+           bg-error text-on-error hover:opacity-90;
 }
 
 @utility card {

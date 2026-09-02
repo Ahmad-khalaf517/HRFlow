@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}{% if attendance %}Edit Attendance · HRFlow{% else %}New Attendance · HRFlow{% endif %}{% endblock %}
+
+{% block page_title %}
+    <h1 class="text-headline-lg text-on-surface">{% if attendance %}Edit attendance{% else %}Add attendance{% endif %}</h1>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl space-y-6">
+    <div class="flex items-center justify-between gap-3">
+        <div>
+            <p class="text-label-caps text-on-surface-variant">Attendance</p>
+            <p class="text-body-md text-on-surface-variant">Record work hours and attendance status.</p>
+        </div>
+        <a href="{% url 'attendance:attendance_list' %}" class="btn-ghost">Cancel</a>
+    </div>
+
+    <form method="post" class="card space-y-6">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="rounded border border-error bg-error-container p-3 text-body-md text-on-error-container">
+                {% for error in form.non_field_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+            {% include "components/field.html" with field=form.employee %}
+            {% include "components/field.html" with field=form.date %}
+            {% include "components/field.html" with field=form.check_in %}
+            {% include "components/field.html" with field=form.check_out %}
+            {% include "components/field.html" with field=form.status %}
+        </div>
+
+        {% include "components/field.html" with field=form.notes %}
+
+        <div class="flex items-center justify-end gap-2 border-t border-outline-variant pt-4">
+            <a href="{% url 'attendance:attendance_list' %}" class="btn-secondary">Cancel</a>
+            <button type="submit" class="btn-primary">{% if attendance %}Update Attendance{% else %}Save Attendance{% endif %}</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

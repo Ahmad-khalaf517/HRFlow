@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Leave Approval · HRFlow{% endblock %}
+
+{% block page_title %}
+    <h1 class="text-headline-lg text-on-surface">Leave Approval</h1>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl space-y-6">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+            <p class="text-label-caps text-on-surface-variant">Workflow</p>
+            <p class="text-body-md text-on-surface-variant">Review pending leave requests and take action.</p>
+        </div>
+    </div>
+
+    {% if leave_requests %}
+        <div class="card overflow-hidden p-0">
+            <div class="overflow-x-auto">
+                <table class="min-w-full border-collapse">
+                    <thead class="bg-surface-container-lowest">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Employee</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Type</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Dates</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Days</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Status</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for leave_request in leave_requests %}
+                            <tr class="border-t border-outline-variant align-top">
+                                <td class="px-4 py-3 text-body-md text-on-surface">{{ leave_request.employee }}</td>
+                                <td class="px-4 py-3 text-body-md text-on-surface">{{ leave_request.leave_type }}</td>
+                                <td class="px-4 py-3 text-body-md text-on-surface">{{ leave_request.start_date }} to {{ leave_request.end_date }}</td>
+                                <td class="px-4 py-3 text-data-mono text-on-surface">{{ leave_request.requested_days }}</td>
+                                <td class="px-4 py-3">
+                                    <span class="badge bg-surface-container text-on-surface-variant">Pending</span>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <div class="flex flex-wrap gap-2">
+                                        <a href="{% url 'attendance:leave_request_detail' leave_request.pk %}" class="btn-secondary">View</a>
+                                        <form method="post" action="{% url 'attendance:leave_request_approve' leave_request.pk %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn-primary">Approve</button>
+                                        </form>
+                                        <form method="post" action="{% url 'attendance:leave_request_reject' leave_request.pk %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn-danger">Reject</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% else %}
+        <div class="card max-w-xl">
+            <h2 class="text-headline-md text-on-surface mb-2">No pending approvals</h2>
+            <p class="text-body-md text-on-surface-variant">There are no leave requests waiting for approval.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -10,81 +10,188 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/dist/output.css' %}">
+    <style>
+        body.sidebar-collapsed .sidebar-shell {
+            width: 5rem;
+        }
+        body.sidebar-collapsed .sidebar-header-text,
+        body.sidebar-collapsed .sidebar-section-label,
+        body.sidebar-collapsed .sidebar-nav-text,
+        body.sidebar-collapsed .sidebar-divider {
+            display: none;
+        }
+        body.sidebar-collapsed .sidebar-link {
+            justify-content: center;
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+        }
+        @media (min-width: 768px) {
+            .app-shell {
+                padding-left: 15rem;
+            }
+            body.sidebar-collapsed .app-shell {
+                padding-left: 5rem;
+            }
+        }
+    </style>
 </head>
 <body class="bg-background text-on-background">
-    <div class="min-h-screen flex">
-        <!-- Sidebar: fixed 240px per docs/design-system.md -->
-        <aside class="w-[240px] shrink-0 bg-primary text-on-primary hidden md:flex md:flex-col">
-            <div class="h-16 flex items-center gap-2 px-6 border-b border-white/10">
-                <span class="w-7 h-7 rounded bg-secondary text-on-secondary flex items-center justify-center text-body-sm font-bold shrink-0">H</span>
-                <span class="text-headline-md">HRFlow</span>
+    <div class="min-h-screen bg-background">
+        <div id="sidebar-overlay" class="fixed inset-0 z-30 hidden bg-primary/40 md:hidden"></div>
+
+        <aside id="sidebar" class="sidebar-shell fixed inset-y-0 left-0 z-40 flex h-screen w-60 -translate-x-full flex-col border-r border-white/10 bg-primary text-on-primary transition-all duration-200 md:translate-x-0">
+            <div class="sidebar-header flex h-16 items-center justify-between gap-2 border-b border-white/10 px-3">
+                <div class="flex items-center gap-2 overflow-hidden">
+                    <span class="w-7 h-7 rounded bg-secondary text-on-secondary flex items-center justify-center text-body-sm font-bold shrink-0">H</span>
+                    <span class="sidebar-header-text text-headline-md">HRFlow</span>
+                </div>
+                <button id="sidebar-collapse" type="button" class="hidden h-9 w-9 shrink-0 items-center justify-center rounded text-on-primary hover:bg-primary-container focus:outline-none focus:ring-2 focus:ring-white/70 md:inline-flex" aria-label="Collapse sidebar" aria-expanded="true">
+                    <span aria-hidden="true">☰</span>
+                </button>
+                <button id="sidebar-close" type="button" class="h-9 w-9 shrink-0 items-center justify-center rounded text-on-primary hover:bg-primary-container focus:outline-none focus:ring-2 focus:ring-white/70 md:hidden" aria-label="Close menu">
+                    <span aria-hidden="true">×</span>
+                </button>
             </div>
-            <nav class="flex-1 px-3 py-4 space-y-1">
-                <!-- Placeholder links: wired up as each module ships. Active section
-                     is derived from request.resolver_match.url_name, one item at a
-                     time — employees' four sub-sections share app_name 'employees'
-                     but not the same url_name prefix. -->
-                <a href="{% url 'home' %}" class="flex items-center gap-3 rounded px-3 py-2 text-body-md {% if request.resolver_match.url_name == 'home' %}font-semibold bg-primary-container{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-                    Dashboard
-                </a>
-                <a href="{% url 'employees:employee-list' %}" class="flex items-center gap-3 rounded px-3 py-2 text-body-md {% if request.resolver_match.url_name|startswith:'employee-' %}font-semibold bg-primary-container{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14.2c2.4.4 4.5 2.4 4.5 5.8"/></svg>
-                    Employees
-                </a>
-                <a href="{% url 'employees:department-list' %}" class="flex items-center gap-3 rounded px-3 py-2 text-body-md {% if request.resolver_match.url_name|startswith:'department-' %}font-semibold bg-primary-container{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><path d="M3.5 8.5 12 3.5l8.5 5v9.5a1 1 0 0 1-1 1h-15a1 1 0 0 1-1-1Z"/><path d="M9 20v-6h6v6"/></svg>
-                    Departments
-                </a>
-                <a href="{% url 'employees:position-list' %}" class="flex items-center gap-3 rounded px-3 py-2 text-body-md {% if request.resolver_match.url_name|startswith:'position-' %}font-semibold bg-primary-container{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><path d="M8 3.5h8v4l-4 3-4-3Z"/><path d="M4.5 20v-8.5a1.5 1.5 0 0 1 1.5-1.5h12a1.5 1.5 0 0 1 1.5 1.5V20Z"/></svg>
-                    Positions
-                </a>
-                <a href="{% url 'employees:contract-list' %}" class="flex items-center gap-3 rounded px-3 py-2 text-body-md {% if request.resolver_match.url_name|startswith:'contract-' %}font-semibold bg-primary-container{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><path d="M6 3.5h9l3 3v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-15a1 1 0 0 1 1-1Z"/><path d="M9 10h6M9 13.5h6M9 17h3.5"/></svg>
-                    Contracts
-                </a>
-                <a href="#" class="flex items-center gap-3 rounded px-3 py-2 text-body-md text-on-primary-container hover:bg-primary-container">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
-                    Attendance
-                </a>
-                <a href="#" class="flex items-center gap-3 rounded px-3 py-2 text-body-md text-on-primary-container hover:bg-primary-container">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><rect x="3.5" y="5" width="17" height="15.5" rx="1.5"/><path d="M3.5 9.5h17M8 3v3M16 3v3"/></svg>
-                    Leave
-                </a>
-                <a href="{% url 'payroll:run-list' %}" class="flex items-center gap-3 rounded px-3 py-2 text-body-md {% if request.resolver_match.app_name == 'payroll' %}font-semibold bg-primary-container{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><path d="M3 7.5A1.5 1.5 0 0 1 4.5 6h13A1.5 1.5 0 0 1 19 7.5v10a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 3 17.5z"/><path d="M15.5 12.5h3.5a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-3.5a2 2 0 0 1 0-4Z"/></svg>
-                    Payroll
-                </a>
-                <a href="#" class="flex items-center gap-3 rounded px-3 py-2 text-body-md text-on-primary-container hover:bg-primary-container">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><path d="M6 3.5h9l3 3v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-15a1 1 0 0 1 1-1Z"/><path d="M9 10h6M9 13.5h6M9 17h3.5"/></svg>
-                    Payslips
-                </a>
+
+            <nav class="flex-1 overflow-y-auto px-3 py-4">
+                <div class="space-y-1">
+                    <a href="{% url 'home' %}" class="sidebar-link flex items-center gap-3 rounded px-3 py-2 text-body-md {% if request.resolver_match.url_name == 'home' %}font-semibold bg-primary-container{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                        <span class="sidebar-nav-text">Dashboard</span>
+                    </a>
+                    <a href="{% url 'employees:employee-list' %}" class="sidebar-link flex items-center gap-3 rounded px-3 py-2 text-body-md {% if request.resolver_match.url_name|startswith:'employee-' %}font-semibold bg-primary-container{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14.2c2.4.4 4.5 2.4 4.5 5.8"/></svg>
+                        <span class="sidebar-nav-text">Employees</span>
+                    </a>
+                    <a href="{% url 'employees:department-list' %}" class="sidebar-link flex items-center gap-3 rounded px-3 py-2 text-body-md {% if request.resolver_match.url_name|startswith:'department-' %}font-semibold bg-primary-container{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><path d="M3.5 8.5 12 3.5l8.5 5v9.5a1 1 0 0 1-1 1h-15a1 1 0 0 1-1-1Z"/><path d="M9 20v-6h6v6"/></svg>
+                        <span class="sidebar-nav-text">Departments</span>
+                    </a>
+                    <a href="{% url 'employees:position-list' %}" class="sidebar-link flex items-center gap-3 rounded px-3 py-2 text-body-md {% if request.resolver_match.url_name|startswith:'position-' %}font-semibold bg-primary-container{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><path d="M8 3.5h8v4l-4 3-4-3Z"/><path d="M4.5 20v-8.5a1.5 1.5 0 0 1 1.5-1.5h12a1.5 1.5 0 0 1 1.5 1.5V20Z"/></svg>
+                        <span class="sidebar-nav-text">Positions</span>
+                    </a>
+                    <a href="{% url 'employees:contract-list' %}" class="sidebar-link flex items-center gap-3 rounded px-3 py-2 text-body-md {% if request.resolver_match.url_name|startswith:'contract-' %}font-semibold bg-primary-container{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><path d="M6 3.5h9l3 3v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-15a1 1 0 0 1 1-1Z"/><path d="M9 10h6M9 13.5h6M9 17h3.5"/></svg>
+                        <span class="sidebar-nav-text">Contracts</span>
+                    </a>
+                </div>
+
+                {% if request.user.is_authenticated %}
+                    <div class="sidebar-divider mt-4 border-t border-white/10 pt-3">
+                        <p class="sidebar-section-label px-3 pb-2 text-label-caps text-on-primary-container/80">Attendance</p>
+                        <div class="space-y-1">
+                            {% if request.user.is_staff %}
+                                <a href="{% url 'attendance:attendance_list' %}" class="sidebar-link block rounded px-3 py-2 text-body-md {% if '/attendance/' in request.path and 'leave' not in request.path and 'summary' not in request.path %}bg-primary-container font-semibold text-on-primary{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
+                                    <span class="sidebar-nav-text">All Attendance</span>
+                                </a>
+                            {% else %}
+                                {% for group in request.user.groups.all %}
+                                    {% if group.name == 'Admin' or group.name == 'HR Manager' or group.name == 'Payroll Officer' %}
+                                        <a href="{% url 'attendance:attendance_list' %}" class="sidebar-link block rounded px-3 py-2 text-body-md {% if '/attendance/' in request.path and 'leave' not in request.path and 'summary' not in request.path %}bg-primary-container font-semibold text-on-primary{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
+                                            <span class="sidebar-nav-text">All Attendance</span>
+                                        </a>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                            {% if request.user.employee_profile %}
+                                <a href="{% url 'attendance:my_attendance' %}" class="sidebar-link block rounded px-3 py-2 text-body-md {% if '/attendance/mine/' in request.path %}bg-primary-container font-semibold text-on-primary{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
+                                    <span class="sidebar-nav-text">My Attendance</span>
+                                </a>
+                            {% endif %}
+                            {% if request.user.is_staff %}
+                                <a href="{% url 'attendance:attendance_summary' %}" class="sidebar-link block rounded px-3 py-2 text-body-md {% if '/attendance/summary/' in request.path %}bg-primary-container font-semibold text-on-primary{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
+                                    <span class="sidebar-nav-text">Summary</span>
+                                </a>
+                            {% else %}
+                                {% for group in request.user.groups.all %}
+                                    {% if group.name == 'Admin' or group.name == 'HR Manager' or group.name == 'Payroll Officer' %}
+                                        <a href="{% url 'attendance:attendance_summary' %}" class="sidebar-link block rounded px-3 py-2 text-body-md {% if '/attendance/summary/' in request.path %}bg-primary-container font-semibold text-on-primary{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
+                                            <span class="sidebar-nav-text">Summary</span>
+                                        </a>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="sidebar-divider mt-4 border-t border-white/10 pt-3">
+                        <p class="sidebar-section-label px-3 pb-2 text-label-caps text-on-primary-container/80">Leave</p>
+                        <div class="space-y-1">
+                            {% if request.user.is_staff %}
+                                <a href="{% url 'attendance:leave_type_list' %}" class="sidebar-link block rounded px-3 py-2 text-body-md {% if '/leave-types/' in request.path %}bg-primary-container font-semibold text-on-primary{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
+                                    <span class="sidebar-nav-text">Leave Types</span>
+                                </a>
+                                <a href="{% url 'attendance:leave_request_list' %}" class="sidebar-link block rounded px-3 py-2 text-body-md {% if '/leave-requests/' in request.path and 'approval' not in request.path %}bg-primary-container font-semibold text-on-primary{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
+                                    <span class="sidebar-nav-text">Leave Requests</span>
+                                </a>
+                                <a href="{% url 'attendance:leave_approval_list' %}" class="sidebar-link block rounded px-3 py-2 text-body-md {% if '/leave-requests/approval/' in request.path %}bg-primary-container font-semibold text-on-primary{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
+                                    <span class="sidebar-nav-text">Leave Approval</span>
+                                </a>
+                            {% else %}
+                                {% for group in request.user.groups.all %}
+                                    {% if group.name == 'Admin' or group.name == 'HR Manager' %}
+                                        <a href="{% url 'attendance:leave_type_list' %}" class="sidebar-link block rounded px-3 py-2 text-body-md {% if '/leave-types/' in request.path %}bg-primary-container font-semibold text-on-primary{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
+                                            <span class="sidebar-nav-text">Leave Types</span>
+                                        </a>
+                                        <a href="{% url 'attendance:leave_request_list' %}" class="sidebar-link block rounded px-3 py-2 text-body-md {% if '/leave-requests/' in request.path and 'approval' not in request.path %}bg-primary-container font-semibold text-on-primary{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
+                                            <span class="sidebar-nav-text">Leave Requests</span>
+                                        </a>
+                                        <a href="{% url 'attendance:leave_approval_list' %}" class="sidebar-link block rounded px-3 py-2 text-body-md {% if '/leave-requests/approval/' in request.path %}bg-primary-container font-semibold text-on-primary{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
+                                            <span class="sidebar-nav-text">Leave Approval</span>
+                                        </a>
+                                    {% endif %}
+                                {% endfor %}
+                                {% if request.user.employee_profile %}
+                                    <a href="{% url 'attendance:my_leave_requests' %}" class="sidebar-link block rounded px-3 py-2 text-body-md {% if '/leave-requests/mine/' in request.path %}bg-primary-container font-semibold text-on-primary{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
+                                        <span class="sidebar-nav-text">My Leave Requests</span>
+                                    </a>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endif %}
+
+                <div class="sidebar-divider mt-4 border-t border-white/10 pt-3">
+                    <p class="sidebar-section-label px-3 pb-2 text-label-caps text-on-primary-container/80">Payroll</p>
+                    <div class="space-y-1">
+                        <a href="{% url 'payroll:run-list' %}" class="sidebar-link flex items-center gap-3 rounded px-3 py-2 text-body-md {% if request.resolver_match.app_name == 'payroll' %}font-semibold bg-primary-container{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><path d="M3 7.5A1.5 1.5 0 0 1 4.5 6h13A1.5 1.5 0 0 1 19 7.5v10a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 3 17.5z"/><path d="M15.5 12.5h3.5a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-3.5a2 2 0 0 1 0-4Z"/></svg>
+                            <span class="sidebar-nav-text">Payroll</span>
+                        </a>
+                        <a href="#" class="sidebar-link flex items-center gap-3 rounded px-3 py-2 text-body-md text-on-primary-container hover:bg-primary-container">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><path d="M6 3.5h9l3 3v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-15a1 1 0 0 1 1-1Z"/><path d="M9 10h6M9 13.5h6M9 17h3.5"/></svg>
+                            <span class="sidebar-nav-text">Payslips</span>
+                        </a>
+                    </div>
+                </div>
             </nav>
         </aside>
 
-        <!-- Main column -->
-        <div class="flex-1 flex flex-col min-w-0">
-            <!-- Top header -->
-            <header class="h-16 bg-surface-container-lowest border-b border-outline-variant flex items-center justify-between px-4 md:px-6">
-                <div class="flex items-center gap-3">
-                    {% block page_title %}<h1 class="text-headline-md text-on-surface">Dashboard</h1>{% endblock %}
-                </div>
-                <div class="flex items-center gap-3 text-body-sm text-on-surface-variant">
-                    {% if request.user.is_authenticated %}
-                        <span class="w-7 h-7 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center text-body-sm font-semibold shrink-0">{{ request.user.get_username|slice:":1"|upper }}</span>
-                        <span>{{ request.user.get_username }}</span>
-                        <form method="post" action="{% url 'logout' %}">
-                            {% csrf_token %}
-                            <button type="submit" class="btn-ghost">Sign out</button>
-                        </form>
-                    {% else %}
-                        <span class="text-outline">Not signed in</span>
-                    {% endif %}
+        <div id="app-shell" class="app-shell min-h-screen transition-all duration-200 md:pl-60">
+            <header class="h-16 border-b border-outline-variant bg-surface-container-lowest px-4 md:px-6">
+                <div class="flex h-full items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <button id="sidebar-open" type="button" class="inline-flex h-9 w-9 items-center justify-center rounded border border-outline-variant bg-white text-on-surface hover:bg-surface-container-low focus:outline-none focus:ring-2 focus:ring-secondary md:hidden" aria-label="Open menu">
+                            <span aria-hidden="true">☰</span>
+                        </button>
+                        {% block page_title %}<h1 class="text-headline-md text-on-surface">Dashboard</h1>{% endblock %}
+                    </div>
+                    <div class="flex items-center gap-3 text-body-sm text-on-surface-variant">
+                        {% if request.user.is_authenticated %}
+                            <span class="w-7 h-7 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center text-body-sm font-semibold shrink-0">{{ request.user.get_username|slice:":1"|upper }}</span>
+                            <span>{{ request.user.get_username }}</span>
+                            <form method="post" action="{% url 'logout' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-ghost">Sign out</button>
+                            </form>
+                        {% else %}
+                            <span class="text-outline">Not signed in</span>
+                        {% endif %}
+                    </div>
                 </div>
             </header>
 
-            <!-- Page content -->
             <main class="flex-1 p-4 md:p-6">
                 {% block content %}{% endblock %}
             </main>
@@ -177,6 +284,47 @@
             if (main) main.innerHTML = SKELETON_HTML;
         });
     })();
+    </script>
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+        const sidebarOpen = document.getElementById('sidebar-open');
+        const sidebarClose = document.getElementById('sidebar-close');
+        const sidebarCollapse = document.getElementById('sidebar-collapse');
+        const appShell = document.getElementById('app-shell');
+
+        function setMobileOpen(isOpen) {
+            if (!sidebar || !sidebarOverlay) return;
+            sidebar.classList.toggle('-translate-x-full', !isOpen);
+            sidebar.classList.toggle('translate-x-0', isOpen);
+            sidebarOverlay.classList.toggle('hidden', !isOpen);
+        }
+
+        function setDesktopCollapsed(isCollapsed) {
+            document.body.classList.toggle('sidebar-collapsed', isCollapsed);
+            if (!appShell) return;
+            appShell.classList.toggle('md:pl-60', !isCollapsed);
+            appShell.classList.toggle('md:pl-20', isCollapsed);
+            if (sidebarCollapse) {
+                sidebarCollapse.setAttribute('aria-expanded', String(!isCollapsed));
+            }
+        }
+
+        sidebarOpen?.addEventListener('click', () => setMobileOpen(true));
+        sidebarClose?.addEventListener('click', () => setMobileOpen(false));
+        sidebarOverlay?.addEventListener('click', () => setMobileOpen(false));
+        sidebarCollapse?.addEventListener('click', () => {
+            const isCollapsed = !document.body.classList.contains('sidebar-collapsed');
+            setDesktopCollapsed(isCollapsed);
+        });
+
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 768) {
+                setMobileOpen(false);
+            }
+        });
+
+        setDesktopCollapsed(false);
     </script>
 </body>
 </html>
