@@ -16,6 +16,21 @@
         <a href="{% url 'attendance:leave_request_create' %}" class="btn-primary">Create Leave Request</a>
     </div>
 
+    <div class="grid grid-cols-3 gap-4">
+        <div class="card border-l-4 border-l-outline-variant">
+            <p class="text-label-caps text-on-surface-variant">Pending</p>
+            <p class="mt-2 text-display text-on-surface">{{ status_counts.pending }}</p>
+        </div>
+        <div class="card border-l-4 border-l-secondary">
+            <p class="text-label-caps text-on-surface-variant">Approved</p>
+            <p class="mt-2 text-display text-on-surface">{{ status_counts.approved }}</p>
+        </div>
+        <div class="card border-l-4 border-l-error">
+            <p class="text-label-caps text-on-surface-variant">Rejected</p>
+            <p class="mt-2 text-display text-on-surface">{{ status_counts.rejected }}</p>
+        </div>
+    </div>
+
     {% if leave_requests %}
         <div class="card overflow-hidden p-0">
             <div class="overflow-x-auto">

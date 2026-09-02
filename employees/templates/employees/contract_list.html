@@ -1,9 +1,14 @@
 {% extends "base.html" %}
+{% load employees_extras %}
 
 {% block title %}
 Contracts
 {% endblock %}
 
+
+{% block page_title %}
+<h1 class="text-headline-lg text-on-surface">Contracts</h1>
+{% endblock %}
 
 {% block content %}
 
@@ -15,10 +20,6 @@ Contracts
 
         <div>
 
-            <h1 class="text-headline-lg text-on-surface">
-                Contracts
-            </h1>
-
             <p class="text-body-md text-on-surface-variant">
                 Manage employee contracts and employment terms.
             </p>
@@ -26,7 +27,7 @@ Contracts
         </div>
 
 
-        {% if user.groups.all %}
+        {% if request.user|in_groups:"Admin,HR Manager" %}
 
             <a
                 href="{% url 'employees:contract-create' %}"

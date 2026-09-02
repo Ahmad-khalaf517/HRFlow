@@ -16,3 +16,38 @@ def startswith(value, prefix):
         return False
 
     return str(value).startswith(prefix)
+
+
+@register.filter
+def has_group(user, group_names):
+    """Used by templates/base.html to hide the Employees/Contracts nav links
+    from users who lack _has_employee_view_access (employees/views.py) so the
+    sidebar doesn't offer a link that 403s. `group_names` is comma-separated.
+    """
+
+    if not getattr(user, "is_authenticated", False):
+        return False
+
+    if user.is_staff:
+        return True
+
+    names = [name.strip() for name in group_names.split(",")]
+
+    return user.groups.filter(name__in=names).exists()
+
+
+@register.filter
+def in_groups(user, group_names):
+    """Strict group-membership check with no is_staff shortcut, mirroring
+    employees.views.HRManagementRequiredMixin's allowed_groups check exactly.
+    Used to hide the Edit/Deactivate/Terminate actions on the employee
+    profile header from anyone those views would actually 403 (including
+    the employee viewing their own record).
+    """
+
+    if not getattr(user, "is_authenticated", False):
+        return False
+
+    names = [name.strip() for name in group_names.split(",")]
+
+    return user.groups.filter(name__in=names).exists()

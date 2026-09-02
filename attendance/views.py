@@ -2,7 +2,7 @@ from decimal import Decimal
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum
+from django.db.models import Count, Sum
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 
@@ -54,6 +54,13 @@ def _can_access_leave_request(user, leave_request):
     return user.is_authenticated and leave_request.employee.user_id == user.pk
 
 
+def _status_counts(queryset, statuses):
+    counts = dict(
+        queryset.values("status").annotate(total=Count("id")).values_list("status", "total")
+    )
+    return {status: counts.get(status, 0) for status in statuses}
+
+
 @login_required
 def attendance_summary(request):
     if not _has_attendance_view_access(request.user):
@@ -87,23 +94,60 @@ def attendance_summary(request):
 
 @login_required
 def attendance_list(request):
-    queryset = Attendance.objects.select_related("employee").order_by("-date")
+    base_queryset = Attendance.objects.select_related("employee").order_by("-date")
 
     if not _has_attendance_view_access(request.user):
-        queryset = queryset.filter(employee__user=request.user)
+        base_queryset = base_queryset.filter(employee__user=request.user)
 
-    return render(request, "attendance/attendance_list.html", {"attendance_records": queryset})
+    status = request.GET.get("status", "").strip()
+    date_filter = request.GET.get("date", "").strip()
 
+    queryset = base_queryset
+    if status:
+        queryset = queryset.filter(status=status)
+    if date_filter:
+        queryset = queryset.filter(date=date_filter)
 
-@login_required
-def my_attendance(request):
-    employee = get_object_or_404(Employee, user=request.user)
-    queryset = Attendance.objects.filter(employee=employee).order_by("-date")
     return render(
         request,
         "attendance/attendance_list.html",
         {
             "attendance_records": queryset,
+            "status_counts": _status_counts(
+                base_queryset, ["present", "late", "absent", "leave"]
+            ),
+            "status_choices": Attendance.STATUS_CHOICES,
+            "selected_status": status,
+            "selected_date": date_filter,
+        },
+    )
+
+
+@login_required
+def my_attendance(request):
+    employee = get_object_or_404(Employee, user=request.user)
+    base_queryset = Attendance.objects.filter(employee=employee).order_by("-date")
+
+    status = request.GET.get("status", "").strip()
+    date_filter = request.GET.get("date", "").strip()
+
+    queryset = base_queryset
+    if status:
+        queryset = queryset.filter(status=status)
+    if date_filter:
+        queryset = queryset.filter(date=date_filter)
+
+    return render(
+        request,
+        "attendance/attendance_list.html",
+        {
+            "attendance_records": queryset,
+            "status_counts": _status_counts(
+                base_queryset, ["present", "late", "absent", "leave"]
+            ),
+            "status_choices": Attendance.STATUS_CHOICES,
+            "selected_status": status,
+            "selected_date": date_filter,
             "title": "My Attendance",
         },
     )
@@ -220,7 +264,14 @@ def leave_request_list(request):
     queryset = LeaveRequest.objects.select_related("employee", "leave_type").order_by("-start_date")
     if not _has_leave_view_access(request.user):
         queryset = queryset.filter(employee__user=request.user)
-    return render(request, "attendance/leave_request_list.html", {"leave_requests": queryset})
+    return render(
+        request,
+        "attendance/leave_request_list.html",
+        {
+            "leave_requests": queryset,
+            "status_counts": _status_counts(queryset, ["pending", "approved", "rejected"]),
+        },
+    )
 
 
 @login_required
@@ -242,7 +293,11 @@ def my_leave_requests(request):
     return render(
         request,
         "attendance/leave_request_list.html",
-        {"leave_requests": queryset, "title": "My Leave Requests"},
+        {
+            "leave_requests": queryset,
+            "status_counts": _status_counts(queryset, ["pending", "approved", "rejected"]),
+            "title": "My Leave Requests",
+        },
     )
 
 

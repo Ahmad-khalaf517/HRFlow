@@ -1,9 +1,14 @@
 {% extends "base.html" %}
+{% load employees_extras %}
 
 {% block title %}
 Contract Details
 {% endblock %}
 
+
+{% block page_title %}
+<h1 class="text-headline-lg text-on-surface">{{ contract.get_status_display }} Contract</h1>
+{% endblock %}
 
 {% block content %}
 
@@ -54,7 +59,7 @@ Contract Details
                 Back to Contracts
             </a>
 
-            {% if user.groups.all %}
+            {% if request.user|in_groups:"Admin,HR Manager" %}
 
                 <a
                     href="{% url 'employees:contract-update' contract.pk %}"
@@ -199,7 +204,7 @@ Contract Details
 
         <!-- ACTIONS -->
 
-        {% if user.groups.all %}
+        {% if request.user|in_groups:"Admin,HR Manager" %}
 
             <div class="rounded border border-outline-variant bg-surface-container-lowest p-6">
 

@@ -1,5 +1,9 @@
 {% extends "base.html" %}
 
+{% block page_title %}
+<h1 class="text-headline-lg text-on-surface">{% if form.instance.pk %}Edit Department{% else %}Add Department{% endif %}</h1>
+{% endblock %}
+
 {% block content %}
 
 <div class="mx-auto max-w-3xl">
@@ -10,12 +14,6 @@
 
         {% if form.instance.pk %}
 
-            <h1 class="text-headline-lg text-on-surface">
-
-                Edit Department
-
-            </h1>
-
             <p class="mt-1 text-body-md text-on-surface-variant">
 
                 Update department information.
@@ -23,12 +21,6 @@
             </p>
 
         {% else %}
-
-            <h1 class="text-headline-lg text-on-surface">
-
-                Add Department
-
-            </h1>
 
             <p class="mt-1 text-body-md text-on-surface-variant">
 

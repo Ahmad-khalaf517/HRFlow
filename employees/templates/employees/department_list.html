@@ -1,4 +1,9 @@
 {% extends "base.html" %}
+{% load employees_extras %}
+
+{% block page_title %}
+<h1 class="text-headline-lg text-on-surface">Departments</h1>
+{% endblock %}
 
 {% block content %}
 
@@ -8,10 +13,6 @@
     <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
 
         <div>
-            <h1 class="text-headline-lg text-on-surface">
-                Departments
-            </h1>
-
             <p class="mt-1 text-body-md text-on-surface-variant">
                 Manage organizational departments and their managers.
             </p>
@@ -19,6 +20,7 @@
 
         <div class="flex items-center gap-3">
 
+    {% if request.user|in_groups:"Admin,HR Manager" %}
     <a
         href="{% url 'employees:department-create' %}"
         class="btn-primary"
@@ -26,6 +28,7 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M12 5v14M5 12h14"/></svg>
         Add Department
     </a>
+    {% endif %}
 
 </div>
     </div>
@@ -198,30 +201,34 @@
                                         View
                                     </a>
 
-                                    <a
-                                        href="{% url 'employees:department-update' department.pk %}"
-                                        class="text-sm font-medium text-on-surface"
-                                    >
-                                        Edit
-                                    </a>
+                                    {% if request.user|in_groups:"Admin,HR Manager" %}
 
-                                    {% if department.is_active %}
-
-                                        <form
-                                            method="post"
-                                            action="{% url 'employees:department-deactivate' department.pk %}"
+                                        <a
+                                            href="{% url 'employees:department-update' department.pk %}"
+                                            class="text-sm font-medium text-on-surface"
                                         >
+                                            Edit
+                                        </a>
 
-                                            {% csrf_token %}
+                                        {% if department.is_active %}
 
-                                            <button
-                                                type="submit"
-                                                class="text-sm font-medium text-on-surface-variant"
+                                            <form
+                                                method="post"
+                                                action="{% url 'employees:department-deactivate' department.pk %}"
                                             >
-                                                Deactivate
-                                            </button>
 
-                                        </form>
+                                                {% csrf_token %}
+
+                                                <button
+                                                    type="submit"
+                                                    class="text-sm font-medium text-on-surface-variant"
+                                                >
+                                                    Deactivate
+                                                </button>
+
+                                            </form>
+
+                                        {% endif %}
 
                                     {% endif %}
 

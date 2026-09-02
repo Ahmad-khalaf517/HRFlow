@@ -62,10 +62,17 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
                         <span class="sidebar-nav-text">Dashboard</span>
                     </a>
-                    <a href="{% url 'employees:employee-list' %}" class="sidebar-link flex items-center gap-3 rounded px-3 py-2 text-body-md {% if request.resolver_match.url_name|startswith:'employee-' %}font-semibold bg-primary-container{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14.2c2.4.4 4.5 2.4 4.5 5.8"/></svg>
-                        <span class="sidebar-nav-text">Employees</span>
-                    </a>
+                    {% if request.user|has_group:"Admin,HR Manager,Payroll Officer" %}
+                        <a href="{% url 'employees:employee-list' %}" class="sidebar-link flex items-center gap-3 rounded px-3 py-2 text-body-md {% if request.resolver_match.url_name|startswith:'employee-' %}font-semibold bg-primary-container{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14.2c2.4.4 4.5 2.4 4.5 5.8"/></svg>
+                            <span class="sidebar-nav-text">Employees</span>
+                        </a>
+                    {% elif request.user.employee_profile %}
+                        <a href="{% url 'employees:employee-detail' request.user.employee_profile.pk %}" class="sidebar-link flex items-center gap-3 rounded px-3 py-2 text-body-md {% if request.resolver_match.url_name|startswith:'employee-' %}font-semibold bg-primary-container{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M15.5 14.2c2.4.4 4.5 2.4 4.5 5.8"/></svg>
+                            <span class="sidebar-nav-text">My Profile</span>
+                        </a>
+                    {% endif %}
                     <a href="{% url 'employees:department-list' %}" class="sidebar-link flex items-center gap-3 rounded px-3 py-2 text-body-md {% if request.resolver_match.url_name|startswith:'department-' %}font-semibold bg-primary-container{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><path d="M3.5 8.5 12 3.5l8.5 5v9.5a1 1 0 0 1-1 1h-15a1 1 0 0 1-1-1Z"/><path d="M9 20v-6h6v6"/></svg>
                         <span class="sidebar-nav-text">Departments</span>
@@ -74,10 +81,12 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><path d="M8 3.5h8v4l-4 3-4-3Z"/><path d="M4.5 20v-8.5a1.5 1.5 0 0 1 1.5-1.5h12a1.5 1.5 0 0 1 1.5 1.5V20Z"/></svg>
                         <span class="sidebar-nav-text">Positions</span>
                     </a>
-                    <a href="{% url 'employees:contract-list' %}" class="sidebar-link flex items-center gap-3 rounded px-3 py-2 text-body-md {% if request.resolver_match.url_name|startswith:'contract-' %}font-semibold bg-primary-container{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><path d="M6 3.5h9l3 3v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-15a1 1 0 0 1 1-1Z"/><path d="M9 10h6M9 13.5h6M9 17h3.5"/></svg>
-                        <span class="sidebar-nav-text">Contracts</span>
-                    </a>
+                    {% if request.user|has_group:"Admin,HR Manager,Payroll Officer" %}
+                        <a href="{% url 'employees:contract-list' %}" class="sidebar-link flex items-center gap-3 rounded px-3 py-2 text-body-md {% if request.resolver_match.url_name|startswith:'contract-' %}font-semibold bg-primary-container{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><path d="M6 3.5h9l3 3v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-15a1 1 0 0 1 1-1Z"/><path d="M9 10h6M9 13.5h6M9 17h3.5"/></svg>
+                            <span class="sidebar-nav-text">Contracts</span>
+                        </a>
+                    {% endif %}
                 </div>
 
                 {% if request.user.is_authenticated %}

@@ -10,6 +10,9 @@
 
 {% endblock %}
 
+{% block page_title %}
+<h1 class="text-headline-lg text-on-surface">{% if object %}Edit Position{% else %}Add Position{% endif %}</h1>
+{% endblock %}
 
 {% block content %}
 
@@ -18,16 +21,6 @@
     <!-- HEADER -->
 
     <div class="mb-6">
-
-        <h1 class="text-headline-lg text-on-surface">
-
-            {% if object %}
-                Edit Position
-            {% else %}
-                Add Position
-            {% endif %}
-
-        </h1>
 
         <p class="mt-1 text-body-md text-on-surface-variant">
 

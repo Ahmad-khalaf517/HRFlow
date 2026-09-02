@@ -1,4 +1,9 @@
 {% extends "base.html" %}
+{% load employees_extras %}
+
+{% block page_title %}
+<h1 class="text-headline-lg text-on-surface">{{ department.name }}</h1>
+{% endblock %}
 
 {% block content %}
 
@@ -59,12 +64,14 @@
             </div>
 
 
-            <a
-                href="{% url 'employees:department-update' department.pk %}"
-                class="rounded bg-primary px-4 py-2 text-body-md font-medium text-white"
-            >
-                Edit Department
-            </a>
+            {% if request.user|in_groups:"Admin,HR Manager" %}
+                <a
+                    href="{% url 'employees:department-update' department.pk %}"
+                    class="rounded bg-primary px-4 py-2 text-body-md font-medium text-white"
+                >
+                    Edit Department
+                </a>
+            {% endif %}
 
         </div>
 
@@ -128,7 +135,7 @@
 
     <!-- Actions -->
 
-    {% if department.is_active %}
+    {% if department.is_active and request.user|in_groups:"Admin,HR Manager" %}
 
         <div class="rounded border border-outline-variant bg-surface-container-lowest p-5">
 

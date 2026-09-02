@@ -16,6 +16,49 @@
         <a href="{% url 'attendance:attendance_create' %}" class="btn-primary">Create Attendance</a>
     </div>
 
+    <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <div class="card border-l-4 border-l-secondary">
+            <p class="text-label-caps text-on-surface-variant">Present</p>
+            <p class="mt-2 text-display text-on-surface">{{ status_counts.present }}</p>
+        </div>
+        <div class="card border-l-4 border-l-outline-variant">
+            <p class="text-label-caps text-on-surface-variant">Late</p>
+            <p class="mt-2 text-display text-on-surface">{{ status_counts.late }}</p>
+        </div>
+        <div class="card border-l-4 border-l-error">
+            <p class="text-label-caps text-on-surface-variant">Absent</p>
+            <p class="mt-2 text-display text-on-surface">{{ status_counts.absent }}</p>
+        </div>
+        <div class="card border-l-4 border-l-primary">
+            <p class="text-label-caps text-on-surface-variant">On Leave</p>
+            <p class="mt-2 text-display text-on-surface">{{ status_counts.leave }}</p>
+        </div>
+    </div>
+
+    <form method="get" class="card">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div>
+                <label class="mb-1 block text-label-caps text-on-surface-variant">Date</label>
+                <input type="date" name="date" value="{{ selected_date }}" class="input">
+            </div>
+            <div>
+                <label class="mb-1 block text-label-caps text-on-surface-variant">Status</label>
+                <select name="status" class="input">
+                    <option value="">All Statuses</option>
+                    {% for value, label in status_choices %}
+                        <option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="flex items-end gap-2">
+                <button type="submit" class="btn-primary">Filter</button>
+                {% if selected_status or selected_date %}
+                    <a href="{{ request.path }}" class="btn-ghost">Clear</a>
+                {% endif %}
+            </div>
+        </div>
+    </form>
+
     {% if attendance_records %}
         <div class="card overflow-hidden p-0">
             <div class="overflow-x-auto">
@@ -35,7 +78,10 @@
                         {% for record in attendance_records %}
                             <tr class="border-t border-outline-variant">
                                 <td class="px-4 py-3 text-body-md text-on-surface">
-                                    <a href="{% url 'attendance:attendance_detail' record.pk %}" class="text-primary hover:underline">{{ record.employee }}</a>
+                                    <a href="{% url 'attendance:attendance_detail' record.pk %}" class="flex items-center gap-3 hover:underline">
+                                        <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded bg-secondary-container text-body-sm font-bold text-on-secondary-container">{{ record.employee.first_name|first }}{{ record.employee.last_name|first }}</span>
+                                        <span class="text-primary">{{ record.employee }}</span>
+                                    </a>
                                 </td>
                                 <td class="px-4 py-3 text-body-md text-on-surface">{{ record.date }}</td>
                                 <td class="px-4 py-3">

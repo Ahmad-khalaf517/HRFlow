@@ -1,7 +1,12 @@
 {% extends "base.html" %}
+{% load employees_extras %}
 
 {% block title %}
 Positions
+{% endblock %}
+
+{% block page_title %}
+<h1 class="text-headline-lg text-on-surface">Positions</h1>
 {% endblock %}
 
 {% block content %}
@@ -14,16 +19,13 @@ Positions
 
         <div>
 
-            <h1 class="text-headline-lg text-on-surface">
-                Positions
-            </h1>
-
             <p class="text-body-md text-on-surface-variant">
                 Manage job positions and organizational roles.
             </p>
 
         </div>
 
+        {% if request.user|in_groups:"Admin,HR Manager" %}
         <a
             href="{% url 'employees:position-create' %}"
             class="btn-primary"
@@ -31,6 +33,7 @@ Positions
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M12 5v14M5 12h14"/></svg>
             Add Position
         </a>
+        {% endif %}
 
     </div>
 

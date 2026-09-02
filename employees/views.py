@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import Q
-from django.http import HttpResponseNotAllowed
+from django.http import Http404, HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.views import View
@@ -51,6 +51,53 @@ class HRManagementRequiredMixin(LoginRequiredMixin):
                 request,
                 "employees/access_denied.html",
                 {"reason": "Only Admin or HR Manager may perform this action."},
+                status=403,
+            )
+
+        return super().dispatch(request, *args, **kwargs)
+
+
+def _has_employee_view_access(user):
+    """
+    Directory-wide employee/contract data (the full list, and other
+    employees' records) is restricted to Admin/HR Manager (who manage it)
+    and Payroll Officer (who needs it to process payroll), mirroring
+    attendance.views._has_attendance_view_access.
+    """
+
+    return user.is_authenticated and (
+        user.is_staff
+        or user.groups.filter(
+            name__in=["Admin", "HR Manager", "Payroll Officer"]
+        ).exists()
+    )
+
+
+def _can_access_employee_record(user, employee):
+    if _has_employee_view_access(user):
+        return True
+    return user.is_authenticated and employee.user_id == user.pk
+
+
+class EmployeeViewAccessRequiredMixin(LoginRequiredMixin):
+    """
+    Allow only Admin, HR Manager, or Payroll Officer to browse the full
+    employee/contract directory. An individual's own record is reached
+    through a separate per-object check (see _can_access_employee_record),
+    not this mixin.
+    """
+
+    def dispatch(self, request, *args, **kwargs):
+
+        if not request.user.is_authenticated:
+            return super().dispatch(request, *args, **kwargs)
+
+        if not _has_employee_view_access(request.user):
+
+            return render(
+                request,
+                "employees/access_denied.html",
+                {"reason": "Only Admin, HR Manager, or Payroll Officer may view this."},
                 status=403,
             )
 
@@ -192,7 +239,7 @@ class DepartmentDeactivateView(
 # EMPLOYEES
 # ==========================================
 
-class EmployeeListView(LoginRequiredMixin, ListView):
+class EmployeeListView(EmployeeViewAccessRequiredMixin, ListView):
 
     model = Employee
     template_name = "employees/employee_list.html"
@@ -301,6 +348,15 @@ class EmployeeDetailView(
             "user",
         )
 
+    def get_object(self, queryset=None):
+
+        employee = super().get_object(queryset)
+
+        if not _can_access_employee_record(self.request.user, employee):
+            raise Http404
+
+        return employee
+
 
 class EmployeeContractsTabView(
     LoginRequiredMixin,
@@ -321,6 +377,15 @@ class EmployeeContractsTabView(
             "department",
             "position",
         )
+
+    def get_object(self, queryset=None):
+
+        employee = super().get_object(queryset)
+
+        if not _can_access_employee_record(self.request.user, employee):
+            raise Http404
+
+        return employee
 
     def get_context_data(self, **kwargs):
 
@@ -659,7 +724,7 @@ class PositionDeactivateView(
 # ==========================================
 
 
-class ContractListView(LoginRequiredMixin, ListView):
+class ContractListView(EmployeeViewAccessRequiredMixin, ListView):
     model = Contract
     template_name = "employees/contract_list.html"
     context_object_name = "contracts"
@@ -742,6 +807,15 @@ class ContractDetailView(LoginRequiredMixin, DetailView):
             "employee__department",
             "employee__position",
         )
+
+    def get_object(self, queryset=None):
+
+        contract = super().get_object(queryset)
+
+        if not _can_access_employee_record(self.request.user, contract.employee):
+            raise Http404
+
+        return contract
 
 
 class ContractCreateView(

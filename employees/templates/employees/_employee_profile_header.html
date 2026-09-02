@@ -1,3 +1,4 @@
+{% load employees_extras %}
 {% comment %}
 Usage: {% include "employees/_employee_profile_header.html" with employee=employee %}
 Shared by the Overview and Contract tabs of the employee profile.
@@ -37,46 +38,56 @@ Shared by the Overview and Contract tabs of the employee profile.
 
         <div class="flex flex-wrap items-center gap-3">
 
-            <a href="{% url 'employees:employee-update' employee.pk %}" class="btn-primary">
-                Edit Employee
-            </a>
+            {% if request.user|in_groups:"Admin,HR Manager" %}
 
-            {% if employee.employment_status == "active" %}
+                <a href="{% url 'employees:employee-update' employee.pk %}" class="btn-primary">
+                    Edit Employee
+                </a>
 
-                <form
-                    method="post"
-                    action="{% url 'employees:employee-deactivate' employee.pk %}"
-                    onsubmit="return confirm('Are you sure you want to deactivate this employee?');"
-                >
-                    {% csrf_token %}
-                    <button type="submit" class="btn-secondary">Deactivate</button>
-                </form>
+                {% if employee.employment_status == "active" %}
 
-                <form
-                    method="post"
-                    action="{% url 'employees:employee-terminate' employee.pk %}"
-                    onsubmit="return confirm('Are you sure you want to terminate this employee? This action will change their employment status to Terminated.');"
-                >
-                    {% csrf_token %}
-                    <button type="submit" class="rounded bg-error px-4 py-2 text-body-md font-semibold text-on-error hover:opacity-90">Terminate</button>
-                </form>
+                    <form
+                        method="post"
+                        action="{% url 'employees:employee-deactivate' employee.pk %}"
+                        onsubmit="return confirm('Are you sure you want to deactivate this employee?');"
+                    >
+                        {% csrf_token %}
+                        <button type="submit" class="btn-secondary">Deactivate</button>
+                    </form>
 
-            {% elif employee.employment_status == "inactive" %}
+                    <form
+                        method="post"
+                        action="{% url 'employees:employee-terminate' employee.pk %}"
+                        onsubmit="return confirm('Are you sure you want to terminate this employee? This action will change their employment status to Terminated.');"
+                    >
+                        {% csrf_token %}
+                        <button type="submit" class="rounded bg-error px-4 py-2 text-body-md font-semibold text-on-error hover:opacity-90">Terminate</button>
+                    </form>
 
-                <form
-                    method="post"
-                    action="{% url 'employees:employee-reactivate' employee.pk %}"
-                    onsubmit="return confirm('Are you sure you want to reactivate this employee?');"
-                >
-                    {% csrf_token %}
-                    <button type="submit" class="btn-primary">Reactivate</button>
-                </form>
+                {% elif employee.employment_status == "inactive" %}
+
+                    <form
+                        method="post"
+                        action="{% url 'employees:employee-reactivate' employee.pk %}"
+                        onsubmit="return confirm('Are you sure you want to reactivate this employee?');"
+                    >
+                        {% csrf_token %}
+                        <button type="submit" class="btn-primary">Reactivate</button>
+                    </form>
+
+                {% endif %}
 
             {% endif %}
 
-            <a href="{% url 'employees:employee-list' %}" class="rounded border border-outline-variant px-4 py-2 text-body-md text-on-surface">
-                Back to Employees
-            </a>
+            {% if request.user|has_group:"Admin,HR Manager,Payroll Officer" %}
+                <a href="{% url 'employees:employee-list' %}" class="rounded border border-outline-variant px-4 py-2 text-body-md text-on-surface">
+                    Back to Employees
+                </a>
+            {% else %}
+                <a href="{% url 'home' %}" class="rounded border border-outline-variant px-4 py-2 text-body-md text-on-surface">
+                    Back to Dashboard
+                </a>
+            {% endif %}
 
         </div>
 
