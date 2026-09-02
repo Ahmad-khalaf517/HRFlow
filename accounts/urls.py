@@ -2,6 +2,7 @@ from django.contrib.auth import views as auth_views
 from django.urls import path
 
 from .forms import LoginForm
+from .views import StaffUserCreateView, StaffUserListView
 
 urlpatterns = [
     path(
@@ -14,4 +15,6 @@ urlpatterns = [
         name="login",
     ),
     path("logout/", auth_views.LogoutView.as_view(), name="logout"),
+    path("users/", StaffUserListView.as_view(), name="staff-user-list"),
+    path("users/new/", StaffUserCreateView.as_view(), name="staff-user-create"),
 ]

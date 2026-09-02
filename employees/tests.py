@@ -249,6 +249,73 @@ class EmployeeFormTests(TestCase):
 
         self.assertTrue(form.is_valid())
 
+
+class EmployeeAccountProvisioningTests(TestCase):
+    def setUp(self):
+        self.hr_user = User.objects.create_user(username="hr-provisioner", password="testpass123")
+        self.hr_user.groups.add(Group.objects.get(name="HR Manager"))
+        self.department = Department.objects.create(name="Provisioning Department")
+        self.position = Position.objects.create(
+            department=self.department,
+            title="Provisioned Position",
+        )
+        self.valid_data = {
+            "employee_number": "EMP-LOGIN-001",
+            "first_name": "Demo",
+            "last_name": "Employee",
+            "email": "demo.employee@example.com",
+            "phone": "",
+            "date_of_birth": "",
+            "address": "",
+            "hire_date": "2026-09-01",
+            "department": self.department.pk,
+            "position": self.position.pk,
+            "employment_status": "active",
+            "bank_name": "",
+            "bank_account_number": "",
+        }
+        self.client.force_login(self.hr_user)
+
+    def test_creating_employee_creates_linked_login_with_employee_role(self):
+        response = self.client.post(reverse("employees:employee-create"), self.valid_data)
+
+        self.assertRedirects(response, reverse("employees:employee-list"))
+        employee = Employee.objects.get(employee_number="EMP-LOGIN-001")
+        self.assertIsNotNone(employee.user)
+        self.assertEqual(employee.user.username, "EMP-LOGIN-001")
+        self.assertEqual(employee.user.get_full_name(), "Demo Employee")
+        self.assertEqual(employee.user.email, "demo.employee@example.com")
+        self.assertTrue(employee.user.check_password("password1"))
+        self.assertEqual(list(employee.user.groups.values_list("name", flat=True)), ["Employee"])
+        self.assertTrue(self.client.login(username="EMP-LOGIN-001", password="password1"))
+
+    def test_username_collision_creates_no_employee(self):
+        User.objects.create_user(username="emp-login-001", password="irrelevant")
+
+        response = self.client.post(reverse("employees:employee-create"), self.valid_data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "A user with this employee number already exists.")
+        self.assertFalse(Employee.objects.filter(employee_number="EMP-LOGIN-001").exists())
+
+    def test_editing_employee_number_into_existing_username_shows_form_error(self):
+        create_response = self.client.post(reverse("employees:employee-create"), self.valid_data)
+        self.assertRedirects(create_response, reverse("employees:employee-list"))
+        employee = Employee.objects.get(employee_number="EMP-LOGIN-001")
+
+        User.objects.create_user(username="EMP-TAKEN-001", password="irrelevant")
+
+        update_data = {**self.valid_data, "employee_number": "EMP-TAKEN-001"}
+        response = self.client.post(
+            reverse("employees:employee-update", kwargs={"pk": employee.pk}), update_data
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "A user with this employee number already exists.")
+        employee.refresh_from_db()
+        self.assertEqual(employee.employee_number, "EMP-LOGIN-001")
+        self.assertEqual(employee.user.username, "EMP-LOGIN-001")
+
 class ContractFormTests(TestCase):
 
     def setUp(self):

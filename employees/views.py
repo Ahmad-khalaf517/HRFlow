@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
+from django.core.exceptions import ValidationError
 from django.db.models import Q
 from django.http import Http404, HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404, redirect, render
@@ -25,6 +26,7 @@ from .models import (
     Employee,
     Position,
 )
+from .services import create_employee_with_account, update_employee_and_account
 
 # ==========================================
 # PERMISSIONS
@@ -330,6 +332,21 @@ class EmployeeCreateView(
         "employees:employee-list"
     )
 
+    def form_valid(self, form):
+        try:
+            self.object = create_employee_with_account(form)
+        except ValidationError as exc:
+            for field, errors in exc.message_dict.items():
+                for error in errors:
+                    form.add_error(field, error)
+            return self.form_invalid(form)
+
+        messages.success(
+            self.request,
+            "Employee and login account created. The username is the employee number.",
+        )
+        return redirect(self.get_success_url())
+
 
 class EmployeeDetailView(
     LoginRequiredMixin,
@@ -406,6 +423,18 @@ class EmployeeUpdateView(
     form_class = EmployeeForm
     template_name = "employees/employee_form.html"
     success_message = "Employee updated."
+
+    def form_valid(self, form):
+        try:
+            self.object = update_employee_and_account(form)
+        except ValidationError as exc:
+            for field, errors in exc.message_dict.items():
+                for error in errors:
+                    form.add_error(field, error)
+            return self.form_invalid(form)
+
+        messages.success(self.request, self.success_message)
+        return redirect(self.get_success_url())
 
     def get_success_url(self):
 

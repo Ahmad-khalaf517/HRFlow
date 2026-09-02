@@ -1,4 +1,5 @@
 from django import forms
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 
 from .models import Contract, Department, Employee, Position
@@ -262,6 +263,14 @@ class EmployeeForm(forms.ModelForm):
         if employees.exists():
             raise ValidationError(
                 "An employee with this employee number already exists."
+            )
+
+        users = get_user_model().objects.filter(username__iexact=employee_number)
+        if self.instance.user_id:
+            users = users.exclude(pk=self.instance.user_id)
+        if users.exists():
+            raise ValidationError(
+                "A user with this employee number already exists."
             )
 
         return employee_number

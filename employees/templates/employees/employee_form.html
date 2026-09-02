@@ -27,6 +27,17 @@
 
             {% csrf_token %}
 
+            {% if not object %}
+            <div class="mb-6 rounded border border-outline-variant bg-surface-container-low p-4">
+                <p class="text-body-md font-semibold text-on-surface">Employee login</p>
+                <p class="mt-1 text-body-sm text-on-surface-variant">
+                    A login account will be created automatically. The username is the employee
+                    number and the initial password is
+                    <span class="text-data-mono">password1</span>.
+                </p>
+            </div>
+            {% endif %}
+
             {% if form.non_field_errors %}
                 <div class="mb-4">
                     {{ form.non_field_errors }}

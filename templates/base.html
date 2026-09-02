@@ -87,6 +87,12 @@
                             <span class="sidebar-nav-text">Contracts</span>
                         </a>
                     {% endif %}
+                    {% if request.user|in_groups:"Admin,HR Manager" %}
+                        <a href="{% url 'staff-user-list' %}" class="sidebar-link flex items-center gap-3 rounded px-3 py-2 text-body-md {% if request.resolver_match.url_name == 'staff-user-list' or request.resolver_match.url_name == 'staff-user-create' %}font-semibold bg-primary-container{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><circle cx="8" cy="8" r="3"/><path d="M2.5 20c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5"/><path d="M17 8v6M14 11h6"/></svg>
+                            <span class="sidebar-nav-text">User Management</span>
+                        </a>
+                    {% endif %}
                 </div>
 
                 {% if request.user.is_authenticated %}
@@ -164,6 +170,7 @@
                     </div>
                 {% endif %}
 
+                {% if request.user|in_groups:"Admin,Payroll Officer" %}
                 <div class="sidebar-divider mt-4 border-t border-white/10 pt-3">
                     <p class="sidebar-section-label px-3 pb-2 text-label-caps text-on-primary-container/80">Payroll</p>
                     <div class="space-y-1">
@@ -171,12 +178,9 @@
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><path d="M3 7.5A1.5 1.5 0 0 1 4.5 6h13A1.5 1.5 0 0 1 19 7.5v10a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 3 17.5z"/><path d="M15.5 12.5h3.5a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-3.5a2 2 0 0 1 0-4Z"/></svg>
                             <span class="sidebar-nav-text">Payroll</span>
                         </a>
-                        <a href="#" class="sidebar-link flex items-center gap-3 rounded px-3 py-2 text-body-md text-on-primary-container hover:bg-primary-container">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><path d="M6 3.5h9l3 3v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-15a1 1 0 0 1 1-1Z"/><path d="M9 10h6M9 13.5h6M9 17h3.5"/></svg>
-                            <span class="sidebar-nav-text">Payslips</span>
-                        </a>
                     </div>
                 </div>
+                {% endif %}
             </nav>
         </aside>
 
@@ -191,8 +195,10 @@
                     </div>
                     <div class="flex items-center gap-3 text-body-sm text-on-surface-variant">
                         {% if request.user.is_authenticated %}
-                            <span class="w-7 h-7 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center text-body-sm font-semibold shrink-0">{{ request.user.get_username|slice:":1"|upper }}</span>
-                            <span>{{ request.user.get_username }}</span>
+                            <span class="w-7 h-7 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center text-body-sm font-semibold shrink-0">
+                                {% if request.user.first_name %}{{ request.user.first_name|slice:":1"|upper }}{% else %}{{ request.user.get_username|slice:":1"|upper }}{% endif %}
+                            </span>
+                            <span>{{ request.user.get_full_name|default:request.user.get_username }}</span>
                             <form method="post" action="{% url 'logout' %}">
                                 {% csrf_token %}
                                 <button type="submit" class="btn-ghost">Sign out</button>

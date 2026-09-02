@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Add user · HRFlow{% endblock %}
+{% block page_title %}<h1 class="text-headline-md text-on-surface">Add user</h1>{% endblock %}
+
+{% block content %}
+<div class="card max-w-2xl">
+    <div class="mb-6">
+        <h2 class="text-headline-md text-on-surface">Create a staff account</h2>
+        <p class="mt-1 text-body-sm text-on-surface-variant">
+            This screen creates HR Manager and Payroll Officer accounts. The initial password is
+            <span class="text-data-mono">password1</span>.
+        </p>
+    </div>
+
+    <form method="post" class="space-y-5">
+        {% csrf_token %}
+        {% for field in form %}
+            {% include "components/field.html" with field=field %}
+        {% endfor %}
+        <div class="flex justify-end gap-3 border-t border-outline-variant pt-5">
+            <a class="btn-secondary" href="{% url 'staff-user-list' %}">Cancel</a>
+            <button class="btn-primary" type="submit">Create user</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}Access denied · HRFlow{% endblock %}
+{% block page_title %}<h1 class="text-headline-md text-on-surface">User management</h1>{% endblock %}
+
+{% block content %}
+<div class="card max-w-xl">
+    <h2 class="text-headline-md text-on-surface">Access denied</h2>
+    <p class="mt-2 text-body-md text-on-surface-variant">{{ reason }}</p>
+</div>
+{% endblock %}
