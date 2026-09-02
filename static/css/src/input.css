@@ -200,3 +200,41 @@
 }
 .toast-enter { animation: toast-in 200ms ease-out; }
 .toast-leave { animation: toast-out 150ms ease-in forwards; }
+
+/* HRF-008: the browser prints the saved payslip without app navigation. */
+@media print {
+    @page payslip { margin: 15mm; }
+
+    .payslip-page { page: payslip; }
+
+    .payslip-page #sidebar,
+    .payslip-page #sidebar-overlay,
+    .payslip-page #app-shell > header,
+    .payslip-page #toast-stack,
+    .payslip-page .payslip-controls {
+        display: none !important;
+    }
+
+    .payslip-page,
+    .payslip-page > div,
+    .payslip-page #app-shell {
+        min-height: 0 !important;
+        background: var(--color-surface-container-lowest) !important;
+    }
+
+    .payslip-page #app-shell,
+    .payslip-page main {
+        padding: 0 !important;
+    }
+
+    .payslip-sheet {
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        break-inside: avoid;
+    }
+
+    .payslip-breakdown {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}

@@ -38,7 +38,7 @@
         }
     </style>
 </head>
-<body class="bg-background text-on-background">
+<body class="bg-background text-on-background {% block body_class %}{% endblock %}">
     <div class="min-h-screen bg-background">
         <div id="sidebar-overlay" class="fixed inset-0 z-30 hidden bg-primary/40 md:hidden"></div>
 
@@ -174,12 +174,18 @@
                 <div class="sidebar-divider mt-4 border-t border-white/10 pt-3">
                     <p class="sidebar-section-label px-3 pb-2 text-label-caps text-on-primary-container/80">Payroll</p>
                     <div class="space-y-1">
-                        <a href="{% url 'payroll:run-list' %}" class="sidebar-link flex items-center gap-3 rounded px-3 py-2 text-body-md {% if request.resolver_match.app_name == 'payroll' %}font-semibold bg-primary-container{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
+                        <a href="{% url 'payroll:run-list' %}" class="sidebar-link flex items-center gap-3 rounded px-3 py-2 text-body-md {% if request.resolver_match.app_name == 'payroll' and not request.resolver_match.url_name|startswith:'payslip-' %}font-semibold bg-primary-container{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><path d="M3 7.5A1.5 1.5 0 0 1 4.5 6h13A1.5 1.5 0 0 1 19 7.5v10a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 3 17.5z"/><path d="M15.5 12.5h3.5a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-3.5a2 2 0 0 1 0-4Z"/></svg>
                             <span class="sidebar-nav-text">Payroll</span>
                         </a>
                     </div>
                 </div>
+                {% endif %}
+                {% if request.user.is_superuser or request.user|in_groups:"Admin,Payroll Officer,Employee" %}
+                <a href="{% url 'payroll:payslip-list' %}" class="sidebar-link mt-3 flex items-center gap-3 rounded px-3 py-2 text-body-md {% if request.resolver_match.url_name|startswith:'payslip-' %}font-semibold bg-primary-container{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0" aria-hidden="true"><path d="M6 3h8l4 4v14H6zM14 3v5h4M9 12h6M9 16h6"/></svg>
+                    <span class="sidebar-nav-text">{% if request.user.is_superuser or request.user|in_groups:"Admin,Payroll Officer" %}Payslips{% else %}My Payslips{% endif %}</span>
+                </a>
                 {% endif %}
             </nav>
         </aside>

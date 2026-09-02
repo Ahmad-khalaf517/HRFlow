@@ -206,3 +206,46 @@ class PayslipTests(TestCase):
             {item.employee_id for item in response.context["page_obj"]},
             {self.employees["employee"].pk},
         )
+
+    def test_dashboard_and_sidebar_links_match_access(self):
+        for role in ("employee", "officer", "admin", "unlinked", "hr", "staff"):
+            self.client.force_login(self.users[role])
+            response = self.client.get(reverse("home"))
+            with self.subTest(role=role):
+                if role in ("hr", "staff"):
+                    self.assertNotContains(response, reverse("payroll:payslip-list"))
+                else:
+                    self.assertContains(response, reverse("payroll:payslip-list"))
+                    self.assertTrue(
+                        any(
+                            link["url"] == reverse("payroll:payslip-list")
+                            for link in response.context["quick_links"]
+                        )
+                    )
+
+    def test_manager_approval_makes_payslip_link_available(self):
+        self.client.force_login(self.users["officer"])
+        run = self.runs["calculated"]
+        item = run.items.get(employee=self.employees["employee"])
+        url = reverse("payroll:payslip-detail", args=[item.pk])
+        response = self.client.get(reverse("payroll:run-detail", args=[run.pk]))
+        self.assertNotContains(response, url)
+        self.client.post(reverse("payroll:run-review", args=[run.pk]))
+        response = self.client.post(reverse("payroll:run-approve", args=[run.pk]), follow=True)
+        self.assertContains(response, url)
+        self.assertContains(self.client.get(url), "Print payslip")
+        self.client.force_login(self.users["employee"])
+        self.assertContains(self.client.get(url), "2751.87")
+
+    def test_legacy_run_explains_unavailable_payslip(self):
+        item = self.item()
+        PayrollItem.objects.filter(pk=item.pk).update(calculation_version="")
+        self.client.force_login(self.users["officer"])
+        response = self.client.get(reverse("payroll:run-detail", args=[item.payroll_id]))
+        self.assertContains(response, "Payslip unavailable for this historical item.")
+        self.assertNotContains(response, reverse("payroll:payslip-detail", args=[item.pk]))
+
+    def test_inactive_employee_record_keeps_own_history_when_account_active(self):
+        Employee.objects.filter(pk=self.employees["employee"].pk).update(is_active=False)
+        self.client.force_login(self.users["employee"])
+        self.assertContains(self.client.get(self.detail_url()), "2751.87")

@@ -85,3 +85,31 @@ Changing contract/profile/tax configuration must not change the issued slip.
   guessed coworker URL returns 404 without identity/amounts. The detail matches
   the documented example. CSS rebuilt; friendly unavailable page added after
   browser review. HR-specific grants remain pending clarification.
+- Step 3: full regression suite passes: 128 tests and 31 subtests. Django check,
+  makemigrations --check --dry-run, Ruff and git diff --check pass; CSS rebuilt
+  with npm run build:css. No shared database was accessed or migrated.
+- Browser checks: employee dashboard/sidebar -> own history -> detail; manager
+  history; coworker URL denial; Admin read-only item; desktop and 390px mobile
+  detail/history; mobile menu open/close. Fixed table-label overflow and verified
+  document width equals the 390px viewport. As Payroll Officer, reviewed and
+  approved a disposable calculated run, then followed its newly available
+  payslip link and confirmed net USD 2751.87.
+- Print verification limit: clicked Print payslip; the call entered native print
+  handling, which the in-app browser cannot inspect. Dismissed it and verified
+  the loaded print stylesheet (hidden navigation/controls, page margins and two
+  columns). Native print preview/page count still requires a human browser check.
+- Migration 0003 will reject pre-existing negative monetary/fact values rather
+  than repair them silently. Legacy approved items with unknown inputs remain
+  unavailable as payslips; any recovery requires a separate owner-approved task.
+
+## Reproducing automated checks
+
+Use the installed requirements with an isolated test database. The checks above
+set `DATABASE_URL=sqlite:///:memory:` and `PYTHON_DOTENV_DISABLED=1` and applied
+`MD5PasswordHasher` only in the test process to keep synthetic account tests fast.
+Application password settings are unchanged. Executed pytest at baseline, for
+each affected payroll step, and across all configured testpaths at integration.
+
+Before merge: define HR Manager's Limited permission, inspect native print
+preview, and obtain the required second-person review. Real attendance integration
+and PostgreSQL concurrency verification remain separate outstanding dependencies.

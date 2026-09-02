@@ -12,7 +12,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
 
-from accounts.constants import ADMIN_GROUP, HR_MANAGER_GROUP, PAYROLL_OFFICER_GROUP
+from accounts.constants import ADMIN_GROUP, EMPLOYEE_GROUP, HR_MANAGER_GROUP, PAYROLL_OFFICER_GROUP
 from attendance.models import Attendance, LeaveRequest
 from employees.models import Employee
 from payroll.models import Payroll
@@ -182,6 +182,19 @@ def dashboard(request):
                     "url": reverse("attendance:my_leave_requests"),
                 },
             ]
+
+    if request.user.is_superuser or is_admin or is_payroll_officer:
+        quick_links.append({
+            "label": "Payslips",
+            "description": "View and print payslips from approved payroll periods.",
+            "url": reverse("payroll:payslip-list"),
+        })
+    elif EMPLOYEE_GROUP in group_names:
+        quick_links.append({
+            "label": "My payslips",
+            "description": "View and print your payslips.",
+            "url": reverse("payroll:payslip-list"),
+        })
 
     return render(
         request,

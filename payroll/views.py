@@ -157,6 +157,11 @@ def run_detail(request, pk):
         Payroll.objects.select_related("created_by", "reviewed_by", "approved_by"), pk=pk
     )
     items = run.items.select_related("employee").order_by("employee__last_name")
+    payslip_ids = set(services.published_payslip_items().filter(payroll=run).values_list(
+        "pk", flat=True
+    ))
+    for item in items:
+        item.payslip_available = item.pk in payslip_ids
     return render(request, "payroll/run_detail.html", {"run": run, "items": items})
 
 

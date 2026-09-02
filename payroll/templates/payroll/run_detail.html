@@ -146,7 +146,14 @@
             <tbody class="divide-y divide-outline-variant">
                 {% for item in items %}
                 <tr class="even:bg-surface-container-low">
-                    <td class="px-3 py-3 text-body-md text-on-surface">{{ item.employee }}</td>
+                    <td class="px-3 py-3 text-body-md text-on-surface">
+                        {{ item.employee }}
+                        {% if item.payslip_available %}
+                        <a href="{% url 'payroll:payslip-detail' item.pk %}" class="mt-1 block text-body-sm text-secondary underline">View payslip</a>
+                        {% elif run.status == 'approved' or run.status == 'paid' %}
+                        <p class="mt-1 text-body-sm text-on-surface-variant">Payslip unavailable for this historical item.</p>
+                        {% endif %}
+                    </td>
                     <td class="px-3 py-3 text-data-mono text-on-surface">${{ item.basic_salary }}</td>
                     <td class="px-3 py-3 text-data-mono text-on-surface">${{ item.overtime_amount }}</td>
                     <td class="px-3 py-3 text-data-mono text-on-surface">${{ item.bonus_amount }}</td>
