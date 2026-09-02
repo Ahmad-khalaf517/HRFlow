@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Payslips · HRFlow{% endblock %}
+{% block page_title %}
+<h1 class="text-headline-md text-on-surface">{% if is_payroll_manager %}Payslips{% else %}My payslips{% endif %}</h1>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl space-y-4">
+    <p class="text-body-md text-on-surface-variant">View payslips from approved payroll periods.</p>
+    <div class="card overflow-x-auto p-0">
+        <table class="w-full text-left">
+            <caption class="sr-only">{% if is_payroll_manager %}All available payslips{% else %}Your available payslips{% endif %}</caption>
+            <thead class="bg-primary text-on-primary">
+                <tr>
+                    <th scope="col" class="px-4 py-3 text-label-caps">Period</th>
+                    {% if is_payroll_manager %}<th scope="col" class="px-4 py-3 text-label-caps">Employee</th>{% endif %}
+                    <th scope="col" class="px-4 py-3 text-label-caps">Currency</th>
+                    <th scope="col" class="px-4 py-3 text-label-caps text-right">Gross</th>
+                    <th scope="col" class="px-4 py-3 text-label-caps text-right">Deductions</th>
+                    <th scope="col" class="px-4 py-3 text-label-caps text-right">Net pay</th>
+                    <th scope="col" class="px-4 py-3 text-label-caps"><span class="sr-only">View payslip</span></th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-outline-variant">
+                {% for item in page_obj %}
+                <tr class="even:bg-surface-container-low">
+                    <th scope="row" class="whitespace-nowrap px-4 py-3 text-body-md font-semibold">{{ item.payroll.period_start|date:"F Y" }}</th>
+                    {% if is_payroll_manager %}
+                    <td class="px-4 py-3">
+                        <p class="text-body-md">{{ item.employee_name_snapshot }}</p>
+                        <p class="text-data-mono text-on-surface-variant">{{ item.employee_number_snapshot }}</p>
+                    </td>
+                    {% endif %}
+                    <td class="px-4 py-3 text-data-mono">{{ item.currency_code }}</td>
+                    <td class="px-4 py-3 text-data-mono text-right">{{ item.gross_salary|floatformat:2 }}</td>
+                    <td class="px-4 py-3 text-data-mono text-right">{{ item.total_deductions|floatformat:2 }}</td>
+                    <td class="px-4 py-3 text-data-mono text-right font-semibold">{{ item.net_salary|floatformat:2 }}</td>
+                    <td class="px-4 py-3">
+                        <a class="btn-secondary whitespace-nowrap" href="{% url 'payroll:payslip-detail' item.pk %}" aria-label="View {{ item.payroll.period_start|date:'F Y' }} payslip for {{ item.employee_name_snapshot }}">View payslip</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="{% if is_payroll_manager %}7{% else %}6{% endif %}" class="px-4 py-8 text-center text-body-md text-on-surface-variant">No payslips available yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% if page_obj.has_other_pages %}
+    <nav aria-label="Payslip pages" class="flex items-center gap-3 text-body-md">
+        {% if page_obj.has_previous %}<a class="btn-secondary" href="?page={{ page_obj.previous_page_number }}">Previous</a>{% endif %}
+        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}<a class="btn-secondary" href="?page={{ page_obj.next_page_number }}">Next</a>{% endif %}
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}

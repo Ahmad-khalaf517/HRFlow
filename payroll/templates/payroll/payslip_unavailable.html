@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Payslip unavailable · HRFlow{% endblock %}
+{% block page_title %}<h1 class="text-headline-md">Payslip unavailable</h1>{% endblock %}
+{% block content %}
+<div class="card max-w-4xl space-y-4">
+    <p class="text-body-md text-on-surface-variant">This payslip is not available for your account.</p>
+    <a href="{% url 'payroll:payslip-list' %}" class="btn-secondary">Back to payslips</a>
+</div>
+{% endblock %}

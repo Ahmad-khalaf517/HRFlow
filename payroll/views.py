@@ -3,8 +3,11 @@ from functools import wraps
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied, ValidationError
+from django.core.paginator import Paginator
 from django.db.models import Count
 from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.cache import never_cache
+from django.views.decorators.http import require_safe
 
 from . import services
 from .forms import BonusForm, ManualDeductionForm, PayrollRunForm, TaxBracketForm
@@ -197,3 +200,45 @@ def run_approve(request, pk):
         else:
             messages.success(request, "Payroll approved.")
     return redirect("payroll:run-detail", pk=pk)
+
+
+# --- Payslips (HRF-008) ------------------------------------------------
+
+@never_cache
+@login_required
+@require_safe
+def payslip_list(request):
+    try:
+        items = services.payslip_items_for_user(request.user)
+    except PermissionDenied as exc:
+        return render(request, "payroll/access_denied.html", {"reason": str(exc)}, status=403)
+    return render(request, "payroll/payslip_list.html", {
+        "page_obj": Paginator(items, 25).get_page(request.GET.get("page")),
+        "is_payroll_manager": services.user_in_groups(
+            request.user, services.PAYROLL_MANAGER_GROUPS
+        ),
+    })
+
+
+@never_cache
+@login_required
+@require_safe
+def payslip_detail(request, pk):
+    try:
+        items = services.payslip_items_for_user(request.user)
+    except PermissionDenied as exc:
+        return render(request, "payroll/access_denied.html", {"reason": str(exc)}, status=403)
+    item = items.filter(pk=pk).first()
+    if item is None:
+        return render(request, "payroll/payslip_unavailable.html", status=404)
+    return render(request, "payroll/payslip_detail.html", {
+        "item": item,
+        "earnings": [
+            ("Basic salary", item.basic_salary), ("Allowances", item.allowances),
+            ("Overtime", item.overtime_amount), ("Bonuses", item.bonus_amount),
+        ],
+        "deductions": [
+            ("Absence", item.absence_deduction), ("Unpaid leave", item.unpaid_leave_deduction),
+            ("Manual deductions", item.manual_deduction_amount), ("Tax", item.tax_amount),
+        ],
+    })

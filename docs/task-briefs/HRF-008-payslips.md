@@ -80,3 +80,8 @@ Changing contract/profile/tax configuration must not change the issued slip.
 - Database note: SQLite validates behavior/migration/constraints here; actual
   PostgreSQL concurrency has not been exercised. Model/Admin guards do not claim
   protection against direct SQL or bulk ORM writes outside the workflow.
+- Step 2: 57 payroll tests and 21 subtests passed. Browser: Admin history shows
+  all three synthetic approved slips; Employee history shows only their own;
+  guessed coworker URL returns 404 without identity/amounts. The detail matches
+  the documented example. CSS rebuilt; friendly unavailable page added after
+  browser review. HR-specific grants remain pending clarification.

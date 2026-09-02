@@ -14,6 +14,7 @@ from django.db import IntegrityError, transaction
 from django.db.models import Q, Sum
 from django.utils import timezone
 
+from accounts.constants import EMPLOYEE_GROUP
 from employees.models import Employee
 
 from .attendance_facts import (
@@ -21,7 +22,14 @@ from .attendance_facts import (
     get_employee_overtime_hours,
     get_unpaid_leave_days,
 )
-from .models import Bonus, ManualDeduction, Payroll, PayrollItem, TaxBracket
+from .models import (
+    LOCKED_PAYROLL_STATUSES,
+    Bonus,
+    ManualDeduction,
+    Payroll,
+    PayrollItem,
+    TaxBracket,
+)
 
 TWO_PLACES = Decimal("0.01")
 OVERTIME_MULTIPLIER = Decimal("1.5")
@@ -41,6 +49,39 @@ def user_in_groups(user, group_names) -> bool:
     if user.is_superuser:
         return True
     return user.groups.filter(name__in=group_names).exists()
+
+
+def published_payslip_items():
+    """Saved, complete items available after approval; never backfill live inputs."""
+    return (
+        PayrollItem.objects.select_related("payroll")
+        .filter(
+            payroll__status__in=LOCKED_PAYROLL_STATUSES,
+            contract__isnull=False,
+            calculation_inputs__has_keys=[
+                "contract", "period_start", "period_end", "daily_divisor",
+                "daily_rate", "hourly_rate", "overtime_multiplier", "tax",
+            ],
+        )
+        .exclude(calculation_version="")
+        .exclude(currency_code="")
+        .exclude(employee_number_snapshot="")
+        .exclude(employee_name_snapshot="")
+        .order_by("-payroll__year", "-payroll__month", "employee_name_snapshot", "pk")
+    )
+
+
+def payslip_items_for_user(user):
+    """Authorization shared by history/detail; staff status alone grants no access."""
+    if not user.is_authenticated or not user.is_active:
+        raise PermissionDenied("Sign in with an active account to view payslips.")
+    items = published_payslip_items()
+    if user_in_groups(user, PAYROLL_MANAGER_GROUPS):
+        return items
+    if user_in_groups(user, [EMPLOYEE_GROUP]):
+        return items.filter(employee__user=user)
+    # HR-specific "Limited" access awaits the business owner's definition.
+    raise PermissionDenied("Your role does not have access to payslips.")
 
 
 def get_active_adjustments_for_period(model, employee, period_start: date, period_end: date):

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Payslip · {{ item.payroll.period_start|date:"F Y" }} · HRFlow{% endblock %}
+{% block page_title %}<h1 class="text-headline-md text-on-surface">Payslip</h1>{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl space-y-4">
+    <div class="payslip-controls flex items-center justify-between gap-3">
+        <a class="btn-secondary" href="{% url 'payroll:payslip-list' %}">Back to payslips</a>
+    </div>
+    <article class="payslip-sheet card space-y-6" aria-label="Payslip for {{ item.employee_name_snapshot }}">
+        <div class="flex flex-wrap items-start justify-between gap-4 border-b border-outline-variant pb-4">
+            <div>
+                <p class="text-label-caps text-secondary">HRFlow</p>
+                <h2 class="text-headline-lg">{{ item.payroll.period_start|date:"F Y" }}</h2>
+                <p class="mt-1 text-body-sm text-on-surface-variant">{{ item.calculation_inputs.period_start }} – {{ item.calculation_inputs.period_end }}</p>
+            </div>
+            <p class="text-label-caps text-on-surface-variant">Payslip · {{ item.currency_code }}</p>
+        </div>
+        <div>
+            <p class="text-body-lg font-semibold">{{ item.employee_name_snapshot }}</p>
+            <p class="text-data-mono text-on-surface-variant">{{ item.employee_number_snapshot }}</p>
+        </div>
+        <div class="payslip-breakdown grid gap-6 md:grid-cols-2">
+            <section aria-labelledby="earnings-heading">
+                <h3 id="earnings-heading" class="mb-3 text-headline-md">Earnings</h3>
+                <dl class="space-y-3">
+                    {% for label, amount in earnings %}
+                    <div class="flex justify-between gap-4 text-body-md"><dt>{{ label }}</dt><dd class="text-data-mono">{{ amount|floatformat:2 }}</dd></div>
+                    {% endfor %}
+                    <div class="flex justify-between gap-4 border-t border-outline-variant pt-3 font-semibold"><dt>Gross pay</dt><dd class="text-data-mono">{{ item.gross_salary|floatformat:2 }}</dd></div>
+                </dl>
+            </section>
+            <section aria-labelledby="deductions-heading">
+                <h3 id="deductions-heading" class="mb-3 text-headline-md">Deductions</h3>
+                <dl class="space-y-3">
+                    {% for label, amount in deductions %}
+                    <div class="flex justify-between gap-4 text-body-md"><dt>{{ label }}</dt><dd class="text-data-mono">{{ amount|floatformat:2 }}</dd></div>
+                    {% endfor %}
+                    <div class="flex justify-between gap-4 border-t border-outline-variant pt-3 font-semibold"><dt>Total deductions</dt><dd class="text-data-mono">{{ item.total_deductions|floatformat:2 }}</dd></div>
+                </dl>
+            </section>
+        </div>
+        <dl class="grid gap-3 border-t border-outline-variant pt-4 text-body-sm sm:grid-cols-3">
+            <div><dt class="text-on-surface-variant">Overtime hours</dt><dd class="mt-1 text-data-mono">{{ item.overtime_hours|floatformat:2 }}</dd></div>
+            <div><dt class="text-on-surface-variant">Absence days</dt><dd class="mt-1 text-data-mono">{{ item.absence_days|floatformat:2 }}</dd></div>
+            <div><dt class="text-on-surface-variant">Unpaid leave days</dt><dd class="mt-1 text-data-mono">{{ item.unpaid_leave_days|floatformat:2 }}</dd></div>
+        </dl>
+        <div class="flex flex-wrap items-center justify-between gap-3 rounded border border-outline-variant bg-surface-container-low p-4">
+            <p class="text-headline-md">Net pay</p>
+            <p class="text-headline-lg"><span class="text-body-md">{{ item.currency_code }}</span> <span class="text-data-mono font-semibold">{{ item.net_salary|floatformat:2 }}</span></p>
+        </div>
+    </article>
+</div>
+{% endblock %}

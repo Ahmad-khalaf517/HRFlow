@@ -5,6 +5,8 @@ from . import views
 app_name = "payroll"
 
 urlpatterns = [
+    path("payslips/", views.payslip_list, name="payslip-list"),
+    path("payslips/<int:pk>/", views.payslip_detail, name="payslip-detail"),
     path("bonuses/", views.bonus_list, name="bonus-list"),
     path("bonuses/new/", views.bonus_create, name="bonus-create"),
     path("bonuses/<int:pk>/cancel/", views.bonus_cancel, name="bonus-cancel"),
