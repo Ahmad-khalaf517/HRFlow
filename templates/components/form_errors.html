@@ -1,0 +1,11 @@
+{% if form.errors %}
+<div class="form-error-summary mb-5 rounded border border-error bg-error-container p-4 text-on-error-container" role="alert" tabindex="-1">
+    <h2 class="text-body-md font-semibold">Please correct the following errors.</h2>
+    <ul class="mt-2 list-disc space-y-1 pl-5 text-body-sm">
+        {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+        {% for field in form %}
+            {% for error in field.errors %}<li><a class="underline" href="#{{ field.id_for_label }}">{{ field.label }}: {{ error }}</a></li>{% endfor %}
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}

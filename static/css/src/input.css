@@ -3,6 +3,7 @@
 @source "../../../payroll/templates";
 @source "../../../employees/templates";
 @source "../../../attendance/templates";
+@source "../../../accounts/templates";
 @source inline("btn-primary btn-secondary btn-ghost card input badge text-display text-headline-lg text-headline-md text-body-lg text-body-md text-body-sm text-label-caps text-data-mono animate-spin animate-pulse sr-only");
 
 /*
@@ -83,6 +84,11 @@
 }
 
 @layer base {
+    :focus-visible {
+        outline: 2px solid var(--color-secondary);
+        outline-offset: 3px;
+    }
+    a, button, input, select, textarea { scroll-margin-top: 5rem; }
     body {
         font-family: var(--font-sans);
         -webkit-font-smoothing: antialiased;
@@ -237,4 +243,23 @@
     .payslip-breakdown {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+}
+
+.input-error { border-color: var(--color-error); }
+.form-checkbox { width: 1.125rem; height: 1.125rem; accent-color: var(--color-secondary); }
+.menu-open { overflow: hidden; }
+.skip-link { position: fixed; top: -5rem; left: 1rem; z-index: 60; }
+.skip-link:focus { top: 1rem; }
+#app-shell, main { min-width: 0; }
+#toast-stack { width: min(24rem, calc(100% - 2rem)); }
+.sidebar-link { min-height: 40px; }
+body.sidebar-collapsed .sidebar-divider { margin-top: 0.5rem; padding-top: 0.5rem; }
+@media (max-width: 767px) {
+    body.sidebar-collapsed .sidebar-shell { width: 15rem; }
+    body.sidebar-collapsed .sidebar-nav-text,
+    body.sidebar-collapsed .sidebar-header-brand { display: flex; }
+    body.sidebar-collapsed .sidebar-link { justify-content: flex-start; }
+}
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }

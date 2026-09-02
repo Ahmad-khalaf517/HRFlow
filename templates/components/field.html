@@ -2,15 +2,25 @@
 {% comment %}
 Usage: {% include "components/field.html" with field=form.username %}
 {% endcomment %}
-<div class="mb-4">
+{% with feedback_id=field.auto_id|add:"_feedback" %}
+<div class="form-field mb-4">
     <label for="{{ field.id_for_label }}" class="block text-body-sm font-semibold text-on-surface mb-1">
         {{ field.label }}{% if field.field.required %}<span class="text-error"> *</span>{% endif %}
     </label>
-    {% render_field field class="input" %}
+    {% if field.field.widget.input_type == 'checkbox' %}
+        {% render_field field class="form-checkbox" aria-describedby=feedback_id %}
+    {% elif field.errors %}
+        {% render_field field class="input input-error" aria-invalid="true" aria-describedby=feedback_id %}
+    {% else %}
+        {% render_field field class="input" aria-describedby=feedback_id %}
+    {% endif %}
+    <div id="{{ feedback_id }}">
     {% if field.help_text %}
         <p class="mt-1 text-body-sm text-on-surface-variant">{{ field.help_text }}</p>
     {% endif %}
     {% for error in field.errors %}
         <p class="mt-1 text-body-sm text-error">{{ error }}</p>
     {% endfor %}
+    </div>
 </div>
+{% endwith %}
