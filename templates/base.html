@@ -14,11 +14,14 @@
         body.sidebar-collapsed .sidebar-shell {
             width: 5rem;
         }
-        body.sidebar-collapsed .sidebar-header-text,
+        body.sidebar-collapsed .sidebar-header-brand,
         body.sidebar-collapsed .sidebar-section-label,
         body.sidebar-collapsed .sidebar-nav-text,
         body.sidebar-collapsed .sidebar-divider {
             display: none;
+        }
+        body.sidebar-collapsed .sidebar-header {
+            justify-content: center;
         }
         body.sidebar-collapsed .sidebar-link {
             justify-content: center;
@@ -41,7 +44,7 @@
 
         <aside id="sidebar" class="sidebar-shell fixed inset-y-0 left-0 z-40 flex h-screen w-60 -translate-x-full flex-col border-r border-white/10 bg-primary text-on-primary transition-all duration-200 md:translate-x-0">
             <div class="sidebar-header flex h-16 items-center justify-between gap-2 border-b border-white/10 px-3">
-                <div class="flex items-center gap-2 overflow-hidden">
+                <div class="sidebar-header-brand flex items-center gap-2 overflow-hidden">
                     <span class="w-7 h-7 rounded bg-secondary text-on-secondary flex items-center justify-center text-body-sm font-bold shrink-0">H</span>
                     <span class="sidebar-header-text text-headline-md">HRFlow</span>
                 </div>
