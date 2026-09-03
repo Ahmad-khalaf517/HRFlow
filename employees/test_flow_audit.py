@@ -16,22 +16,30 @@ class EmployeeFlowAuditTests(TestCase):
         cls.department = Department.objects.create(name="Demo Engineering")
         cls.position = Position.objects.create(department=cls.department, title="Demo Engineer")
         cls.employee = Employee.objects.create(
-            employee_number="DEMO-001", first_name="Demo", last_name="Employee",
-            email="demo@example.test", hire_date=date(2026, 1, 1),
+            employee_number="DEMO-001",
+            first_name="Demo",
+            last_name="Employee",
+            email="demo@example.test",
+            hire_date=date(2026, 1, 1),
         )
 
     def employee_data(self, **changes):
         return {
-            "employee_number": "DEMO-002", "first_name": "Demo", "last_name": "New",
-            "email": "new@example.test", "hire_date": "2026-01-01",
-            "employment_status": "active", **changes,
+            "employee_number": "DEMO-002",
+            "first_name": "Demo",
+            "last_name": "New",
+            "email": "new@example.test",
+            "hire_date": "2026-01-01",
+            "employment_status": "active",
+            **changes,
         }
 
     def test_negative_salary_ranges_are_rejected(self):
         for field in ("min_salary", "max_salary"):
             with self.subTest(field=field):
-                form = PositionForm({"department": self.department.pk, "title": "New role",
-                                     field: "-0.01"})
+                form = PositionForm(
+                    {"department": self.department.pk, "title": "New role", field: "-0.01"}
+                )
                 self.assertFalse(form.is_valid())
                 self.assertIn(field, form.errors)
 
@@ -52,23 +60,32 @@ class EmployeeFlowAuditTests(TestCase):
 
     def test_employment_status_and_active_flag_remain_consistent(self):
         self.client.force_login(self.manager)
-        response = self.client.post(reverse("employees:employee-create"),
-                                    self.employee_data(employment_status="inactive"))
+        response = self.client.post(
+            reverse("employees:employee-create"), self.employee_data(employment_status="inactive")
+        )
         self.assertEqual(response.status_code, 302)
         self.assertFalse(Employee.objects.get(employee_number="DEMO-002").is_active)
 
     def test_invalid_directory_filters_show_errors_without_crashing(self):
         self.client.force_login(self.manager)
-        for filters in ({"department": "²"}, {"department": "9" * 100},
-                        {"status": "unknown"}, {"contract_type": "unknown"}):
+        for filters in (
+            {"department": "²"},
+            {"department": "9" * 100},
+            {"status": "unknown"},
+            {"contract_type": "unknown"},
+        ):
             with self.subTest(filters=filters):
                 response = self.client.get(reverse("employees:employee-list"), filters)
                 self.assertEqual(response.status_code, 200)
                 self.assertContains(response, "Please correct the following errors.")
 
     def test_active_contract_filter_and_column_match(self):
-        Contract.objects.create(employee=self.employee, start_date=date(2026, 1, 1),
-                                basic_salary=1000, contract_type="part_time")
+        Contract.objects.create(
+            employee=self.employee,
+            start_date=date(2026, 1, 1),
+            basic_salary=1000,
+            contract_type="part_time",
+        )
         self.client.force_login(self.manager)
         url = reverse("employees:employee-list")
         self.assertContains(self.client.get(url, {"contract_type": "part_time"}), "DEMO-001")
@@ -88,9 +105,22 @@ class EmployeeFlowAuditTests(TestCase):
 
     def test_pagination_preserves_search(self):
         for i in range(12):
-            Employee.objects.create(employee_number=f"EXTRA-{i}", first_name="Demo",
-                                    last_name=f"Extra {i}", email=f"extra{i}@example.test",
-                                    hire_date=date(2026, 1, 1))
+            Employee.objects.create(
+                employee_number=f"EXTRA-{i}",
+                first_name="Demo",
+                last_name=f"Extra {i}",
+                email=f"extra{i}@example.test",
+                hire_date=date(2026, 1, 1),
+            )
         self.client.force_login(self.manager)
         response = self.client.get(reverse("employees:employee-list"), {"search": "Extra"})
         self.assertContains(response, 'href="?search=Extra&amp;page=2"')
+
+    def test_profile_links_to_existing_hr_records_without_granting_payslips(self):
+        self.client.force_login(self.manager)
+        response = self.client.get(reverse("employees:employee-detail", args=[self.employee.pk]))
+
+        employee_query = f"?search={self.employee.employee_number}"
+        self.assertContains(response, reverse("attendance:attendance_list") + employee_query)
+        self.assertContains(response, reverse("attendance:leave_request_list") + employee_query)
+        self.assertNotContains(response, reverse("payroll:payslip-list"))

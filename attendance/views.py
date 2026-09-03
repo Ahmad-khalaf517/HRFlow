@@ -12,7 +12,13 @@ from django.views.decorators.http import require_POST
 
 from employees.models import Employee
 
-from .forms import AttendanceFilterForm, AttendanceForm, LeaveRequestForm, LeaveTypeForm
+from .forms import (
+    AttendanceFilterForm,
+    AttendanceForm,
+    LeaveRequestFilterForm,
+    LeaveRequestForm,
+    LeaveTypeForm,
+)
 from .models import Attendance, LeaveRequest, LeaveType
 
 
@@ -268,20 +274,43 @@ def leave_type_form(request, pk=None):
     )
 
 
-@login_required
-def leave_request_list(request):
+def _leave_request_list(request, *, own_only=False):
     queryset = LeaveRequest.objects.select_related("employee", "leave_type").order_by("-start_date")
-    if not _has_leave_view_access(request.user):
+    if own_only or not _has_leave_view_access(request.user):
         queryset = queryset.filter(employee__user=request.user)
+    form = LeaveRequestFilterForm(request.GET)
+    if form.is_valid():
+        data = form.cleaned_data
+        if data["search"]:
+            term = data["search"]
+            queryset = queryset.filter(
+                Q(employee__first_name__icontains=term)
+                | Q(employee__last_name__icontains=term)
+                | Q(employee__employee_number__icontains=term)
+            )
+        counts = _status_counts(queryset, ["pending", "approved", "rejected"])
+        if data["status"]:
+            queryset = queryset.filter(status=data["status"])
+    else:
+        queryset = queryset.none()
+        counts = _status_counts(queryset, ["pending", "approved", "rejected"])
+    page = Paginator(queryset, 20).get_page(request.GET.get("page"))
     return render(
         request,
         "attendance/leave_request_list.html",
         {
-            "leave_requests": Paginator(queryset, 20).get_page(request.GET.get("page")),
-            "page_obj": Paginator(queryset, 20).get_page(request.GET.get("page")),
-            "status_counts": _status_counts(queryset, ["pending", "approved", "rejected"]),
+            "leave_requests": page,
+            "page_obj": page,
+            "status_counts": counts,
+            "form": form,
+            "title": "My Leave Requests" if own_only else "Leave Requests",
         },
     )
+
+
+@login_required
+def leave_request_list(request):
+    return _leave_request_list(request)
 
 
 @login_required
@@ -308,18 +337,8 @@ def leave_approval_list(request):
 
 @login_required
 def my_leave_requests(request):
-    employee = get_object_or_404(Employee, user=request.user)
-    queryset = LeaveRequest.objects.filter(employee=employee).order_by("-start_date")
-    return render(
-        request,
-        "attendance/leave_request_list.html",
-        {
-            "leave_requests": Paginator(queryset, 20).get_page(request.GET.get("page")),
-            "page_obj": Paginator(queryset, 20).get_page(request.GET.get("page")),
-            "status_counts": _status_counts(queryset, ["pending", "approved", "rejected"]),
-            "title": "My Leave Requests",
-        },
-    )
+    get_object_or_404(Employee, user=request.user)
+    return _leave_request_list(request, own_only=True)
 
 
 @login_required

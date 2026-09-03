@@ -1,5 +1,6 @@
-{% comment %}Usage: {% include "employees/_employee_tabs.html" with employee=employee active="overview" %} — active is one of overview/contract{% endcomment %}
-<nav class="flex gap-1 border-b border-outline-variant">
+{% load employees_extras %}
+{% comment %}Usage: {% include "employees/_employee_tabs.html" with employee=employee active="overview" %}{% endcomment %}
+<nav aria-label="Employee sections" class="flex gap-1 overflow-x-auto border-b border-outline-variant">
     <a href="{% url 'employees:employee-detail' employee.pk %}"
        class="px-3 py-2 text-body-md {% if active == 'overview' %}text-primary font-semibold border-b-2 border-primary{% else %}text-on-surface-variant hover:text-on-surface{% endif %}">
         Overview
@@ -8,4 +9,22 @@
        class="px-3 py-2 text-body-md {% if active == 'contract' %}text-primary font-semibold border-b-2 border-primary{% else %}text-on-surface-variant hover:text-on-surface{% endif %}">
         Contract
     </a>
+    {% if request.user|has_group:"Admin,HR Manager,Payroll Officer" %}
+    <a href="{% url 'attendance:attendance_list' %}?search={{ employee.employee_number|urlencode }}"
+       class="px-3 py-2 text-body-md whitespace-nowrap text-on-surface-variant hover:text-on-surface">Attendance</a>
+    <a href="{% url 'attendance:leave_request_list' %}?search={{ employee.employee_number|urlencode }}"
+       class="px-3 py-2 text-body-md whitespace-nowrap text-on-surface-variant hover:text-on-surface">Leave</a>
+    {% elif employee.user_id == request.user.pk %}
+    <a href="{% url 'attendance:my_attendance' %}"
+       class="px-3 py-2 text-body-md whitespace-nowrap text-on-surface-variant hover:text-on-surface">Attendance</a>
+    <a href="{% url 'attendance:my_leave_requests' %}"
+       class="px-3 py-2 text-body-md whitespace-nowrap text-on-surface-variant hover:text-on-surface">Leave</a>
+    {% endif %}
+    {% if request.user|has_group:"Admin,Payroll Officer" %}
+    <a href="{% url 'payroll:payslip-list' %}?search={{ employee.employee_number|urlencode }}"
+       class="px-3 py-2 text-body-md whitespace-nowrap text-on-surface-variant hover:text-on-surface">Payslips</a>
+    {% elif employee.user_id == request.user.pk %}
+    <a href="{% url 'payroll:payslip-list' %}"
+       class="px-3 py-2 text-body-md whitespace-nowrap text-on-surface-variant hover:text-on-surface">Payslips</a>
+    {% endif %}
 </nav>

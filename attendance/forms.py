@@ -22,6 +22,18 @@ class AttendanceFilterForm(forms.Form):
     )
 
 
+class LeaveRequestFilterForm(forms.Form):
+    status = forms.ChoiceField(
+        required=False, choices=[("", "All statuses"), *LeaveRequest.STATUS_CHOICES]
+    )
+    search = forms.CharField(
+        required=False,
+        max_length=150,
+        label="Employee",
+        widget=forms.TextInput(attrs={"placeholder": "Name or employee ID"}),
+    )
+
+
 class AttendanceForm(forms.ModelForm):
     class Meta:
         model = Attendance

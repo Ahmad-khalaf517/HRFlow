@@ -129,3 +129,21 @@ Only sanitized findings and reproducible tests belong in the repository.
   dashboard, payslip search/detail and the 390px layout using synthetic records.
 - Targeted suite: 90 payroll/account tests and 51 subtests passed. Ruff passed for
   changed Python, compiled CSS was rebuilt and `git diff --check` passed.
+
+### Step 5 — cross-screen navigation and account consistency
+
+- Added the 15-screen comparison matrix with implemented counterparts, justified
+  differences and explicit gaps. Payment screens remain unavailable rather than
+  presenting actions without the required service and authorization workflow.
+- Employee profiles now link to existing attendance, leave and payslip routes only
+  when the viewer already has server-side access. HR Manager payslip access remains
+  ungranted. Leave lists accept validated employee/status filters.
+- Staff account creation applies Django username validation in the form and service,
+  rejects unsupported direct-service roles and case-insensitive duplicates, and
+  maps service races back to visible form errors. Staff listings are paginated.
+- Filtered empty trusted-origin configuration no longer produces an invalid origin,
+  and WhiteNoise follows Django’s security middleware as required by its deployment
+  integration.
+- Targeted suites: 26 account tests plus 4 subtests, then 73 attendance/employee
+  tests plus 18 subtests passed. Browser verified linked account errors, the
+  employee-specific leave result and the 390px profile without page overflow.

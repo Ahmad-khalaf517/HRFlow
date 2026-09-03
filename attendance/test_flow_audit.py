@@ -75,6 +75,24 @@ class AttendanceFlowAuditTests(TestCase):
                     self.assertEqual(response.status_code, 200)
                     self.assertTrue(response.context["form"].errors)
 
+    def test_leave_filters_are_validated_and_scoped(self):
+        self.leave()
+        self.leave(self.other, status="approved")
+        self.client.force_login(self.manager)
+        url = reverse("attendance:leave_request_list")
+
+        response = self.client.get(url, {"search": "WORKER", "status": "pending"})
+        self.assertEqual(
+            list(response.context["leave_requests"]),
+            [LeaveRequest.objects.get(employee=self.employee)],
+        )
+        self.assertEqual(response.context["status_counts"]["pending"], 1)
+
+        invalid = self.client.get(url, {"status": "unknown"})
+        self.assertEqual(invalid.status_code, 200)
+        self.assertTrue(invalid.context["form"].errors)
+        self.assertEqual(list(invalid.context["leave_requests"]), [])
+
     def test_employee_cannot_reassign_attendance_on_edit(self):
         record = Attendance.objects.create(employee=self.employee, date=date(2026, 9, 1))
         self.client.force_login(self.user)
