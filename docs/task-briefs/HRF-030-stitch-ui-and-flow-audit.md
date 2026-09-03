@@ -46,15 +46,15 @@
 
 ## Acceptance and verification
 
-- [ ] Map all 15 reference screens to an implemented route/state or explicit gap.
-- [ ] Inspect each reference and counterpart; record fixes and justified differences.
-- [ ] Shared shell, forms, statuses and feedback use consistent accessible components.
-- [ ] Test each changed app before committing; rebuild and include compiled CSS.
-- [ ] Exercise valid, invalid, empty and permission-denied paths with synthetic data.
-- [ ] Browser-check desktop/mobile layouts, navigation, forms and workflow transitions.
-- [ ] Run the complete isolated test suite, Ruff, Django system checks and migration
+- [x] Map all 15 reference screens to an implemented route/state or explicit gap.
+- [x] Inspect each reference and counterpart; record fixes and justified differences.
+- [x] Shared shell, forms, statuses and feedback use consistent accessible components.
+- [x] Test each changed app before committing; rebuild and include compiled CSS.
+- [x] Exercise valid, invalid, empty and permission-denied paths with synthetic data.
+- [x] Browser-check desktop/mobile layouts, navigation, forms and workflow transitions.
+- [x] Run the complete isolated test suite, Ruff, Django system checks and migration
       drift check; review final diff and record the exact outcomes.
-- [ ] Report missing workflows and real-deployment blockers separately from verified fixes.
+- [x] Report missing workflows and real-deployment blockers separately from verified fixes.
 
 ## Work sequence
 
@@ -147,3 +147,13 @@ Only sanitized findings and reproducible tests belong in the repository.
 - Targeted suites: 26 account tests plus 4 subtests, then 73 attendance/employee
   tests plus 18 subtests passed. Browser verified linked account errors, the
   employee-specific leave result and the 390px profile without page overflow.
+
+### Final validation
+
+- Full isolated SQLite suite: 167 tests and 69 subtests passed. No shared or remote
+  database was accessed.
+- Ruff passed across `accounts`, `attendance`, `config`, `employees` and `payroll`.
+- Django system check reported no issues; migration drift check reported no changes.
+- Tailwind CSS rebuilt successfully and `git diff --check` passed.
+- The complete screen mapping and limitations are recorded in
+  `HRF-030-stitch-screen-matrix.md`.
