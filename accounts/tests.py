@@ -1,4 +1,5 @@
 from django.contrib.auth.models import Group, User
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.urls import reverse
 
@@ -6,6 +7,7 @@ from employees.models import Employee
 
 from .constants import DEFAULT_INITIAL_PASSWORD
 from .forms import StaffUserCreationForm
+from .services import create_staff_user
 
 
 class HomePageTests(TestCase):
@@ -91,6 +93,46 @@ class StaffUserCreationTests(TestCase):
         self.assertFalse(form.is_valid())
         self.assertIn("username", form.errors)
 
+    def test_form_rejects_username_outside_django_rules(self):
+        form = StaffUserCreationForm(
+            data={
+                "username": "invalid name!",
+                "first_name": "Demo",
+                "last_name": "HR",
+                "email": "demo.hr@example.com",
+                "role": "HR Manager",
+            }
+        )
+
+        self.assertFalse(form.is_valid())
+        self.assertIn("username", form.errors)
+
+    def test_service_rejects_invalid_role_without_writing(self):
+        with self.assertRaises(ValidationError):
+            create_staff_user(
+                username="demo.invalid-role",
+                first_name="Demo",
+                last_name="User",
+                email="demo.user@example.com",
+                role="Employee",
+            )
+
+        self.assertFalse(User.objects.filter(username="demo.invalid-role").exists())
+
+    def test_service_rejects_case_insensitive_duplicate(self):
+        User.objects.create_user(username="Demo.Staff", password="irrelevant")
+
+        with self.assertRaises(ValidationError):
+            create_staff_user(
+                username="demo.staff",
+                first_name="Demo",
+                last_name="User",
+                email="demo.user@example.com",
+                role="HR Manager",
+            )
+
+        self.assertEqual(User.objects.filter(username__iexact="demo.staff").count(), 1)
+
 
 class StaffUserViewPermissionTests(TestCase):
     def setUp(self):
@@ -158,6 +200,19 @@ class StaffUserViewPermissionTests(TestCase):
         created = User.objects.get(username="new.payroll")
         self.assertTrue(created.check_password(DEFAULT_INITIAL_PASSWORD))
         self.assertTrue(created.groups.filter(name="Payroll Officer").exists())
+
+    def test_user_list_is_paginated(self):
+        group = Group.objects.get(name="HR Manager")
+        for index in range(26):
+            user = User.objects.create_user(username=f"demo-staff-{index:02d}")
+            user.groups.add(group)
+
+        self.client.force_login(self.admin)
+        response = self.client.get(reverse("staff-user-list"))
+
+        self.assertEqual(len(response.context["staff_users"]), 25)
+        self.assertEqual(response.context["page_obj"].paginator.count, 28)
+        self.assertContains(response, "Page 1 of 2")
 
 
 class RoleAwareDashboardTests(TestCase):

@@ -2,6 +2,7 @@
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import NON_FIELD_ERRORS, ValidationError
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import FormView, ListView
@@ -28,6 +29,7 @@ class StaffUserListView(AccountManagementRequiredMixin, ListView):
     model = get_user_model()
     template_name = "accounts/user_list.html"
     context_object_name = "staff_users"
+    paginate_by = 25
 
     def get_queryset(self):
         return (
@@ -46,6 +48,18 @@ class StaffUserCreateView(AccountManagementRequiredMixin, FormView):
     success_url = reverse_lazy("staff-user-list")
 
     def form_valid(self, form):
-        user = form.save()
+        try:
+            user = form.save()
+        except ValidationError as exc:
+            if hasattr(exc, "message_dict"):
+                for field, errors in exc.message_dict.items():
+                    target = (
+                        None if field == NON_FIELD_ERRORS or field not in form.fields else field
+                    )
+                    for error in errors:
+                        form.add_error(target, error)
+            else:
+                form.add_error(None, exc)
+            return self.form_invalid(form)
         messages.success(self.request, f"User account created for {user.get_full_name()}.")
         return super().form_valid(form)

@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import AuthenticationForm
+from django.core.exceptions import ValidationError
 
 from .constants import STAFF_ACCOUNT_ROLES
 from .services import create_staff_user
@@ -32,9 +33,17 @@ class StaffUserCreationForm(forms.Form):
 
     def clean_username(self):
         username = self.cleaned_data["username"].strip()
+        username_field = get_user_model()._meta.get_field("username")
+        try:
+            username_field.run_validators(username)
+        except ValidationError as exc:
+            raise forms.ValidationError(exc.messages) from exc
         if get_user_model().objects.filter(username__iexact=username).exists():
             raise forms.ValidationError("A user with this username already exists.")
         return username
+
+    def clean_email(self):
+        return self.cleaned_data["email"].strip()
 
     def save(self):
         if not self.is_valid():
