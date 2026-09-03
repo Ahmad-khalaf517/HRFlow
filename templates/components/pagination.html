@@ -1,0 +1,10 @@
+{% load employees_extras %}
+{% if page_obj %}
+<nav aria-label="Pages" class="flex flex-wrap items-center justify-between gap-3 border-t border-outline-variant px-4 py-3 text-body-sm">
+    <span>{{ page_obj.paginator.count }} records · Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+    <div class="flex gap-2">
+        {% if page_obj.has_previous %}<a class="btn-secondary" href="{% page_url page_obj.previous_page_number %}">Previous</a>{% endif %}
+        {% if page_obj.has_next %}<a class="btn-secondary" href="{% page_url page_obj.next_page_number %}">Next</a>{% endif %}
+    </div>
+</nav>
+{% endif %}

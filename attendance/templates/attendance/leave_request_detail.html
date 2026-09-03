@@ -15,31 +15,7 @@
         </div>
         <div class="flex flex-wrap items-center gap-2">
             <a href="{% url 'attendance:leave_request_list' %}" class="btn-ghost">Back to Leave Requests</a>
-            {% if leave_request.status == 'pending' %}
-                {% if request.user.is_staff %}
-                    <form method="post" action="{% url 'attendance:leave_request_approve' leave_request.pk %}">
-                        {% csrf_token %}
-                        <button type="submit" class="btn-primary">Approve</button>
-                    </form>
-                    <form method="post" action="{% url 'attendance:leave_request_reject' leave_request.pk %}">
-                        {% csrf_token %}
-                        <button type="submit" class="btn-danger">Reject</button>
-                    </form>
-                {% else %}
-                    {% for group in request.user.groups.all %}
-                        {% if group.name == 'Admin' or group.name == 'HR Manager' %}
-                            <form method="post" action="{% url 'attendance:leave_request_approve' leave_request.pk %}">
-                                {% csrf_token %}
-                                <button type="submit" class="btn-primary">Approve</button>
-                            </form>
-                            <form method="post" action="{% url 'attendance:leave_request_reject' leave_request.pk %}">
-                                {% csrf_token %}
-                                <button type="submit" class="btn-danger">Reject</button>
-                            </form>
-                        {% endif %}
-                    {% endfor %}
-                {% endif %}
-            {% endif %}
+            {% include "attendance/_leave_actions.html" %}
         </div>
     </div>
 
@@ -82,6 +58,9 @@
             </div>
         </div>
 
+        {% if leave_request.approved_at %}
+        <p class="text-body-sm text-on-surface-variant">{{ leave_request.get_status_display }} by {{ leave_request.approved_by.get_full_name|default:leave_request.approved_by.get_username }} · {{ leave_request.approved_at|date:"Y-m-d H:i" }}</p>
+        {% endif %}
         {% if leave_request.reason %}
             <div class="rounded border border-outline-variant p-4">
                 <p class="text-label-caps text-on-surface-variant">Reason</p>

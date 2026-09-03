@@ -1,6 +1,25 @@
 from django import forms
+from django.db import transaction
+
+from employees.models import Department
 
 from .models import Attendance, LeaveRequest, LeaveType
+
+
+class AttendanceFilterForm(forms.Form):
+    date = forms.DateField(required=False, widget=forms.DateInput(attrs={"type": "date"}))
+    department = forms.ModelChoiceField(
+        required=False, queryset=Department.objects.order_by("name"), empty_label="All departments"
+    )
+    status = forms.ChoiceField(
+        required=False, choices=[("", "All statuses"), *Attendance.STATUS_CHOICES]
+    )
+    search = forms.CharField(
+        required=False,
+        max_length=150,
+        label="Employee",
+        widget=forms.TextInput(attrs={"placeholder": "Name or employee ID"}),
+    )
 
 
 class AttendanceForm(forms.ModelForm):
@@ -16,12 +35,6 @@ class AttendanceForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
-        check_in = cleaned_data.get("check_in")
-        check_out = cleaned_data.get("check_out")
-
-        if check_in and check_out and check_out <= check_in:
-            raise forms.ValidationError("Check-out must be after check-in.")
-
         employee = cleaned_data.get("employee")
         work_date = cleaned_data.get("date")
         if employee and work_date:
@@ -35,6 +48,7 @@ class AttendanceForm(forms.ModelForm):
 
         return cleaned_data
 
+    @transaction.atomic
     def save(self, commit=True):
         instance = super().save(commit=False)
         instance.full_clean()
@@ -64,31 +78,11 @@ class LeaveRequestForm(forms.ModelForm):
             "reason": forms.Textarea(attrs={"rows": 3}),
         }
 
-    def clean(self):
-        cleaned_data = super().clean()
-        start_date = cleaned_data.get("start_date")
-        end_date = cleaned_data.get("end_date")
-        employee = cleaned_data.get("employee")
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["leave_type"].queryset = LeaveType.objects.filter(is_active=True)
 
-        if start_date and end_date and end_date < start_date:
-            raise forms.ValidationError("End date cannot precede start date.")
-
-        if employee and start_date and end_date:
-            queryset = LeaveRequest.objects.filter(
-                employee=employee,
-                status__in=["pending", "approved"],
-                start_date__lte=end_date,
-                end_date__gte=start_date,
-            )
-            if self.instance.pk:
-                queryset = queryset.exclude(pk=self.instance.pk)
-            if queryset.exists():
-                raise forms.ValidationError(
-                    "Pending or approved leave requests may not overlap for the same employee."
-                )
-
-        return cleaned_data
-
+    @transaction.atomic
     def save(self, commit=True):
         instance = super().save(commit=False)
         instance.full_clean()

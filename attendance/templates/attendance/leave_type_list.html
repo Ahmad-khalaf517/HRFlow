@@ -23,19 +23,19 @@
         <div class="card overflow-hidden p-0">
             <div class="overflow-x-auto">
                 <table class="min-w-full border-collapse">
-                    <thead class="bg-surface-container-lowest">
+                    <thead class="bg-primary text-on-primary">
                         <tr>
-                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Name</th>
-                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Annual allowance</th>
-                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Paid</th>
-                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Approval</th>
-                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Status</th>
-                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Actions</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-primary">Name</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-primary">Annual allowance</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-primary">Paid</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-primary">Approval</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-primary">Status</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-primary">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for leave_type in leave_types %}
-                            <tr class="border-t border-outline-variant">
+                            <tr class="even:bg-surface-container-low/60 border-t border-outline-variant">
                                 <td class="px-4 py-3 text-body-md text-on-surface">{{ leave_type.name }}</td>
                                 <td class="px-4 py-3 text-data-mono text-on-surface">{{ leave_type.annual_allowance }} days</td>
                                 <td class="px-4 py-3">

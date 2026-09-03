@@ -38,27 +38,14 @@
         </div>
     </div>
 
-    <form method="get" class="card">
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <div>
-                <label class="mb-1 block text-label-caps text-on-surface-variant">Date</label>
-                <input type="date" name="date" value="{{ selected_date }}" class="input">
-            </div>
-            <div>
-                <label class="mb-1 block text-label-caps text-on-surface-variant">Status</label>
-                <select name="status" class="input">
-                    <option value="">All Statuses</option>
-                    {% for value, label in status_choices %}
-                        <option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>{{ label }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="flex items-end gap-2">
-                <button type="submit" class="btn-primary">Filter</button>
-                {% if selected_status or selected_date %}
-                    <a href="{{ request.path }}" class="btn-ghost">Clear</a>
-                {% endif %}
-            </div>
+    <form method="get" class="card" novalidate>
+        <div class="grid gap-x-4 sm:grid-cols-2 lg:grid-cols-4">
+            {% for field in form %}{% include "components/field.html" %}{% endfor %}
+        </div>
+        <div class="flex flex-wrap gap-2">
+            <button type="submit" class="btn-primary">Filter</button>
+            <a href="{{ request.path }}" class="btn-ghost">Clear filters</a>
+            <a href="{% url 'attendance:attendance_summary' %}" class="btn-secondary">Summary</a>
         </div>
     </form>
 
@@ -66,27 +53,27 @@
         <div class="card overflow-hidden p-0">
             <div class="overflow-x-auto">
                 <table class="min-w-full border-collapse">
-                    <thead class="bg-surface-container-lowest">
+                    <thead class="bg-primary text-on-primary">
                         <tr>
-                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Employee</th>
-                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Date</th>
-                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Status</th>
-                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Check in</th>
-                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Check out</th>
-                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Worked</th>
-                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Overtime</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-primary">Employee</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-primary">Date</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-primary">Status</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-primary">Check in</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-primary">Check out</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-primary">Worked</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-primary">Overtime</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for record in attendance_records %}
-                            <tr class="border-t border-outline-variant">
+                            <tr class="even:bg-surface-container-low/60 border-t border-outline-variant">
                                 <td class="px-4 py-3 text-body-md text-on-surface">
                                     <a href="{% url 'attendance:attendance_detail' record.pk %}" class="flex items-center gap-3 hover:underline">
                                         <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded bg-secondary-container text-body-sm font-bold text-on-secondary-container">{{ record.employee.first_name|first }}{{ record.employee.last_name|first }}</span>
-                                        <span class="text-primary">{{ record.employee }}</span>
+                                        <span class="text-primary">{{ record.employee }}<span class="block text-body-sm text-on-surface-variant">{{ record.employee.department|default:"—" }}</span></span>
                                     </a>
                                 </td>
-                                <td class="px-4 py-3 text-body-md text-on-surface">{{ record.date }}</td>
+                                <td class="px-4 py-3 text-body-md text-on-surface">{{ record.date|date:"Y-m-d" }}</td>
                                 <td class="px-4 py-3">
                                     {% if record.status == 'present' %}
                                         <span class="badge bg-secondary-container text-on-secondary-container">Present</span>
@@ -119,5 +106,6 @@
             {% endif %}
         </div>
     {% endif %}
+{% include "components/pagination.html" %}
 </div>
 {% endblock %}

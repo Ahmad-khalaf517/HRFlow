@@ -1,11 +1,9 @@
-from datetime import timedelta
 from decimal import ROUND_HALF_UP, Decimal
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.db import models
+from django.db import models, transaction
 from django.db.models import CheckConstraint, F, Q, UniqueConstraint
-from django.utils import timezone
 
 
 class Attendance(models.Model):
@@ -52,7 +50,7 @@ class Attendance(models.Model):
         ]
 
     def _calculate_worked_hours(self):
-        if not self.employee:
+        if not self.employee_id:
             self.worked_hours = Decimal("0")
             self.overtime_hours = Decimal("0")
             return
@@ -70,9 +68,7 @@ class Attendance(models.Model):
         self.worked_hours = hours.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
         contract = self.employee.contracts.filter(status="active").order_by("-start_date").first()
-        contract_hours = (
-            Decimal(str(contract.working_hours_per_day)) if contract else Decimal("0")
-        )
+        contract_hours = Decimal(str(contract.working_hours_per_day)) if contract else Decimal("0")
         overtime = self.worked_hours - contract_hours
         self.overtime_hours = max(overtime, Decimal("0")).quantize(
             Decimal("0.01"), rounding=ROUND_HALF_UP
@@ -171,13 +167,9 @@ class LeaveRequest(models.Model):
 
     @staticmethod
     def _working_days_between(start_date, end_date):
-        current = start_date
-        count = 0
-        while current <= end_date:
-            if current.weekday() < 5:
-                count += 1
-            current += timedelta(days=1)
-        return count
+        days = max((end_date - start_date).days + 1, 0)
+        weeks, remainder = divmod(days, 7)
+        return weeks * 5 + sum((start_date.weekday() + day) % 7 < 5 for day in range(remainder))
 
     def calculate_requested_days(self):
         if not self.start_date or not self.end_date:
@@ -197,20 +189,14 @@ class LeaveRequest(models.Model):
         return self.status in allowed and new_status in allowed[self.status]
 
     def approve(self, user):
-        if self.status != "pending":
-            raise ValidationError("Only pending leave requests can be approved.")
-        self.status = "approved"
-        self.approved_by = user
-        self.approved_at = timezone.now()
-        self.save(update_fields=["status", "approved_by", "approved_at", "updated_at"])
+        from .services import transition_leave
+
+        transition_leave(self, user, "approved")
 
     def reject(self, user):
-        if self.status != "pending":
-            raise ValidationError("Only pending leave requests can be rejected.")
-        self.status = "rejected"
-        self.approved_by = user
-        self.approved_at = timezone.now()
-        self.save(update_fields=["status", "approved_by", "approved_at", "updated_at"])
+        from .services import transition_leave
+
+        transition_leave(self, user, "rejected")
 
     def clean(self):
         super().clean()
@@ -218,7 +204,7 @@ class LeaveRequest(models.Model):
             raise ValidationError({"end_date": "End date cannot precede start date."})
 
         if (
-            self.employee
+            self.employee_id
             and self.start_date
             and self.end_date
             and self.status in {"pending", "approved"}
@@ -237,11 +223,17 @@ class LeaveRequest(models.Model):
                 )
 
         self.calculate_requested_days()
+        if self.requested_days > Decimal("999.99"):
+            raise ValidationError("Leave duration exceeds the supported maximum of 999 days.")
 
     def save(self, *args, **kwargs):
-        self.full_clean()
-        self.calculate_requested_days()
-        super().save(*args, **kwargs)
+        from employees.models import Employee
+
+        with transaction.atomic():
+            if self.employee_id:
+                Employee.objects.select_for_update().get(pk=self.employee_id)
+            self.full_clean()
+            super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.employee} — {self.leave_type} ({self.start_date} to {self.end_date})"

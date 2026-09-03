@@ -1,0 +1,11 @@
+{% load employees_extras %}
+{% if leave_request.status == 'pending' and leave_request.employee.user_id != request.user.pk %}
+    {% if request.user|has_group:"Admin,HR Manager" %}
+        <form method="post" action="{% url 'attendance:leave_request_approve' leave_request.pk %}">
+            {% csrf_token %}<button type="submit" class="btn-primary">Approve</button>
+        </form>
+        <form method="post" action="{% url 'attendance:leave_request_reject' leave_request.pk %}">
+            {% csrf_token %}<button type="submit" class="btn-danger">Reject</button>
+        </form>
+    {% endif %}
+{% endif %}

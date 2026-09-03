@@ -19,7 +19,7 @@
         {% endif %}
     </div>
 
-    <div class="grid grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div class="card border-l-4 border-l-outline-variant">
             <p class="text-label-caps text-on-surface-variant">Pending</p>
             <p class="mt-2 text-display text-on-surface">{{ status_counts.pending }}</p>
@@ -38,23 +38,24 @@
         <div class="card overflow-hidden p-0">
             <div class="overflow-x-auto">
                 <table class="min-w-full border-collapse">
-                    <thead class="bg-surface-container-lowest">
+                    <thead class="bg-primary text-on-primary">
                         <tr>
-                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Employee</th>
-                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Type</th>
-                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Dates</th>
-                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Days</th>
-                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Status</th>
-                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Actions</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-primary">Employee</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-primary">Type</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-primary">Dates</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-primary">Days</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-primary">Reason</th><th class="px-4 py-3 text-left text-label-caps text-on-primary">Status</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-primary">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for leave_request in leave_requests %}
-                            <tr class="border-t border-outline-variant">
+                            <tr class="even:bg-surface-container-low/60 border-t border-outline-variant">
                                 <td class="px-4 py-3 text-body-md text-on-surface">{{ leave_request.employee }}</td>
                                 <td class="px-4 py-3 text-body-md text-on-surface">{{ leave_request.leave_type }}</td>
                                 <td class="px-4 py-3 text-body-md text-on-surface">{{ leave_request.start_date }} to {{ leave_request.end_date }}</td>
                                 <td class="px-4 py-3 text-data-mono text-on-surface">{{ leave_request.requested_days }}</td>
+                                <td class="px-4 py-3 text-body-sm">{{ leave_request.reason|default:"—"|truncatechars:100 }}</td>
                                 <td class="px-4 py-3">
                                     {% if leave_request.status == 'pending' %}
                                         <span class="badge bg-surface-container text-on-surface-variant">Pending</span>
@@ -69,31 +70,7 @@
                                 <td class="px-4 py-3">
                                     <div class="flex flex-wrap gap-2">
                                         <a href="{% url 'attendance:leave_request_detail' leave_request.pk %}" class="btn-secondary">View</a>
-                                        {% if leave_request.status == 'pending' %}
-                                            {% if request.user.is_staff %}
-                                                <form method="post" action="{% url 'attendance:leave_request_approve' leave_request.pk %}">
-                                                    {% csrf_token %}
-                                                    <button type="submit" class="btn-primary">Approve</button>
-                                                </form>
-                                                <form method="post" action="{% url 'attendance:leave_request_reject' leave_request.pk %}">
-                                                    {% csrf_token %}
-                                                    <button type="submit" class="btn-danger">Reject</button>
-                                                </form>
-                                            {% else %}
-                                                {% for group in request.user.groups.all %}
-                                                    {% if group.name == 'Admin' or group.name == 'HR Manager' %}
-                                                        <form method="post" action="{% url 'attendance:leave_request_approve' leave_request.pk %}">
-                                                            {% csrf_token %}
-                                                            <button type="submit" class="btn-primary">Approve</button>
-                                                        </form>
-                                                        <form method="post" action="{% url 'attendance:leave_request_reject' leave_request.pk %}">
-                                                            {% csrf_token %}
-                                                            <button type="submit" class="btn-danger">Reject</button>
-                                                        </form>
-                                                    {% endif %}
-                                                {% endfor %}
-                                            {% endif %}
-                                        {% endif %}
+                                        {% include "attendance/_leave_actions.html" %}
                                     </div>
                                 </td>
                             </tr>
@@ -111,5 +88,6 @@
             {% endif %}
         </div>
     {% endif %}
+{% include "components/pagination.html" %}
 </div>
 {% endblock %}

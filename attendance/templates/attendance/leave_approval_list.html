@@ -20,19 +20,19 @@
         <div class="card overflow-hidden p-0">
             <div class="overflow-x-auto">
                 <table class="min-w-full border-collapse">
-                    <thead class="bg-surface-container-lowest">
+                    <thead class="bg-primary text-on-primary">
                         <tr>
-                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Employee</th>
-                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Type</th>
-                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Dates</th>
-                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Days</th>
-                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Status</th>
-                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Actions</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-primary">Employee</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-primary">Type</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-primary">Dates</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-primary">Days</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-primary">Status</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-primary">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for leave_request in leave_requests %}
-                            <tr class="border-t border-outline-variant align-top">
+                            <tr class="even:bg-surface-container-low/60 border-t border-outline-variant align-top">
                                 <td class="px-4 py-3 text-body-md text-on-surface">{{ leave_request.employee }}</td>
                                 <td class="px-4 py-3 text-body-md text-on-surface">{{ leave_request.leave_type }}</td>
                                 <td class="px-4 py-3 text-body-md text-on-surface">{{ leave_request.start_date }} to {{ leave_request.end_date }}</td>

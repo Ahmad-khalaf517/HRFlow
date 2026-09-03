@@ -45,19 +45,19 @@
         {% if attendance_records %}
             <div class="mt-4 overflow-x-auto">
                 <table class="min-w-full border-collapse">
-                    <thead class="bg-surface-container-lowest">
+                    <thead class="bg-primary text-on-primary">
                         <tr>
-                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Employee</th>
-                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Date</th>
-                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Status</th>
-                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Worked</th>
-                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Overtime</th>
-                            <th class="px-4 py-3 text-left text-label-caps text-on-surface-variant">Action</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-primary">Employee</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-primary">Date</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-primary">Status</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-primary">Worked</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-primary">Overtime</th>
+                            <th class="px-4 py-3 text-left text-label-caps text-on-primary">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for attendance in attendance_records %}
-                            <tr class="border-t border-outline-variant">
+                            <tr class="even:bg-surface-container-low/60 border-t border-outline-variant">
                                 <td class="px-4 py-3 text-body-md text-on-surface">{{ attendance.employee }}</td>
                                 <td class="px-4 py-3 text-body-md text-on-surface">{{ attendance.date }}</td>
                                 <td class="px-4 py-3">

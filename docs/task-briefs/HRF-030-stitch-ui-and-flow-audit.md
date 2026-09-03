@@ -96,3 +96,18 @@ Only sanitized findings and reproducible tests belong in the repository.
 - Main reconciliation: origin/main fetched on 2026-09-03 at dd12f18. Main checkout
   was clean. Three commits add validation/overlap checks, bonus editing, officer
   read access and deployment/health support; preserve these during integration.
+
+### Step 3 — attendance and leave
+
+- Merged main at dd12f18; all 142 tests and 37 subtests passed after reconciliation.
+- Added validated attendance filters, department/search, scoped counts and paging;
+  aligned dark tables, alternating rows, leave reason/actions and decision trace.
+- Blocked own-record reassignment, staff-only privilege escalation, GET decisions,
+  self-review and repeated transitions. Empty/forged forms and extreme date ranges
+  return errors. Leave overlap checks serialize saves by employee on PostgreSQL.
+- Added the required public attendance fact services; only recorded overtime,
+  absences and approved unpaid weekday leave within the period are returned.
+- Browser exercised invalid check-out, correction/save (9.50 hours, 1.50 overtime),
+  leave submission (2 weekdays), approval, success feedback and approved table.
+- Targeted suite: 37 attendance tests and 12 subtests passed. PostgreSQL concurrency
+  is not verified by the isolated SQLite suite; no shared database was accessed.
