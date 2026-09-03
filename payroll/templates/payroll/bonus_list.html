@@ -45,10 +45,17 @@
                     </td>
                     <td class="px-4 py-3 text-right">
                         {% if bonus.status == "active" %}
-                        <form method="post" action="{% url 'payroll:bonus-cancel' bonus.pk %}">
-                            {% csrf_token %}
-                            <button type="submit" class="btn-ghost">Cancel</button>
-                        </form>
+                            {% if bonus.effective_date >= today %}
+                                <div class="flex items-center justify-end gap-2">
+                                    <a href="{% url 'payroll:bonus-update' bonus.pk %}" class="btn-ghost">Edit</a>
+                                    <form method="post" action="{% url 'payroll:bonus-cancel' bonus.pk %}">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn-ghost">Cancel</button>
+                                    </form>
+                                </div>
+                            {% else %}
+                                <span class="text-body-sm text-on-surface-variant">Locked (past date)</span>
+                            {% endif %}
                         {% endif %}
                     </td>
                 </tr>

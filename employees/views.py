@@ -46,7 +46,7 @@ class HRManagementRequiredMixin(LoginRequiredMixin):
         if not request.user.is_authenticated:
             return super().dispatch(request, *args, **kwargs)
 
-        if not request.user.is_superuser and not request.user.groups.filter(
+        if not request.user.groups.filter(
             name__in=self.allowed_groups
         ).exists():
 

@@ -8,14 +8,22 @@ the project settles on a dedicated home for cross-app views.
 """
 
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils import timezone
+from django.views.decorators.http import require_GET
 
 from accounts.constants import ADMIN_GROUP, EMPLOYEE_GROUP, HR_MANAGER_GROUP, PAYROLL_OFFICER_GROUP
 from attendance.models import Attendance, LeaveRequest
 from employees.models import Employee
 from payroll.models import Payroll
+
+
+@require_GET
+def health(request):
+    """Unauthenticated liveness check for the deploy host (Render)."""
+    return JsonResponse({"status": "ok"})
 
 
 @login_required

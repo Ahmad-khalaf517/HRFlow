@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 
-{% block title %}Record bonus · HRFlow{% endblock %}
+{% block title %}{% if bonus %}Edit bonus{% else %}Record bonus{% endif %} · HRFlow{% endblock %}
 
 {% block page_title %}
-<h1 class="text-headline-md text-on-surface">Record bonus</h1>
+<h1 class="text-headline-md text-on-surface">{% if bonus %}Edit bonus{% else %}Record bonus{% endif %}</h1>
 {% endblock %}
 
 {% block content %}
@@ -11,9 +11,9 @@
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M15 5l-7 7 7 7"/></svg>
     Back to bonuses
 </a>
-<div class="max-w-md">
+<div class="max-w-2xl">
     <div class="card">
-        <p class="text-headline-md text-on-surface">Record bonus</p>
+        <p class="text-headline-md text-on-surface">{% if bonus %}Edit bonus{% else %}Record bonus{% endif %}</p>
         <p class="text-body-sm text-on-surface-variant mt-1">Approved bonuses are included in the employee's next payroll calculation.</p>
         <hr class="border-outline-variant my-4">
         {% if form.non_field_errors %}
@@ -23,14 +23,20 @@
         {% endif %}
         <form method="post" novalidate>
             {% csrf_token %}
-            {% include "components/field.html" with field=form.employee %}
-            {% include "components/field.html" with field=form.bonus_type %}
-            {% include "components/field.html" with field=form.amount %}
-            {% include "components/field.html" with field=form.effective_date %}
+            <div class="grid grid-cols-1 gap-x-6 md:grid-cols-2">
+                <div>
+                    {% include "components/field.html" with field=form.employee %}
+                    {% include "components/field.html" with field=form.bonus_type %}
+                </div>
+                <div>
+                    {% include "components/field.html" with field=form.amount %}
+                    {% include "components/field.html" with field=form.effective_date %}
+                </div>
+            </div>
             {% include "components/field.html" with field=form.description %}
             <div class="flex justify-end gap-2 mt-2">
                 <a href="{% url 'payroll:bonus-list' %}" class="btn-secondary">Cancel</a>
-                <button type="submit" class="btn-primary">Save bonus</button>
+                <button type="submit" class="btn-primary">{% if bonus %}Save changes{% else %}Save bonus{% endif %}</button>
             </div>
         </form>
     </div>

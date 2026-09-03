@@ -113,7 +113,7 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-5 h-5 shrink-0" aria-hidden="true"><path d="M5 4h14v17H5zM8 2v4M16 2v4M9 12l6 6M15 12l-6 6"/></svg>
                         <span class="sidebar-nav-text">{% if request.user|has_group:"Admin,HR Manager,Payroll Officer" %}Leave Requests{% else %}My Leave Requests{% endif %}</span>
                     </a>
-                    {% if request.user|has_group:"Admin,HR Manager" %}
+                    {% if request.user|has_group:"Admin,HR Manager,Payroll Officer" %}
                     <a href="{% url 'attendance:leave_approval_list' %}" class="sidebar-link flex items-center gap-3 rounded px-3 py-2 text-body-md text-on-primary-container hover:bg-primary-container">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-5 h-5 shrink-0" aria-hidden="true"><path d="M5 4h14v17H5zM8 12l3 3 5-6"/></svg><span class="sidebar-nav-text">Leave Approval</span>
                     </a>

@@ -51,7 +51,7 @@ def masked_account(value):
 
 @register.filter
 def in_groups(user, group_names):
-    """Group membership or superuser access, mirroring
+    """Strict group membership with no staff or superuser shortcut, mirroring
     employees.views.HRManagementRequiredMixin's allowed_groups check exactly.
     Used to hide the Edit/Deactivate/Terminate actions on the employee
     profile header from anyone those views would actually 403 (including
@@ -60,9 +60,6 @@ def in_groups(user, group_names):
 
     if not getattr(user, "is_authenticated", False):
         return False
-
-    if user.is_superuser:
-        return True
 
     names = [name.strip() for name in group_names.split(",")]
 

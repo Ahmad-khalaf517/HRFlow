@@ -1,3 +1,4 @@
+from datetime import date
 from functools import wraps
 
 from django.contrib import messages
@@ -42,7 +43,9 @@ def require_payroll_manager(view_func):
 @require_payroll_manager
 def bonus_list(request):
     bonuses = Bonus.objects.select_related("employee").all()
-    return render(request, "payroll/bonus_list.html", {"bonuses": bonuses})
+    return render(
+        request, "payroll/bonus_list.html", {"bonuses": bonuses, "today": date.today()}
+    )
 
 
 @require_payroll_manager
@@ -58,12 +61,34 @@ def bonus_create(request):
 
 
 @require_payroll_manager
+def bonus_update(request, pk):
+    bonus = get_object_or_404(Bonus, pk=pk)
+    if bonus.effective_date < date.today():
+        messages.error(
+            request, "This bonus's effective date has passed and can no longer be edited."
+        )
+        return redirect("payroll:bonus-list")
+
+    form = BonusForm(request.POST or None, instance=bonus)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Bonus updated.")
+        return redirect("payroll:bonus-list")
+    return render(request, "payroll/bonus_form.html", {"form": form, "bonus": bonus})
+
+
+@require_payroll_manager
 def bonus_cancel(request, pk):
     if request.method == "POST":
         bonus = get_object_or_404(Bonus, pk=pk)
-        bonus.status = "cancelled"
-        bonus.save(update_fields=["status"])
-        messages.success(request, "Bonus cancelled.")
+        if bonus.effective_date < date.today():
+            messages.error(
+                request, "This bonus's effective date has passed and can no longer be cancelled."
+            )
+        else:
+            bonus.status = "cancelled"
+            bonus.save(update_fields=["status"])
+            messages.success(request, "Bonus cancelled.")
     return redirect("payroll:bonus-list")
 
 

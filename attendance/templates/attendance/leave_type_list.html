@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load employees_extras %}
 
 {% block title %}Leave Types · HRFlow{% endblock %}
 
@@ -13,7 +14,9 @@
             <p class="text-label-caps text-on-surface-variant">Policy</p>
             <p class="text-body-md text-on-surface-variant">Manage the leave categories available in the system.</p>
         </div>
-        <a href="{% url 'attendance:leave_type_create' %}" class="btn-primary">Create Leave Type</a>
+        {% if request.user|has_group:"Admin,HR Manager" %}
+            <a href="{% url 'attendance:leave_type_create' %}" class="btn-primary">Create Leave Type</a>
+        {% endif %}
     </div>
 
     {% if leave_types %}
@@ -57,7 +60,11 @@
                                     {% endif %}
                                 </td>
                                 <td class="px-4 py-3">
-                                    <a href="{% url 'attendance:leave_type_update' leave_type.pk %}" class="btn-secondary">Edit</a>
+                                    {% if request.user|has_group:"Admin,HR Manager" %}
+                                        <a href="{% url 'attendance:leave_type_update' leave_type.pk %}" class="btn-secondary">Edit</a>
+                                    {% else %}
+                                        <span class="text-body-sm text-on-surface-variant">&mdash;</span>
+                                    {% endif %}
                                 </td>
                             </tr>
                         {% endfor %}
@@ -69,7 +76,9 @@
         <div class="card max-w-xl">
             <h2 class="text-headline-md text-on-surface mb-2">No leave types</h2>
             <p class="text-body-md text-on-surface-variant mb-4">Create the first leave category to start processing requests.</p>
-            <a href="{% url 'attendance:leave_type_create' %}" class="btn-primary">Create Leave Type</a>
+            {% if request.user|has_group:"Admin,HR Manager" %}
+                <a href="{% url 'attendance:leave_type_create' %}" class="btn-primary">Create Leave Type</a>
+            {% endif %}
         </div>
     {% endif %}
 </div>

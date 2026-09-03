@@ -25,7 +25,10 @@ class SharedInterfaceTests(TestCase):
         self.client.force_login(user)
         response = self.client.get(reverse("home"))
         self.assertContains(response, f'href="{reverse("attendance:leave_request_list")}"')
-        self.assertNotContains(response, f'href="{reverse("attendance:leave_approval_list")}"')
+        self.assertContains(response, f'href="{reverse("attendance:leave_approval_list")}"')
+        approval = self.client.get(reverse("attendance:leave_approval_list"))
+        self.assertEqual(approval.status_code, 200)
+        self.assertNotContains(approval, 'type="submit">Approve')
 
     def test_invalid_staff_form_has_error_summary(self):
         user = User.objects.create_user("demo-admin")
