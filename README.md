@@ -12,24 +12,29 @@ This repository is an MVP foundation, not a production payroll or legal-complian
 
 Implemented:
 
-- Django authentication, login/logout, session handling, and four seeded role groups;
+- Django authentication, login/logout, session handling, four seeded role groups, and guarded
+  HR/Payroll staff provisioning;
 - Supabase-hosted PostgreSQL through Django's ORM;
-- all current domain models and initial migrations;
+- employee, department, position, and contract screens with employee-login provisioning;
+- attendance hour calculation, own-record access, leave submission, and guarded leave decisions;
+- bonus, deduction, tax, monthly payroll calculation/review/approval, immutable snapshot guards,
+  and role-scoped payslip screens;
+- all current domain models and migrations;
 - Django Admin registrations for domain models;
-- the authenticated dashboard shell;
+- role-aware dashboards and object-scoped domain access;
 - the shared Tailwind CSS design system and compiled stylesheet;
-- initial authentication and database-constraint tests.
+- authentication, constraint, authorization, workflow, snapshot, and flow-audit tests.
 
 Not implemented yet:
 
-- custom employee and contract screens;
-- attendance calculation and leave workflow services;
-- payroll calculation and guarded status-transition services;
-- object-level role enforcement across domain views;
-- employee payslip and payment workflows;
-- complete synthetic fixtures and an end-to-end demo.
+- the custom one-full-payment workflow and automatic transition from Approved to Paid;
+- forced initial-password rotation, password reset, and full user/role lifecycle management;
+- a unified Django permission assignment/object-permission policy across every interface;
+- HR Manager's undefined "Limited" payslip access;
+- production security, legal payroll compliance, and use with real HR/payroll data.
 
-Payroll calculation work is blocked by pending decisions Q-002 through Q-004 in `docs/business-rules.md`.
+Q-002 through Q-004 were confirmed on 2026-09-01. Formal synthetic/demo product-scope decision
+Q-001 remains Pending; repository security policy still requires synthetic data.
 
 ## Technology
 
@@ -118,6 +123,8 @@ For a teammate handoff, share `TEAM_CONTEXT.md`; it is self-contained. Repositor
 5. `docs/delivery-plan.md` — current implementation status, three-person sequence, ownership, and cut line.
 6. `docs/security-and-data-policy.md` — synthetic-data and credential-handling requirements.
 7. `docs/task-brief-template.md` — required scope/acceptance template for one change.
+8. `docs/feature-handbook.md` — feature logic, models, workflows, validations, user flows, and
+   implemented role-based access control.
 
 The Django migrations are the only executable schema source of truth. Do not maintain or run a parallel SQL schema.
 
