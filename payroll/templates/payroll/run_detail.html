@@ -16,6 +16,9 @@
 
     {% include "payroll/_lifecycle_stepper.html" with current_step=run.lifecycle_step %}
 
+    {% if has_demo_facts %}<p class="rounded border border-outline-variant bg-surface-container-low p-4 text-body-sm">This historical run used demo attendance totals. Approved snapshots remain unchanged.</p>{% endif %}
+    {% if run.status == 'reviewed' %}<h2 class="text-headline-lg">Final review and confirmation</h2>{% endif %}
+    <p class="text-body-md">{{ employee_count }} employees · Total tax: <span class="text-data-mono">{{ run.currency_code }} {{ total_tax|default_if_none:"0.00"|floatformat:2 }}</span></p>
     <!-- Totals -->
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div class="card">
@@ -23,28 +26,28 @@
                 <p class="text-label-caps text-on-surface-variant">Total gross</p>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-outline"><path d="M3 7.5A1.5 1.5 0 0 1 4.5 6h13A1.5 1.5 0 0 1 19 7.5v10a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 3 17.5z"/><path d="M15.5 12.5h3.5a1.5 1.5 0 0 1 1.5 1.5v1a1.5 1.5 0 0 1-1.5 1.5h-3.5a2 2 0 0 1 0-4Z"/></svg>
             </div>
-            <p class="text-display text-on-surface mt-2 text-data-mono">${{ run.total_gross }}</p>
+            <p class="font-mono text-2xl font-semibold text-on-surface mt-2">${{ run.total_gross }}</p>
         </div>
         <div class="card">
             <div class="flex items-center justify-between">
                 <p class="text-label-caps text-on-surface-variant">Total deductions</p>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-outline"><path d="M12 3.5v13M12 16.5l-4.5-4.5M12 16.5l4.5-4.5"/><path d="M4.5 20.5h15"/></svg>
             </div>
-            <p class="text-display text-on-surface mt-2 text-data-mono">${{ run.total_deductions }}</p>
+            <p class="font-mono text-2xl font-semibold text-on-surface mt-2">${{ run.total_deductions }}</p>
         </div>
-        <div class="card">
+        <div class="rounded bg-primary p-6 text-on-primary">
             <div class="flex items-center justify-between">
-                <p class="text-label-caps text-on-surface-variant">Total net</p>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-outline"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v8M9.5 10a2.5 2 0 0 1 2.5-1.5c1.4 0 2.5.8 2.5 1.8 0 2.2-5 1.2-5 3.4 0 1 1.1 1.8 2.5 1.8s2.5-.6 2.5-1.5"/></svg>
+                <p class="text-label-caps text-on-primary-container">Total net</p>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-on-primary-container"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v8M9.5 10a2.5 2 0 0 1 2.5-1.5c1.4 0 2.5.8 2.5 1.8 0 2.2-5 1.2-5 3.4 0 1 1.1 1.8 2.5 1.8s2.5-.6 2.5-1.5"/></svg>
             </div>
-            <p class="text-display text-on-surface mt-2 text-data-mono">${{ run.total_net }}</p>
+            <p class="font-mono text-2xl font-semibold text-on-primary mt-2">${{ run.total_net }}</p>
         </div>
     </div>
 
     <!-- Approval chain -->
     <div class="card">
         <h2 class="text-headline-md text-on-surface mb-4">Approval chain</h2>
-        <ol class="space-y-4">
+        <ol class="grid gap-4 md:grid-cols-3">
             <li class="flex items-start gap-3">
                 <span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-secondary-container text-on-secondary-container">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5"><path d="M20 6 9 17l-5-5"/></svg>
@@ -118,13 +121,19 @@
         </form>
         {% endif %}
         {% if run.status == "reviewed" %}
-        <form method="post" action="{% url 'payroll:run-approve' run.pk %}">
+        <form method="post" action="{% url 'payroll:run-approve' run.pk %}" onsubmit="return confirm('Approve this payroll? Its saved calculations will be locked.');">
             {% csrf_token %}
             <button type="submit" class="btn-primary">Approve</button>
         </form>
         {% endif %}
     </div>
 
+    <h2 class="text-headline-md">Employee breakdown</h2>
+    <p class="text-body-sm text-on-surface-variant">Summary totals cover the full payroll run. Filters apply to the breakdown below.</p>
+    <form method="get" class="card" novalidate>
+    <div class="grid gap-x-4 sm:grid-cols-2 lg:grid-cols-3">{% for field in form %}{% include "components/field.html" %}{% endfor %}</div>
+    <div class="flex flex-wrap gap-2"><button class="btn-primary" type="submit">Filter</button><a class="btn-ghost" href="{{ request.path }}">Clear filters</a></div>
+</form>
     <!-- Items -->
     <div class="card p-0 overflow-x-auto">
         <table class="w-full text-left">
@@ -147,7 +156,7 @@
                 {% for item in items %}
                 <tr class="even:bg-surface-container-low">
                     <td class="px-3 py-3 text-body-md text-on-surface">
-                        {{ item.employee }}
+                        {{ item.employee_name_snapshot|default:item.employee }}<span class="mt-1 block text-data-mono text-on-surface-variant">{{ item.employee_number_snapshot }}</span>
                         {% if item.payslip_available %}
                         <a href="{% url 'payroll:payslip-detail' item.pk %}" class="mt-1 block text-body-sm text-secondary underline">View payslip</a>
                         {% elif run.status == 'approved' or run.status == 'paid' %}
@@ -166,10 +175,11 @@
                     <td class="px-3 py-3 text-data-mono text-on-surface font-semibold">${{ item.net_salary }}</td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="11" class="px-3 py-6 text-center text-body-md text-on-surface-variant">Not calculated yet.</td></tr>
+                <tr><td colspan="11" class="px-3 py-6 text-center text-body-md text-on-surface-variant">{% if run.status == "draft" %}Not calculated yet.{% else %}No employees match this view.{% endif %}</td></tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
+    {% include "components/pagination.html" %}
 </div>
 {% endblock %}

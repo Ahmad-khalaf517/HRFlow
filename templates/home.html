@@ -13,7 +13,7 @@
         <p class="mt-1 text-body-md text-on-surface-variant">{{ dashboard_intro }}</p>
     </div>
 
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 {% if stats|length == 3 %}lg:grid-cols-3{% else %}lg:grid-cols-4{% endif %}">
         {% for stat in stats %}
         <div class="card">
             <p class="text-label-caps text-on-surface-variant">{{ stat.label }}</p>
@@ -22,6 +22,7 @@
         {% endfor %}
     </div>
 
+    {% if show_payroll_cycle %}{% include "components/payroll_cycle.html" %}{% endif %}
     {% if quick_links %}
     <div>
         <h2 class="mb-3 text-headline-md text-on-surface">Quick access</h2>

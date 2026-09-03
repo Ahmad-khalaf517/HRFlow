@@ -243,6 +243,11 @@
     .payslip-breakdown {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+    .payslip-net {
+        background: white !important;
+        color: black !important;
+        border: 1px solid black;
+    }
 }
 
 .input-error { border-color: var(--color-error); }

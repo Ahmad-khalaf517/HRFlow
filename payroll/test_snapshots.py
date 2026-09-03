@@ -62,7 +62,7 @@ class SnapshotTests(TestCase):
         self.assertEqual(item.employee_name_snapshot, "Demo Employee")
         self.assertEqual(item.employee_number_snapshot, "EMP-SNAPSHOT")
         self.assertEqual(item.currency_code, "USD")
-        self.assertEqual(item.calculation_version, "mvp-1")
+        self.assertEqual(item.calculation_version, "mvp-2")
         self.assertEqual(item.contract_id, self.contract.pk)
         self.assertEqual(item.calculation_inputs["contract"]["working_hours_per_day"], "8.00")
         self.assertEqual(Decimal(item.calculation_inputs["hourly_rate"]), Decimal("12.5"))

@@ -16,11 +16,7 @@
         <p class="text-headline-md text-on-surface">Add tax bracket</p>
         <p class="text-body-sm text-on-surface-variant mt-1">Demonstrative only — not a legally compliant tax engine.</p>
         <hr class="border-outline-variant my-4">
-        {% if form.non_field_errors %}
-            <div class="mb-4 rounded border border-error bg-error-container px-3 py-2 text-body-sm text-on-error-container">
-                {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
-            </div>
-        {% endif %}
+
         <form method="post" novalidate>
             {% csrf_token %}
             {% include "components/field.html" with field=form.name %}

@@ -11,16 +11,13 @@
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M15 5l-7 7 7 7"/></svg>
     Back to payroll
 </a>
-<div class="max-w-sm">
+<div class="mx-auto max-w-2xl space-y-5">
+{% include "payroll/_lifecycle_stepper.html" with current_step=0 %}
     <div class="card">
         <p class="text-headline-md text-on-surface">Initialize payroll run</p>
-        <p class="text-body-sm text-on-surface-variant mt-1">Select the pay period to begin calculations.</p>
+        <p class="text-body-sm text-on-surface-variant mt-1">Select the pay period. All active employees with an active contract are included when you calculate this run.</p>
         <hr class="border-outline-variant my-4">
-        {% if form.non_field_errors %}
-            <div class="mb-4 rounded border border-error bg-error-container px-3 py-2 text-body-sm text-on-error-container">
-                {% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}
-            </div>
-        {% endif %}
+
         <form method="post" novalidate>
             {% csrf_token %}
             {% include "components/field.html" with field=form.month %}

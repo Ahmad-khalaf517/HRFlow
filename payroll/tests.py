@@ -22,7 +22,7 @@ from .services import (
 
 
 def patch_attendance_facts(overtime=Decimal("0"), absence=Decimal("0"), unpaid_leave=Decimal("0")):
-    """Patch the three mocked attendance-fact functions payroll.services imports.
+    """Patch the three public attendance-fact functions payroll.services imports.
 
     Each fact defaults to 0 so a test only needs to pass the ones it cares about.
     Returns a 3-tuple of unstarted patchers to use as `with p1, p2, p3:`.
@@ -86,6 +86,7 @@ class PayrollCalculationTests(TestCase):
 
     def setUp(self):
         self.officer = User.objects.create_user(username="calc_officer", password="testpass123")
+        self.officer.groups.add(Group.objects.get(name="Payroll Officer"))
         self.employee = Employee.objects.create(
             employee_number="EMP-CALC-1",
             first_name="Grace",

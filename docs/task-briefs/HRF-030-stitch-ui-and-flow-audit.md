@@ -111,3 +111,21 @@ Only sanitized findings and reproducible tests belong in the repository.
   leave submission (2 weekdays), approval, success feedback and approved table.
 - Targeted suite: 37 attendance tests and 12 subtests passed. PostgreSQL concurrency
   is not verified by the isolated SQLite suite; no shared database was accessed.
+
+### Step 4 — payroll lifecycle and payslips
+
+- Payroll calculation now consumes the public attendance fact services and records
+  calculation version `mvp-2`; historical `mvp-1` runs retain an explicit legacy
+  input notice. Approved payroll and payslip snapshots remain immutable.
+- Added validated run, breakdown and payslip filters with scoped counts and paging;
+  invalid filter values return an empty result rather than silently broadening data.
+- Aligned run creation, calculation, review, approval and payslip layouts with the
+  reference lifecycle, summary cards, tax totals, actor trace and locked-state cues.
+- Replaced illustrative dashboard payroll figures with the current stored cycle and
+  aggregate values. Manager payslip search is limited to Admin and Payroll Officer;
+  employees retain their existing self-only view.
+- Browser exercised duplicate-period rejection, October creation, calculation from
+  recorded attendance and approved unpaid leave, review, approval lock, current-cycle
+  dashboard, payslip search/detail and the 390px layout using synthetic records.
+- Targeted suite: 90 payroll/account tests and 51 subtests passed. Ruff passed for
+  changed Python, compiled CSS was rebuilt and `git diff --check` passed.

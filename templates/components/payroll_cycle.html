@@ -1,0 +1,19 @@
+<section aria-labelledby="cycle-heading" class="space-y-4">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+        <h2 id="cycle-heading" class="text-headline-md">Current payroll cycle</h2>
+        {% if current_payroll %}{% include "payroll/_status_badge.html" with status=current_payroll.status %}{% endif %}
+    </div>
+    {% if current_payroll %}
+    <div class="grid gap-4 lg:grid-cols-3">
+        <div class="card"><p class="text-label-caps text-on-surface-variant">Gross payroll · {{ current_payroll.currency_code }}</p><p class="mt-3 font-mono text-2xl font-semibold">{{ current_payroll.total_gross }}</p></div>
+        <div class="card"><p class="text-label-caps text-on-surface-variant">Total deductions · {{ current_payroll.currency_code }}</p><p class="mt-3 font-mono text-2xl font-semibold">{{ current_payroll.total_deductions }}</p></div>
+        <div class="rounded bg-primary p-6 text-on-primary"><p class="text-label-caps text-on-primary-container">Net payroll · {{ current_payroll.currency_code }}</p><p class="mt-3 font-mono text-2xl font-semibold">{{ current_payroll.total_net }}</p></div>
+    </div>
+    <div class="card flex flex-wrap items-center justify-between gap-4">
+        <div><h3 class="text-headline-md">{{ current_payroll.period_start|date:"F Y" }}</h3><p class="text-body-sm text-on-surface-variant">{{ current_payroll.period_start|date:"Y-m-d" }} – {{ current_payroll.period_end|date:"Y-m-d" }} · {{ cycle_employee_count }} employees calculated</p></div>
+        <a class="btn-primary" href="{% url 'payroll:run-detail' current_payroll.pk %}">{% if current_payroll.status == 'approved' or current_payroll.status == 'paid' %}View payroll{% else %}Continue payroll{% endif %}</a>
+    </div>
+    {% else %}
+    <div class="card flex flex-wrap items-center justify-between gap-3"><p class="text-body-md">No payroll run has been started for the current month.</p><a class="btn-primary" href="{% url 'payroll:run-create' %}">Create payroll run</a></div>
+    {% endif %}
+</section>

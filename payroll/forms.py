@@ -2,6 +2,8 @@ from datetime import date
 
 from django import forms
 
+from employees.models import Department
+
 from .models import Bonus, ManualDeduction, Payroll, TaxBracket
 
 # Explicit ISO format: the "type": "date" widget requires yyyy-mm-dd in its
@@ -9,9 +11,18 @@ from .models import Bonus, ManualDeduction, Payroll, TaxBracket
 DATE_INPUT = forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d")
 
 MONTH_CHOICES = [
-    (1, "January"), (2, "February"), (3, "March"), (4, "April"),
-    (5, "May"), (6, "June"), (7, "July"), (8, "August"),
-    (9, "September"), (10, "October"), (11, "November"), (12, "December"),
+    (1, "January"),
+    (2, "February"),
+    (3, "March"),
+    (4, "April"),
+    (5, "May"),
+    (6, "June"),
+    (7, "July"),
+    (8, "August"),
+    (9, "September"),
+    (10, "October"),
+    (11, "November"),
+    (12, "December"),
 ]
 
 
@@ -66,6 +77,12 @@ class TaxBracketForm(forms.ModelForm):
             "fixed_amount": forms.NumberInput(attrs={"step": "0.01", "min": "0"}),
         }
 
+    def clean_fixed_amount(self):
+        value = self.cleaned_data["fixed_amount"]
+        if value < 0:
+            raise forms.ValidationError("Fixed amount cannot be negative.")
+        return value
+
     def clean_min_amount(self):
         min_amount = self.cleaned_data.get("min_amount")
         if min_amount is not None and min_amount < 0:
@@ -83,9 +100,7 @@ class TaxBracketForm(forms.ModelForm):
         min_amount = cleaned.get("min_amount")
         max_amount = cleaned.get("max_amount")
         if min_amount is not None and max_amount is not None and max_amount < min_amount:
-            self.add_error(
-                "max_amount", "Max amount must be greater than or equal to min amount."
-            )
+            self.add_error("max_amount", "Max amount must be greater than or equal to min amount.")
         return cleaned
 
 
@@ -105,3 +120,35 @@ class PayrollRunForm(forms.Form):
         if month and year and Payroll.objects.filter(month=month, year=year).exists():
             raise forms.ValidationError(f"A payroll run already exists for {month:02d}/{year}.")
         return cleaned
+
+
+class PayrollFilterForm(forms.Form):
+    month = forms.TypedChoiceField(
+        required=False, choices=[("", "All months"), *MONTH_CHOICES], coerce=int, empty_value=None
+    )
+    year = forms.IntegerField(required=False, min_value=2000, max_value=2100)
+    status = forms.ChoiceField(
+        required=False, choices=[("", "All statuses"), *Payroll.STATUS_CHOICES]
+    )
+
+
+class BreakdownFilterForm(forms.Form):
+    search = forms.CharField(
+        required=False,
+        max_length=150,
+        label="Employee",
+        widget=forms.TextInput(attrs={"placeholder": "Name or employee ID"}),
+    )
+    department = forms.ModelChoiceField(
+        required=False,
+        queryset=Department.objects.order_by("name"),
+        label="Current department",
+        empty_label="All departments",
+    )
+
+
+class PayslipFilterForm(PayrollFilterForm, BreakdownFilterForm):
+    status = forms.ChoiceField(
+        required=False,
+        choices=[("", "All published periods"), ("approved", "Approved"), ("paid", "Paid")],
+    )

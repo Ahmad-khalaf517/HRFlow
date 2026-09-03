@@ -3,9 +3,9 @@ Usage: {% include "payroll/_lifecycle_stepper.html" with current_step=run.lifecy
 current_step: 0=Draft 1=Calculated 2=Reviewed 3=Approved 4=Paid
 Mirrors the Stitch "Payroll Lifecycle" stepper.
 {% endcomment %}
-<div class="card">
+<div class="card overflow-x-auto">
     <p class="text-label-caps text-on-surface-variant mb-4">Payroll lifecycle</p>
-    <div class="flex items-start">
+    <div class="flex min-w-96 items-start">
         <div class="flex flex-col items-center gap-2">
             <div class="w-9 h-9 rounded flex items-center justify-center border
                 {% if current_step > 0 %}bg-primary-container border-primary-container text-on-primary-container

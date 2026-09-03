@@ -15,13 +15,13 @@ from django.db.models import Q, Sum
 from django.utils import timezone
 
 from accounts.constants import EMPLOYEE_GROUP
-from employees.models import Employee
-
-from .attendance_facts import (
+from attendance.services import (
     get_absence_days,
     get_employee_overtime_hours,
     get_unpaid_leave_days,
 )
+from employees.models import Employee
+
 from .models import (
     LOCKED_PAYROLL_STATUSES,
     Bonus,
@@ -33,7 +33,7 @@ from .models import (
 
 TWO_PLACES = Decimal("0.01")
 OVERTIME_MULTIPLIER = Decimal("1.5")
-CALCULATION_VERSION = "mvp-1"
+CALCULATION_VERSION = "mvp-2"
 
 RECALCULATABLE_STATUSES = ("draft", "calculated")
 PAYROLL_MANAGER_GROUPS = ["Admin", "Payroll Officer"]
@@ -44,7 +44,7 @@ def _money(value: Decimal) -> Decimal:
 
 
 def user_in_groups(user, group_names) -> bool:
-    if not user.is_authenticated:
+    if not user.is_authenticated or not user.is_active:
         return False
     if user.is_superuser:
         return True
@@ -59,8 +59,14 @@ def published_payslip_items():
             payroll__status__in=LOCKED_PAYROLL_STATUSES,
             contract__isnull=False,
             calculation_inputs__has_keys=[
-                "contract", "period_start", "period_end", "daily_divisor",
-                "daily_rate", "hourly_rate", "overtime_multiplier", "tax",
+                "contract",
+                "period_start",
+                "period_end",
+                "daily_divisor",
+                "daily_rate",
+                "hourly_rate",
+                "overtime_multiplier",
+                "tax",
             ],
         )
         .exclude(calculation_version="")
@@ -103,6 +109,15 @@ def get_matching_tax_bracket(gross_salary: Decimal):
 
 
 def create_payroll_run(month: int, year: int, created_by) -> Payroll:
+    if not user_in_groups(created_by, PAYROLL_MANAGER_GROUPS):
+        raise PermissionDenied("Only Admin or Payroll Officer may create payroll.")
+    if (
+        not isinstance(month, int)
+        or not isinstance(year, int)
+        or not 1 <= month <= 12
+        or not 2000 <= year <= 2100
+    ):
+        raise ValidationError("Choose a valid month and a year from 2000 to 2100.")
     period_start = date(year, month, 1)
     period_end = date(year, month, monthrange(year, month)[1])
     try:
@@ -115,13 +130,13 @@ def create_payroll_run(month: int, year: int, created_by) -> Payroll:
                 created_by=created_by,
             )
     except IntegrityError as exc:
-        raise ValidationError(
-            f"A payroll run already exists for {month:02d}/{year}."
-        ) from exc
+        raise ValidationError(f"A payroll run already exists for {month:02d}/{year}.") from exc
 
 
 @transaction.atomic
 def calculate_payroll(payroll: Payroll, actor) -> Payroll:
+    if not user_in_groups(actor, PAYROLL_MANAGER_GROUPS):
+        raise PermissionDenied("Only Admin or Payroll Officer may calculate payroll.")
     # Lock and refresh before inspecting status; callers may hold stale model instances.
     Payroll.objects.select_for_update().get(pk=payroll.pk)
     payroll.refresh_from_db()
@@ -147,10 +162,16 @@ def calculate_payroll(payroll: Payroll, actor) -> Payroll:
             employee, payroll.period_start, payroll.period_end
         )
 
-        if any(value < 0 for value in (
-            contract.basic_salary, contract.allowances_default,
-            overtime_hours, absence_days, unpaid_leave_days,
-        )):
+        if any(
+            value < 0
+            for value in (
+                contract.basic_salary,
+                contract.allowances_default,
+                overtime_hours,
+                absence_days,
+                unpaid_leave_days,
+            )
+        ):
             raise ValidationError("Payroll inputs cannot be negative.")
         if contract.working_hours_per_day <= 0:
             raise ValidationError("Contract working hours must be greater than zero.")
@@ -229,8 +250,10 @@ def calculate_payroll(payroll: Payroll, actor) -> Payroll:
                         ),
                         "percentage": str(bracket.percentage),
                         "fixed_amount": str(bracket.fixed_amount),
-                    } if bracket else None,
-                    "attendance_source": "mock-attendance-v1",
+                    }
+                    if bracket
+                    else None,
+                    "attendance_source": "attendance-services-v1",
                 },
                 "basic_salary": contract.basic_salary,
                 "allowances": contract.allowances_default,
@@ -260,14 +283,14 @@ def calculate_payroll(payroll: Payroll, actor) -> Payroll:
     payroll.total_deductions = totals["total_deductions"] or Decimal("0.00")
     payroll.total_net = totals["total_net"] or Decimal("0.00")
     payroll.status = "calculated"
-    payroll.save(
-        update_fields=["total_gross", "total_deductions", "total_net", "status"]
-    )
+    payroll.save(update_fields=["total_gross", "total_deductions", "total_net", "status"])
     return payroll
 
 
 @transaction.atomic
 def mark_reviewed(payroll: Payroll, actor) -> Payroll:
+    if not user_in_groups(actor, PAYROLL_MANAGER_GROUPS):
+        raise PermissionDenied("Only Admin or Payroll Officer may review payroll.")
     Payroll.objects.select_for_update().get(pk=payroll.pk)
     payroll.refresh_from_db()
     if payroll.status != "calculated":

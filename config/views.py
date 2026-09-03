@@ -33,6 +33,7 @@ def dashboard(request):
     is_admin = ADMIN_GROUP in group_names
     is_hr_manager = HR_MANAGER_GROUP in group_names
     is_payroll_officer = PAYROLL_OFFICER_GROUP in group_names
+    current_payroll = None
 
     if is_admin:
         current_payroll = (
@@ -212,5 +213,8 @@ def dashboard(request):
             "dashboard_intro": dashboard_intro,
             "stats": stats,
             "quick_links": quick_links,
+            "show_payroll_cycle": is_admin or (is_payroll_officer and not is_hr_manager),
+            "current_payroll": current_payroll,
+            "cycle_employee_count": current_payroll.items.count() if current_payroll else 0,
         },
     )

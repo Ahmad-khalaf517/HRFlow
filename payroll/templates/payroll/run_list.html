@@ -9,7 +9,7 @@
 {% block content %}
 {% include "payroll/_nav.html" with active="runs" %}
 <div class="max-w-6xl space-y-4">
-    <div class="flex items-end justify-between">
+    <div class="flex flex-wrap items-end justify-between gap-3">
         <p class="text-body-md text-on-surface-variant">Manage, process, and review organization payroll cycles.</p>
         <a href="{% url 'payroll:run-create' %}" class="btn-primary">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M12 5v14M5 12h14"/></svg>
@@ -17,6 +17,11 @@
         </a>
     </div>
 
+    {% include "payroll/_lifecycle_stepper.html" %}
+    <form method="get" class="card" novalidate>
+    <div class="grid gap-x-4 sm:grid-cols-2 lg:grid-cols-3">{% for field in form %}{% include "components/field.html" %}{% endfor %}</div>
+    <div class="flex flex-wrap gap-2"><button class="btn-primary" type="submit">Filter</button><a class="btn-ghost" href="{{ request.path }}">Clear filters</a></div>
+</form>
     <div class="card p-0 overflow-x-auto">
         <table class="w-full text-left">
             <thead>
@@ -26,7 +31,7 @@
                     <th class="px-4 py-2 text-label-caps">Employees</th>
                     <th class="px-4 py-2 text-label-caps">Total gross (USD)</th>
                     <th class="px-4 py-2 text-label-caps">Total deductions (USD)</th>
-                    <th class="px-4 py-2 text-label-caps">Total net (USD)</th>
+                    <th class="px-4 py-2 text-label-caps">Tax (USD)</th><th class="px-4 py-2 text-label-caps">Total net (USD)</th>
                     <th class="px-4 py-2 text-label-caps">Created</th>
                     <th class="px-4 py-2 text-label-caps"></th>
                 </tr>
@@ -41,7 +46,7 @@
                     <td class="px-4 py-3 text-data-mono text-on-surface-variant">{{ run.item_count }}</td>
                     <td class="px-4 py-3 text-data-mono text-on-surface">${{ run.total_gross }}</td>
                     <td class="px-4 py-3 text-data-mono text-on-surface">${{ run.total_deductions }}</td>
-                    <td class="px-4 py-3 text-data-mono text-on-surface font-semibold">${{ run.total_net }}</td>
+                    <td class="px-4 py-3 text-data-mono">${{ run.total_tax|default_if_none:"0.00"|floatformat:2 }}</td><td class="px-4 py-3 text-data-mono text-on-surface font-semibold">${{ run.total_net }}</td>
                     <td class="px-4 py-3 text-body-sm text-on-surface-variant">{{ run.created_at|date:"M d, Y" }}</td>
                     <td class="px-4 py-3 text-right">
                         <a href="{% url 'payroll:run-detail' run.pk %}" class="inline-flex text-on-surface-variant hover:text-primary" aria-label="View payroll {{ run.month|stringformat:'02d' }}/{{ run.year }}">
@@ -50,10 +55,11 @@
                     </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="8" class="px-4 py-6 text-center text-body-md text-on-surface-variant">No payroll runs yet.</td></tr>
+                <tr><td colspan="9" class="px-4 py-6 text-center text-body-md text-on-surface-variant">No payroll runs yet.</td></tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
+    {% include "components/pagination.html" %}
 </div>
 {% endblock %}

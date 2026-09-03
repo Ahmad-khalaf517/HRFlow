@@ -8,6 +8,10 @@
 {% block content %}
 <div class="max-w-6xl space-y-4">
     <p class="text-body-md text-on-surface-variant">View payslips from approved payroll periods.</p>
+    <form method="get" class="card" novalidate>
+    <div class="grid gap-x-4 sm:grid-cols-2 lg:grid-cols-3">{% for field in form %}{% include "components/field.html" %}{% endfor %}</div>
+    <div class="flex flex-wrap gap-2"><button class="btn-primary" type="submit">Filter</button><a class="btn-ghost" href="{{ request.path }}">Clear filters</a></div>
+</form>
     <div class="card relative overflow-x-auto p-0">
         <table class="w-full text-left">
             <caption class="sr-only">{% if is_payroll_manager %}All available payslips{% else %}Your available payslips{% endif %}</caption>
@@ -15,7 +19,7 @@
                 <tr>
                     <th scope="col" class="px-4 py-3 text-label-caps">Period</th>
                     {% if is_payroll_manager %}<th scope="col" class="px-4 py-3 text-label-caps">Employee</th>{% endif %}
-                    <th scope="col" class="px-4 py-3 text-label-caps">Currency</th>
+                    <th scope="col" class="px-4 py-3 text-label-caps">Status</th><th scope="col" class="px-4 py-3 text-label-caps">Currency</th>
                     <th scope="col" class="px-4 py-3 text-label-caps text-right">Gross</th>
                     <th scope="col" class="px-4 py-3 text-label-caps text-right">Deductions</th>
                     <th scope="col" class="px-4 py-3 text-label-caps text-right">Net pay</th>
@@ -32,7 +36,7 @@
                         <p class="text-data-mono text-on-surface-variant">{{ item.employee_number_snapshot }}</p>
                     </td>
                     {% endif %}
-                    <td class="px-4 py-3 text-data-mono">{{ item.currency_code }}</td>
+                    <td class="px-4 py-3">{% include "payroll/_status_badge.html" with status=item.payroll.status %}</td><td class="px-4 py-3 text-data-mono">{{ item.currency_code }}</td>
                     <td class="px-4 py-3 text-data-mono text-right">{{ item.gross_salary|floatformat:2 }}</td>
                     <td class="px-4 py-3 text-data-mono text-right">{{ item.total_deductions|floatformat:2 }}</td>
                     <td class="px-4 py-3 text-data-mono text-right font-semibold">{{ item.net_salary|floatformat:2 }}</td>
@@ -41,17 +45,11 @@
                     </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="{% if is_payroll_manager %}7{% else %}6{% endif %}" class="px-4 py-8 text-center text-body-md text-on-surface-variant">No payslips available yet.</td></tr>
+                <tr><td colspan="{% if is_payroll_manager %}8{% else %}7{% endif %}" class="px-4 py-8 text-center text-body-md text-on-surface-variant">No payslips available yet.</td></tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
-    {% if page_obj.has_other_pages %}
-    <nav aria-label="Payslip pages" class="flex items-center gap-3 text-body-md">
-        {% if page_obj.has_previous %}<a class="btn-secondary" href="?page={{ page_obj.previous_page_number }}">Previous</a>{% endif %}
-        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
-        {% if page_obj.has_next %}<a class="btn-secondary" href="?page={{ page_obj.next_page_number }}">Next</a>{% endif %}
-    </nav>
-    {% endif %}
+    {% include "components/pagination.html" %}
 </div>
 {% endblock %}
