@@ -28,7 +28,7 @@ def has_group(user, group_names):
     if not getattr(user, "is_authenticated", False):
         return False
 
-    if user.is_staff:
+    if user.is_superuser:
         return True
 
     names = [name.strip() for name in group_names.split(",")]
@@ -36,9 +36,22 @@ def has_group(user, group_names):
     return user.groups.filter(name__in=names).exists()
 
 
+@register.simple_tag(takes_context=True)
+def page_url(context, page):
+    """Preserve every active list filter when moving between pages."""
+    query = context["request"].GET.copy()
+    query["page"] = page
+    return "?" + query.urlencode()
+
+
+@register.filter
+def masked_account(value):
+    return "•••• " + str(value)[-4:] if value else "—"
+
+
 @register.filter
 def in_groups(user, group_names):
-    """Strict group-membership check with no is_staff shortcut, mirroring
+    """Group membership or superuser access, mirroring
     employees.views.HRManagementRequiredMixin's allowed_groups check exactly.
     Used to hide the Edit/Deactivate/Terminate actions on the employee
     profile header from anyone those views would actually 403 (including
@@ -47,6 +60,9 @@ def in_groups(user, group_names):
 
     if not getattr(user, "is_authenticated", False):
         return False
+
+    if user.is_superuser:
+        return True
 
     names = [name.strip() for name in group_names.split(",")]
 

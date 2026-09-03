@@ -18,7 +18,7 @@ Contract Details
 
     <div class="text-sm text-on-surface-variant">
 
-        <a href="{% url 'employees:employee-list' %}" class="hover:underline">Employees</a>
+        {% if request.user|has_group:"Admin,HR Manager,Payroll Officer" %}<a href="{% url 'employees:employee-list' %}" class="hover:underline">Employees</a>{% else %}My profile{% endif %}
         <span class="mx-2">/</span>
         <a href="{% url 'employees:employee-detail' contract.employee.pk %}" class="hover:underline">{{ contract.employee.first_name }} {{ contract.employee.last_name }}</a>
         <span class="mx-2">/</span>
@@ -29,15 +29,15 @@ Contract Details
 
     <!-- HEADER -->
 
-    <div class="flex items-center justify-between">
+    <div class="flex flex-wrap items-center justify-between gap-3">
 
         <div>
 
             <div class="flex items-center gap-3">
 
-                <h1 class="text-headline-lg text-on-surface">
+                <h2 class="text-headline-lg text-on-surface">
                     {{ contract.get_status_display }} Contract
-                </h1>
+                </h2>
 
                 {% include "employees/_status_badge.html" with status=contract.status %}
 
@@ -53,10 +53,10 @@ Contract Details
         <div class="flex gap-3">
 
             <a
-                href="{% url 'employees:contract-list' %}"
+                href="{% url 'employees:employee-contract-tab' contract.employee.pk %}"
                 class="rounded border border-outline-variant px-4 py-2 text-body-md text-on-surface"
             >
-                Back to Contracts
+                Contract History
             </a>
 
             {% if request.user|in_groups:"Admin,HR Manager" %}
@@ -77,7 +77,7 @@ Contract Details
 
     <!-- SALARY + PARTICULARS -->
 
-    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-[1fr_2fr]">
 
         <!-- SALARY -->
 
@@ -91,17 +91,17 @@ Contract Details
 
             <div class="mt-6 space-y-3 border-t border-outline-variant pt-4">
 
-                <div class="flex items-center justify-between">
+                <div class="flex flex-wrap items-center justify-between gap-3">
                     <p class="text-body-sm text-on-surface-variant">Default Allowances</p>
                     <p class="text-body-md text-data-mono text-on-surface">${{ contract.allowances_default }}</p>
                 </div>
 
-                <div class="flex items-center justify-between">
+                <div class="flex flex-wrap items-center justify-between gap-3">
                     <p class="text-body-sm text-on-surface-variant">Payment Frequency</p>
                     <p class="text-body-md text-on-surface">Monthly</p>
                 </div>
 
-                <div class="flex items-center justify-between">
+                <div class="flex flex-wrap items-center justify-between gap-3">
                     <p class="text-body-sm text-on-surface-variant">Currency</p>
                     <p class="text-body-md text-on-surface">USD</p>
                 </div>
@@ -186,7 +186,7 @@ Contract Details
                     {% if contract.end_date %}
                         <span class="badge bg-surface-container text-on-surface-variant mt-1">{{ contract.end_date|date:"M d, Y" }}</span>
                     {% else %}
-                        <span class="badge bg-surface-container text-on-surface-variant mt-1">Present</span>
+                        <span class="badge bg-surface-container text-on-surface-variant mt-1">Indefinite</span>
                     {% endif %}
                 </div>
 

@@ -131,10 +131,10 @@
 
                     {% for department in departments %}
 
-                        <tr class="border-b border-outline-variant last:border-b-0">
+                        <tr class="border-b border-outline-variant last:border-b-0 even:bg-surface-container-low">
 
                             <!-- Department -->
-                            <td class="px-5 py-4">
+                            <td class="px-4 py-3">
 
                                 <a
                                     href="{% url 'employees:department-detail' department.pk %}"
@@ -155,7 +155,7 @@
 
 
                             <!-- Manager -->
-                            <td class="px-5 py-4 text-body-md text-on-surface">
+                            <td class="px-4 py-3 text-body-md text-on-surface">
 
                                 {% if department.manager %}
 
@@ -174,7 +174,7 @@
 
 
                             <!-- Employee Count -->
-                            <td class="px-5 py-4 text-data-mono text-on-surface">
+                            <td class="px-4 py-3 text-data-mono text-on-surface">
 
                                 {{ department.employees.count }}
 
@@ -182,7 +182,7 @@
 
 
                             <!-- Status -->
-                            <td class="px-5 py-4">
+                            <td class="px-4 py-3">
 
                                 {% include "employees/_active_badge.html" with is_active=department.is_active %}
 
@@ -190,7 +190,7 @@
 
 
                             <!-- Actions -->
-                            <td class="px-5 py-4">
+                            <td class="px-4 py-3">
 
                                 <div class="flex justify-end gap-3">
 
@@ -266,7 +266,7 @@
 
     {% if is_paginated %}
 
-        <div class="flex items-center justify-between">
+        <div class="flex flex-wrap items-center justify-between gap-3">
 
             <div class="text-sm text-on-surface-variant">
 
@@ -281,7 +281,7 @@
                 {% if page_obj.has_previous %}
 
                     <a
-                        href="?page={{ page_obj.previous_page_number }}&search={{ request.GET.search }}&status={{ request.GET.status }}"
+                        href="{% page_url page_obj.previous_page_number %}&search={{ request.GET.search }}&status={{ request.GET.status }}"
                         class="rounded border border-outline-variant px-3 py-2 text-sm text-on-surface"
                     >
                         Previous
@@ -293,7 +293,7 @@
                 {% if page_obj.has_next %}
 
                     <a
-                        href="?page={{ page_obj.next_page_number }}&search={{ request.GET.search }}&status={{ request.GET.status }}"
+                        href="{% page_url page_obj.next_page_number %}&search={{ request.GET.search }}&status={{ request.GET.status }}"
                         class="rounded border border-outline-variant px-3 py-2 text-sm text-on-surface"
                     >
                         Next

@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import ValidationError
-from django.db.models import Q
+from django.db.models import Prefetch, Q
 from django.http import Http404, HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
@@ -17,6 +17,7 @@ from django.views.generic import (
 from .forms import (
     ContractForm,
     DepartmentForm,
+    EmployeeFilterForm,
     EmployeeForm,
     PositionForm,
 )
@@ -45,7 +46,7 @@ class HRManagementRequiredMixin(LoginRequiredMixin):
         if not request.user.is_authenticated:
             return super().dispatch(request, *args, **kwargs)
 
-        if not request.user.groups.filter(
+        if not request.user.is_superuser and not request.user.groups.filter(
             name__in=self.allowed_groups
         ).exists():
 
@@ -68,7 +69,7 @@ def _has_employee_view_access(user):
     """
 
     return user.is_authenticated and (
-        user.is_staff
+        user.is_superuser
         or user.groups.filter(
             name__in=["Admin", "HR Manager", "Payroll Officer"]
         ).exists()
@@ -249,71 +250,32 @@ class EmployeeListView(EmployeeViewAccessRequiredMixin, ListView):
     paginate_by = 10
 
     def get_queryset(self):
-
-        queryset = Employee.objects.select_related(
-            "department",
-            "position",
-        ).all()
-
-        search = self.request.GET.get(
-            "search",
-            ""
-        ).strip()
-
-        department_id = self.request.GET.get(
-            "department",
-            ""
-        ).strip()
-
-        status = self.request.GET.get(
-            "status",
-            ""
-        ).strip()
-
-        # Search employee number, name, or email.
-        if search:
-
+        self.filter_form = EmployeeFilterForm(self.request.GET)
+        queryset = Employee.objects.select_related("department", "position").prefetch_related(
+            Prefetch("contracts", queryset=Contract.objects.filter(status="active"),
+                     to_attr="active_contracts")
+        ).order_by("last_name", "first_name", "pk")
+        if not self.filter_form.is_valid():
+            return queryset.none()
+        filters = self.filter_form.cleaned_data
+        if filters["search"]:
+            search = filters["search"]
             queryset = queryset.filter(
-
-                Q(employee_number__icontains=search)
-                | Q(first_name__icontains=search)
-                | Q(last_name__icontains=search)
-                | Q(email__icontains=search)
-
+                Q(employee_number__icontains=search) | Q(first_name__icontains=search)
+                | Q(last_name__icontains=search) | Q(email__icontains=search)
             )
-
-        # Filter by department.
-        if department_id.isdigit():
-
-            queryset = queryset.filter(
-                department_id=department_id
-            )
-
-        # Filter by employment status.
-        if status:
-
-            queryset = queryset.filter(
-                employment_status=status
-            )
-
+        if filters["department"]:
+            queryset = queryset.filter(department=filters["department"])
+        if filters["status"]:
+            queryset = queryset.filter(employment_status=filters["status"])
+        if filters["contract_type"]:
+            queryset = queryset.filter(contracts__status="active",
+                                       contracts__contract_type=filters["contract_type"])
         return queryset
 
     def get_context_data(self, **kwargs):
-
-        context = super().get_context_data(
-            **kwargs
-        )
-
-        context["departments"] = Department.objects.filter(
-            is_active=True
-        ).order_by(
-            "name"
-        )
-
-        context["status_choices"] = (
-            Employee.EMPLOYMENT_STATUS_CHOICES
-        )
-
+        context = super().get_context_data(**kwargs)
+        context["filter_form"] = self.filter_form
         return context
 
 
@@ -624,7 +586,7 @@ class PositionListView(LoginRequiredMixin, ListView):
             )
 
         # Filter by department.
-        if department_id.isdigit():
+        if department_id.isascii() and department_id.isdigit() and len(department_id) <= 18:
 
             queryset = queryset.filter(
                 department_id=department_id

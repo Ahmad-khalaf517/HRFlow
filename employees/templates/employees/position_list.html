@@ -15,7 +15,7 @@ Positions
 
     <!-- HEADER -->
 
-    <div class="flex items-center justify-between">
+    <div class="flex flex-wrap items-center justify-between gap-3">
 
         <div>
 
@@ -172,27 +172,27 @@ Positions
 
                     <tr>
 
-                        <th class="px-5 py-4 text-left text-label-caps">
+                        <th class="px-4 py-3 text-left text-label-caps">
                             Position
                         </th>
 
-                        <th class="px-5 py-4 text-left text-label-caps">
+                        <th class="px-4 py-3 text-left text-label-caps">
                             Department
                         </th>
 
-                        <th class="px-5 py-4 text-left text-label-caps">
+                        <th class="px-4 py-3 text-left text-label-caps">
                             Code
                         </th>
 
-                        <th class="px-5 py-4 text-left text-label-caps">
+                        <th class="px-4 py-3 text-left text-label-caps">
                             Salary Range
                         </th>
 
-                        <th class="px-5 py-4 text-left text-label-caps">
+                        <th class="px-4 py-3 text-left text-label-caps">
                             Status
                         </th>
 
-                        <th class="px-5 py-4 text-right text-label-caps">
+                        <th class="px-4 py-3 text-right text-label-caps">
                             Actions
                         </th>
 
@@ -209,7 +209,7 @@ Positions
 
                             <!-- POSITION -->
 
-                            <td class="px-5 py-4">
+                            <td class="px-4 py-3">
 
                                 <div class="font-medium text-on-surface">
 
@@ -222,7 +222,7 @@ Positions
 
                             <!-- DEPARTMENT -->
 
-                            <td class="px-5 py-4 text-body-md">
+                            <td class="px-4 py-3 text-body-md">
 
                                 {{ position.department.name }}
 
@@ -231,7 +231,7 @@ Positions
 
                             <!-- CODE -->
 
-                            <td class="px-5 py-4 text-body-md">
+                            <td class="px-4 py-3 text-body-md">
 
                                 {% if position.code %}
                                     {{ position.code }}
@@ -244,7 +244,7 @@ Positions
 
                             <!-- SALARY RANGE -->
 
-                            <td class="px-5 py-4 text-body-md">
+                            <td class="px-4 py-3 text-body-md">
 
                                 {% if position.min_salary is not None or position.max_salary is not None %}
 
@@ -273,7 +273,7 @@ Positions
 
                             <!-- STATUS -->
 
-                            <td class="px-5 py-4">
+                            <td class="px-4 py-3">
 
                                 {% include "employees/_active_badge.html" with is_active=position.is_active %}
 
@@ -282,7 +282,7 @@ Positions
 
                             <!-- ACTIONS -->
 
-                            <td class="px-5 py-4 text-right">
+                            <td class="px-4 py-3 text-right">
 
                                 <a
                                     href="{% url 'employees:position-detail' position.pk %}"
@@ -330,7 +330,7 @@ Positions
             {% if page_obj.has_previous %}
 
                 <a
-                    href="?page={{ page_obj.previous_page_number }}"
+                    href="{% page_url page_obj.previous_page_number %}"
                     class="rounded border border-outline-variant px-4 py-2"
                 >
                     Previous
@@ -350,7 +350,7 @@ Positions
             {% if page_obj.has_next %}
 
                 <a
-                    href="?page={{ page_obj.next_page_number }}"
+                    href="{% page_url page_obj.next_page_number %}"
                     class="rounded border border-outline-variant px-4 py-2"
                 >
                     Next

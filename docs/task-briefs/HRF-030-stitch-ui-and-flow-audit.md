@@ -82,3 +82,17 @@ Only sanitized findings and reproducible tests belong in the repository.
   changed Python lint passed. Browser verified 390px layout without horizontal
   overflow, menu open/Escape/focus return, and visible labeled links when collapsed
   to 80px at desktop size.
+
+### Step 2 — employee directory and forms
+
+- Aligned directory columns, active-contract filter, zebra table and compact forms;
+  preserved search parameters during pagination and masked bank account display.
+- Rejected invalid employee login names, case-insensitive duplicate emails,
+  mismatched department/position and negative salary ranges. Staff flags alone no
+  longer grant HR directory access; employment state and active flag agree.
+- Validation: 56 tests and 10 subtests passed (employees/accounts), changed Python
+  lint passed and CSS rebuilt. Browser checked officer read-only directory and HR
+  empty submission: linked field errors, focused summary, and enabled retry.
+- Main reconciliation: origin/main fetched on 2026-09-03 at dd12f18. Main checkout
+  was clean. Three commits add validation/overlap checks, bonus editing, officer
+  read access and deployment/health support; preserve these during integration.

@@ -1,493 +1,58 @@
 {% extends "base.html" %}
 {% load employees_extras %}
-
-{% block title %}
-Employees
-{% endblock %}
-
-{% block page_title %}
-<h1 class="text-headline-lg text-on-surface">Employees</h1>
-{% endblock %}
-
-
+{% block title %}Employees · HRFlow{% endblock %}
+{% block page_title %}<h1 class="text-headline-lg">Employees</h1>{% endblock %}
 {% block content %}
-
-<div class="space-y-6">
-
-    <!-- ========================================= -->
-    <!-- PAGE HEADER -->
-    <!-- ========================================= -->
-
-    <div class="flex justify-between items-center mb-6">
-
-    <div>
-        <p class="text-body-md text-on-surface-variant">
-            Manage employee records and employment information.
-        </p>
+<div class="space-y-5">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+        <p class="text-body-md text-on-surface-variant">Manage employee records, contracts, and organizational information.</p>
+        {% if request.user|in_groups:"Admin,HR Manager" %}<a href="{% url 'employees:employee-create' %}" class="btn-primary">Add Employee</a>{% endif %}
     </div>
-
-    <div>
-        {% if request.user|in_groups:"Admin,HR Manager" %}
-        <a
-            href="{% url 'employees:employee-create' %}"
-            class="btn-primary"
-        >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M12 5v14M5 12h14"/></svg>
-            Add Employee
-        </a>
-        {% endif %}
-    </div>
-
-</div>
-
-
-
-    <!-- ========================================= -->
-    <!-- FILTER BAR -->
-    <!-- ========================================= -->
-
-    <form
-        method="get"
-        class="rounded border border-outline-variant bg-surface-container-lowest p-4"
-    >
-
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
-
-
-            <!-- SEARCH -->
-
-            <div>
-
-                <label
-                    class="mb-1 block text-label-caps text-on-surface-variant"
-                >
-                    Search
-                </label>
-
-                <input
-                    type="text"
-                    name="search"
-                    value="{{ request.GET.search }}"
-                    placeholder="Search name, ID, or email"
-                    class="w-full rounded border border-outline-variant px-3 py-2 text-body-md"
-                >
-
-            </div>
-
-
-
-            <!-- DEPARTMENT -->
-
-            <div>
-
-                <label
-                    class="mb-1 block text-label-caps text-on-surface-variant"
-                >
-                    Department
-                </label>
-
-                <select
-                    name="department"
-                    class="w-full rounded border border-outline-variant px-3 py-2 text-body-md"
-                >
-
-                    <option value="">
-                        All Departments
-                    </option>
-
-
-                    {% for department in departments %}
-
-                        <option
-                            value="{{ department.id }}"
-
-                            {% if request.GET.department == department.id|stringformat:"s" %}
-                                selected
-                            {% endif %}
-                        >
-
-                            {{ department.name }}
-
-                        </option>
-
-                    {% endfor %}
-
-                </select>
-
-            </div>
-
-
-
-            <!-- STATUS -->
-
-            <div>
-
-                <label
-                    class="mb-1 block text-label-caps text-on-surface-variant"
-                >
-                    Status
-                </label>
-
-
-                <select
-                    name="status"
-                    class="w-full rounded border border-outline-variant px-3 py-2 text-body-md"
-                >
-
-                    <option value="">
-                        All Statuses
-                    </option>
-
-
-                    {% for value, label in status_choices %}
-
-                        <option
-                            value="{{ value }}"
-
-                            {% if request.GET.status == value %}
-                                selected
-                            {% endif %}
-                        >
-
-                            {{ label }}
-
-                        </option>
-
-                    {% endfor %}
-
-                </select>
-
-            </div>
-
-
-
-            <!-- FILTER BUTTON -->
-
-            <div class="flex items-end">
-
-                <button
-                    type="submit"
-                    class="w-full rounded bg-primary px-4 py-2 text-body-md text-white"
-                >
-                    Filter
-                </button>
-
-            </div>
-
-
+    <form method="get" class="card p-4" novalidate>
+        {% include "components/form_errors.html" with form=filter_form %}
+        <div class="grid gap-x-4 sm:grid-cols-2 xl:grid-cols-4">
+            {% for field in filter_form %}{% include "components/field.html" with field=field %}{% endfor %}
         </div>
-
+        <div class="flex gap-2"><button type="submit" class="btn-primary">Filter</button><a class="btn-ghost" href="{% url 'employees:employee-list' %}">Clear filters</a></div>
     </form>
-
-
-
-    <!-- ========================================= -->
-    <!-- EMPLOYEE TABLE -->
-    <!-- ========================================= -->
-
-    <div
-        class="overflow-hidden rounded border border-outline-variant bg-surface-container-lowest"
-    >
-
-
+    <div class="card overflow-hidden p-0">
         <div class="overflow-x-auto">
-
-            <table class="w-full">
-
-                <!-- TABLE HEADER -->
-
-                <thead class="bg-primary text-on-primary">
-
-                    <tr>
-
-                        <th class="px-5 py-4 text-left text-label-caps">
-                            Employee
-                        </th>
-
-                        <th class="px-5 py-4 text-left text-label-caps">
-                            ID
-                        </th>
-
-                        <th class="px-5 py-4 text-left text-label-caps">
-                            Department & Role
-                        </th>
-
-                        <th class="px-5 py-4 text-left text-label-caps">
-                            Status
-                        </th>
-
-                        <th class="px-5 py-4 text-left text-label-caps">
-                            Join Date
-                        </th>
-
-                        <th class="px-5 py-4 text-right text-label-caps">
-                            Actions
-                        </th>
-
-                    </tr>
-
-                </thead>
-
-
-
-                <!-- TABLE BODY -->
-
-                <tbody>
-
-
+            <table class="w-full text-left">
+                <caption class="sr-only">Employee directory</caption>
+                <thead class="bg-primary text-on-primary"><tr>
+                    <th scope="col" class="px-4 py-3 text-label-caps">Employee</th>
+                    <th scope="col" class="px-4 py-3 text-label-caps">ID</th>
+                    <th scope="col" class="px-4 py-3 text-label-caps">Department & role</th>
+                    <th scope="col" class="px-4 py-3 text-label-caps">Contract</th>
+                    <th scope="col" class="px-4 py-3 text-label-caps">Status</th>
+                    <th scope="col" class="px-4 py-3 text-label-caps">Join date</th>
+                    <th scope="col" class="px-4 py-3 text-label-caps">Actions</th>
+                </tr></thead>
+                <tbody class="divide-y divide-outline-variant">
                     {% for employee in employees %}
-
-                    <tr
-                        class="border-b border-outline-variant last:border-b-0"
-                    >
-
-
-                        <!-- EMPLOYEE -->
-
-                        <td class="px-5 py-4">
-
-                            <div class="flex items-center gap-3">
-
-
-                                <!-- AVATAR -->
-
-                                <div
-                                    class="flex h-10 w-10 items-center justify-center rounded bg-secondary-container text-body-md font-bold text-on-secondary-container"
-                                >
-
-                                    {{ employee.first_name|first }}{{ employee.last_name|first }}
-
-                                </div>
-
-
-
-                                <!-- NAME -->
-
-                                <div>
-
-                                    <div
-                                        class="text-body-md font-semibold text-on-surface"
-                                    >
-
-                                        {{ employee.first_name }}
-                                        {{ employee.last_name }}
-
-                                    </div>
-
-
-                                    <div
-                                        class="text-sm text-on-surface-variant"
-                                    >
-
-                                        {{ employee.email }}
-
-                                    </div>
-
-                                </div>
-
-
-                            </div>
-
-                        </td>
-
-
-
-                        <!-- EMPLOYEE NUMBER -->
-
-                        <td
-                            class="px-5 py-4 text-data-mono text-on-surface"
-                        >
-
-                            {{ employee.employee_number }}
-
-                        </td>
-
-
-
-                        <!-- DEPARTMENT + POSITION -->
-
-                        <td class="px-5 py-4">
-
-
-                            {% if employee.department %}
-
-                                <div
-                                    class="text-body-md text-on-surface"
-                                >
-
-                                    {{ employee.department.name }}
-
-                                </div>
-
-                            {% else %}
-
-                                <div
-                                    class="text-body-md text-on-surface-variant"
-                                >
-
-                                    No Department
-
-                                </div>
-
-                            {% endif %}
-
-
-
-                            {% if employee.position %}
-
-                                <div
-                                    class="text-sm text-on-surface-variant"
-                                >
-
-                                    {{ employee.position.title }}
-
-                                </div>
-
-                            {% endif %}
-
-
-                        </td>
-
-
-
-                        <!-- STATUS -->
-
-                        <td class="px-5 py-4">
-
-                            {% include "employees/_status_badge.html" with status=employee.employment_status %}
-
-                        </td>
-
-
-
-                        <!-- JOIN DATE -->
-
-                        <td
-                            class="px-5 py-4 text-body-md text-on-surface"
-                        >
-
-                            {{ employee.hire_date|date:"M d, Y" }}
-
-                        </td>
-
-
-
-                        <!-- ACTIONS -->
-
-                        <td class="px-5 py-4 text-right">
-
-
-                            <!-- TEMPORARY -->
-
-                            <a
-                                href="{% url 'employees:employee-detail' employee.pk %}"
-                                class="text-body-md font-semibold text-on-surface"
-                            >
-                                View
-                            </a>
-
-
-                        </td>
-
-
+                    <tr class="even:bg-surface-container-low">
+                        <td class="px-4 py-3"><div class="flex items-center gap-3">
+                            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-secondary-container text-body-sm font-semibold text-on-secondary-container" aria-hidden="true">{{ employee.first_name|first }}{{ employee.last_name|first }}</span>
+                            <div><a class="text-body-md font-semibold hover:underline" href="{% url 'employees:employee-detail' employee.pk %}">{{ employee.first_name }} {{ employee.last_name }}</a><p class="text-body-sm text-on-surface-variant">{{ employee.email }}</p></div>
+                        </div></td>
+                        <td class="px-4 py-3 text-data-mono">{{ employee.employee_number }}</td>
+                        <td class="px-4 py-3"><p class="text-body-md">{{ employee.department.name|default:"—" }}</p><p class="text-body-sm text-on-surface-variant">{{ employee.position.title|default:"—" }}</p></td>
+                        <td class="px-4 py-3 text-body-sm">{% with contract=employee.active_contracts.0 %}{% if contract %}<a class="hover:underline" href="{% url 'employees:contract-detail' contract.pk %}">{{ contract.get_contract_type_display }}</a>{% else %}No active contract{% endif %}{% endwith %}</td>
+                        <td class="px-4 py-3">{% include "employees/_status_badge.html" with status=employee.employment_status %}</td>
+                        <td class="whitespace-nowrap px-4 py-3 text-data-mono">{{ employee.hire_date|date:"Y-m-d" }}</td>
+                        <td class="px-4 py-3"><a class="btn-ghost" href="{% url 'employees:employee-detail' employee.pk %}" aria-label="View {{ employee.first_name }} {{ employee.last_name }}">View</a></td>
                     </tr>
-
-
-                    {% empty %}
-
-
-                    <tr>
-
-                        <td
-                            colspan="6"
-                            class="px-5 py-10 text-center text-body-md text-on-surface-variant"
-                        >
-
-                            No employees found.
-
-                        </td>
-
-                    </tr>
-
-
-                    {% endfor %}
-
-
+                    {% empty %}<tr><td colspan="7" class="px-4 py-8 text-center text-body-md text-on-surface-variant">No employees match these filters.</td></tr>{% endfor %}
                 </tbody>
-
             </table>
-
         </div>
-
-
-
-        <!-- ========================================= -->
-        <!-- PAGINATION -->
-        <!-- ========================================= -->
-
-
-        {% if is_paginated %}
-
-        <div
-            class="flex items-center justify-between border-t border-outline-variant px-5 py-4"
-        >
-
-
-            <div
-                class="text-body-md text-on-surface-variant"
-            >
-
-                Page {{ page_obj.number }}
-                of {{ page_obj.paginator.num_pages }}
-
-            </div>
-
-
-
-            <div class="flex gap-2">
-
-
-                {% if page_obj.has_previous %}
-
-                    <a
-                        href="?page={{ page_obj.previous_page_number }}"
-                        class="rounded border border-outline-variant px-3 py-2 text-body-md text-on-surface"
-                    >
-
-                        Previous
-
-                    </a>
-
-                {% endif %}
-
-
-
-                {% if page_obj.has_next %}
-
-                    <a
-                        href="?page={{ page_obj.next_page_number }}"
-                        class="rounded border border-outline-variant px-3 py-2 text-body-md text-on-surface"
-                    >
-
-                        Next
-
-                    </a>
-
-                {% endif %}
-
-
-            </div>
-
-
+        <div class="flex flex-wrap items-center justify-between gap-3 border-t border-outline-variant px-4 py-3 text-body-sm">
+            <p>{{ page_obj.paginator.count }} employee{{ page_obj.paginator.count|pluralize }} · Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</p>
+            <nav aria-label="Employee pages" class="flex gap-2">
+                {% if page_obj.has_previous %}<a class="btn-secondary" href="{% page_url page_obj.previous_page_number %}">Previous</a>{% endif %}
+                {% if page_obj.has_next %}<a class="btn-secondary" href="{% page_url page_obj.next_page_number %}">Next</a>{% endif %}
+            </nav>
         </div>
-
-        {% endif %}
-
-
     </div>
-
-
 </div>
-
-
 {% endblock %}

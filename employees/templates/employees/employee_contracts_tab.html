@@ -19,7 +19,7 @@
     {% include "employees/_employee_tabs.html" with employee=employee active="contract" %}
 
 
-    <div class="flex items-center justify-between">
+    <div class="flex flex-wrap items-center justify-between gap-3">
 
         <p class="text-body-md text-on-surface-variant">
             Contract history for {{ employee.first_name }} {{ employee.last_name }}.
@@ -46,12 +46,12 @@
                 <thead class="bg-primary text-on-primary">
 
                     <tr>
-                        <th class="px-5 py-4 text-left text-label-caps">Contract Type</th>
-                        <th class="px-5 py-4 text-left text-label-caps">Start Date</th>
-                        <th class="px-5 py-4 text-left text-label-caps">End Date</th>
-                        <th class="px-5 py-4 text-left text-label-caps">Basic Salary</th>
-                        <th class="px-5 py-4 text-left text-label-caps">Status</th>
-                        <th class="px-5 py-4 text-right text-label-caps">Actions</th>
+                        <th class="px-4 py-3 text-left text-label-caps">Contract Type</th>
+                        <th class="px-4 py-3 text-left text-label-caps">Start Date</th>
+                        <th class="px-4 py-3 text-left text-label-caps">End Date</th>
+                        <th class="px-4 py-3 text-left text-label-caps">Basic Salary</th>
+                        <th class="px-4 py-3 text-left text-label-caps">Status</th>
+                        <th class="px-4 py-3 text-right text-label-caps">Actions</th>
                     </tr>
 
                 </thead>
@@ -62,27 +62,27 @@
 
                         <tr class="border-b border-outline-variant last:border-0">
 
-                            <td class="px-5 py-4 font-medium text-on-surface">
+                            <td class="px-4 py-3 font-medium text-on-surface">
                                 {{ contract.get_contract_type_display }}
                             </td>
 
-                            <td class="px-5 py-4 text-body-md text-on-surface">
+                            <td class="px-4 py-3 text-body-md text-on-surface">
                                 {{ contract.start_date|date:"M d, Y" }}
                             </td>
 
-                            <td class="px-5 py-4 text-body-md text-on-surface">
+                            <td class="px-4 py-3 text-body-md text-on-surface">
                                 {% if contract.end_date %}{{ contract.end_date|date:"M d, Y" }}{% else %}—{% endif %}
                             </td>
 
-                            <td class="px-5 py-4 text-data-mono text-on-surface">
+                            <td class="px-4 py-3 text-data-mono text-on-surface">
                                 ${{ contract.basic_salary }}
                             </td>
 
-                            <td class="px-5 py-4">
+                            <td class="px-4 py-3">
                                 {% include "employees/_status_badge.html" with status=contract.status %}
                             </td>
 
-                            <td class="px-5 py-4 text-right">
+                            <td class="px-4 py-3 text-right">
                                 <a href="{% url 'employees:contract-detail' contract.pk %}" class="text-body-md font-semibold text-on-surface">
                                     View
                                 </a>

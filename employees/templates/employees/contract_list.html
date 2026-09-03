@@ -16,7 +16,7 @@ Contracts
 
     <!-- HEADER -->
 
-    <div class="flex items-center justify-between">
+    <div class="flex flex-wrap items-center justify-between gap-3">
 
         <div>
 
@@ -185,31 +185,31 @@ Contracts
 
                     <tr>
 
-                        <th class="px-5 py-4 text-left text-label-caps">
+                        <th class="px-4 py-3 text-left text-label-caps">
                             Employee
                         </th>
 
-                        <th class="px-5 py-4 text-left text-label-caps">
+                        <th class="px-4 py-3 text-left text-label-caps">
                             Contract Type
                         </th>
 
-                        <th class="px-5 py-4 text-left text-label-caps">
+                        <th class="px-4 py-3 text-left text-label-caps">
                             Start Date
                         </th>
 
-                        <th class="px-5 py-4 text-left text-label-caps">
+                        <th class="px-4 py-3 text-left text-label-caps">
                             End Date
                         </th>
 
-                        <th class="px-5 py-4 text-left text-label-caps">
+                        <th class="px-4 py-3 text-left text-label-caps">
                             Basic Salary
                         </th>
 
-                        <th class="px-5 py-4 text-left text-label-caps">
+                        <th class="px-4 py-3 text-left text-label-caps">
                             Status
                         </th>
 
-                        <th class="px-5 py-4 text-right text-label-caps">
+                        <th class="px-4 py-3 text-right text-label-caps">
                             Actions
                         </th>
 
@@ -228,7 +228,7 @@ Contracts
 
                             <!-- EMPLOYEE -->
 
-                            <td class="px-5 py-4">
+                            <td class="px-4 py-3">
 
                                 <div class="font-medium text-on-surface">
 
@@ -250,7 +250,7 @@ Contracts
 
                             <!-- CONTRACT TYPE -->
 
-                            <td class="px-5 py-4 text-body-md">
+                            <td class="px-4 py-3 text-body-md">
 
                                 {{ contract.get_contract_type_display }}
 
@@ -259,7 +259,7 @@ Contracts
 
                             <!-- START DATE -->
 
-                            <td class="px-5 py-4 text-body-md">
+                            <td class="px-4 py-3 text-body-md">
 
                                 {{ contract.start_date|date:"M d, Y" }}
 
@@ -268,7 +268,7 @@ Contracts
 
                             <!-- END DATE -->
 
-                            <td class="px-5 py-4 text-body-md">
+                            <td class="px-4 py-3 text-body-md">
 
                                 {% if contract.end_date %}
 
@@ -285,7 +285,7 @@ Contracts
 
                             <!-- SALARY -->
 
-                            <td class="px-5 py-4 text-body-md">
+                            <td class="px-4 py-3 text-body-md">
 
                                 {{ contract.basic_salary }}
 
@@ -294,7 +294,7 @@ Contracts
 
                             <!-- STATUS -->
 
-                            <td class="px-5 py-4">
+                            <td class="px-4 py-3">
 
                                 {% include "employees/_status_badge.html" with status=contract.status %}
 
@@ -303,7 +303,7 @@ Contracts
 
                             <!-- ACTIONS -->
 
-                            <td class="px-5 py-4 text-right">
+                            <td class="px-4 py-3 text-right">
 
                                 <a
                                     href="{% url 'employees:contract-detail' contract.pk %}"
@@ -352,7 +352,7 @@ Contracts
             {% if page_obj.has_previous %}
 
                 <a
-                    href="?page={{ page_obj.previous_page_number }}"
+                    href="{% page_url page_obj.previous_page_number %}"
                     class="rounded border border-outline-variant px-4 py-2"
                 >
                     Previous
@@ -372,7 +372,7 @@ Contracts
             {% if page_obj.has_next %}
 
                 <a
-                    href="?page={{ page_obj.next_page_number }}"
+                    href="{% page_url page_obj.next_page_number %}"
                     class="rounded border border-outline-variant px-4 py-2"
                 >
                     Next
