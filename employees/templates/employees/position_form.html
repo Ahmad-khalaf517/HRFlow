@@ -48,9 +48,11 @@
 
             {% if form.non_field_errors %}
 
-                <div class="mb-6 rounded border border-red-300 bg-red-50 p-4 text-red-700">
+                <div class="mb-6 rounded border border-error bg-error-container p-4 text-body-sm text-on-error-container">
 
-                    {{ form.non_field_errors }}
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
 
                 </div>
 
@@ -72,15 +74,15 @@
 
                     {{ form.department }}
 
-                    {% if form.department.errors %}
+                    {% for error in form.department.errors %}
 
-                        <p class="mt-1 text-sm text-red-600">
+                        <p class="mt-1 text-body-sm text-error">
 
-                            {{ form.department.errors.0 }}
+                            {{ error }}
 
                         </p>
 
-                    {% endif %}
+                    {% endfor %}
 
                 </div>
 
@@ -97,15 +99,15 @@
 
                     {{ form.title }}
 
-                    {% if form.title.errors %}
+                    {% for error in form.title.errors %}
 
-                        <p class="mt-1 text-sm text-red-600">
+                        <p class="mt-1 text-body-sm text-error">
 
-                            {{ form.title.errors.0 }}
+                            {{ error }}
 
                         </p>
 
-                    {% endif %}
+                    {% endfor %}
 
                 </div>
 
@@ -122,15 +124,15 @@
 
                     {{ form.code }}
 
-                    {% if form.code.errors %}
+                    {% for error in form.code.errors %}
 
-                        <p class="mt-1 text-sm text-red-600">
+                        <p class="mt-1 text-body-sm text-error">
 
-                            {{ form.code.errors.0 }}
+                            {{ error }}
 
                         </p>
 
-                    {% endif %}
+                    {% endfor %}
 
                 </div>
 
@@ -164,15 +166,15 @@
 
                 {{ form.description }}
 
-                {% if form.description.errors %}
+                {% for error in form.description.errors %}
 
-                    <p class="mt-1 text-sm text-red-600">
+                    <p class="mt-1 text-body-sm text-error">
 
-                        {{ form.description.errors.0 }}
+                        {{ error }}
 
                     </p>
 
-                {% endif %}
+                {% endfor %}
 
             </div>
 
@@ -202,15 +204,15 @@
 
                         {{ form.min_salary }}
 
-                        {% if form.min_salary.errors %}
+                        {% for error in form.min_salary.errors %}
 
-                            <p class="mt-1 text-sm text-red-600">
+                            <p class="mt-1 text-body-sm text-error">
 
-                                {{ form.min_salary.errors.0 }}
+                                {{ error }}
 
                             </p>
 
-                        {% endif %}
+                        {% endfor %}
 
                     </div>
 
@@ -227,15 +229,15 @@
 
                         {{ form.max_salary }}
 
-                        {% if form.max_salary.errors %}
+                        {% for error in form.max_salary.errors %}
 
-                            <p class="mt-1 text-sm text-red-600">
+                            <p class="mt-1 text-body-sm text-error">
 
-                                {{ form.max_salary.errors.0 }}
+                                {{ error }}
 
                             </p>
 
-                        {% endif %}
+                        {% endfor %}
 
                     </div>
 

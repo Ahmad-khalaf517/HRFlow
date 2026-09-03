@@ -7,6 +7,7 @@ app_name = "payroll"
 urlpatterns = [
     path("bonuses/", views.bonus_list, name="bonus-list"),
     path("bonuses/new/", views.bonus_create, name="bonus-create"),
+    path("bonuses/<int:pk>/edit/", views.bonus_update, name="bonus-update"),
     path("bonuses/<int:pk>/cancel/", views.bonus_cancel, name="bonus-cancel"),
     path("deductions/", views.deduction_list, name="deduction-list"),
     path("deductions/new/", views.deduction_create, name="deduction-create"),

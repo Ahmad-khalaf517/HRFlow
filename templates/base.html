@@ -100,7 +100,8 @@
                         <p class="sidebar-section-label px-3 pb-2 text-label-caps text-on-primary-container/80">Attendance</p>
                         <div class="space-y-1">
                             {% if request.user.is_staff %}
-                                <a href="{% url 'attendance:attendance_list' %}" class="sidebar-link block rounded px-3 py-2 text-body-md {% if '/attendance/' in request.path and 'leave' not in request.path and 'summary' not in request.path %}bg-primary-container font-semibold text-on-primary{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
+                                <a href="{% url 'attendance:attendance_list' %}" class="sidebar-link flex items-center gap-3 rounded px-3 py-2 text-body-md {% if '/attendance/' in request.path and 'leave' not in request.path and 'summary' not in request.path %}bg-primary-container font-semibold text-on-primary{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
                                     <span class="sidebar-nav-text">All Attendance</span>
                                 </a>
                             {% else %}
@@ -113,12 +114,14 @@
                                 {% endfor %}
                             {% endif %}
                             {% if request.user.employee_profile %}
-                                <a href="{% url 'attendance:my_attendance' %}" class="sidebar-link block rounded px-3 py-2 text-body-md {% if '/attendance/mine/' in request.path %}bg-primary-container font-semibold text-on-primary{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
+                                <a href="{% url 'attendance:my_attendance' %}" class="sidebar-link flex items-center gap-3 rounded px-3 py-2 text-body-md {% if '/attendance/mine/' in request.path %}bg-primary-container font-semibold text-on-primary{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>
                                     <span class="sidebar-nav-text">My Attendance</span>
                                 </a>
                             {% endif %}
                             {% if request.user.is_staff %}
-                                <a href="{% url 'attendance:attendance_summary' %}" class="sidebar-link block rounded px-3 py-2 text-body-md {% if '/attendance/summary/' in request.path %}bg-primary-container font-semibold text-on-primary{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
+                                <a href="{% url 'attendance:attendance_summary' %}" class="sidebar-link flex items-center gap-3 rounded px-3 py-2 text-body-md {% if '/attendance/summary/' in request.path %}bg-primary-container font-semibold text-on-primary{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><path d="M5 19V11M11 19V5M17 19v-6"/></svg>
                                     <span class="sidebar-nav-text">Summary</span>
                                 </a>
                             {% else %}
@@ -148,20 +151,24 @@
                                 </a>
                             {% else %}
                                 {% for group in request.user.groups.all %}
-                                    {% if group.name == 'Admin' or group.name == 'HR Manager' %}
-                                        <a href="{% url 'attendance:leave_type_list' %}" class="sidebar-link block rounded px-3 py-2 text-body-md {% if '/leave-types/' in request.path %}bg-primary-container font-semibold text-on-primary{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
+                                    {% if group.name == 'Admin' or group.name == 'HR Manager' or group.name == 'Payroll Officer' %}
+                                        <a href="{% url 'attendance:leave_type_list' %}" class="sidebar-link flex items-center gap-3 rounded px-3 py-2 text-body-md {% if '/leave-types/' in request.path %}bg-primary-container font-semibold text-on-primary{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><path d="M11 3.5H6.5A1.5 1.5 0 0 0 5 5v4.5L13.5 18l5-5L11 3.5Z"/><circle cx="8.2" cy="7.8" r="1.1"/></svg>
                                             <span class="sidebar-nav-text">Leave Types</span>
                                         </a>
-                                        <a href="{% url 'attendance:leave_request_list' %}" class="sidebar-link block rounded px-3 py-2 text-body-md {% if '/leave-requests/' in request.path and 'approval' not in request.path %}bg-primary-container font-semibold text-on-primary{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
+                                        <a href="{% url 'attendance:leave_request_list' %}" class="sidebar-link flex items-center gap-3 rounded px-3 py-2 text-body-md {% if '/leave-requests/' in request.path and 'approval' not in request.path %}bg-primary-container font-semibold text-on-primary{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><rect x="3.5" y="5" width="17" height="15" rx="1.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/></svg>
                                             <span class="sidebar-nav-text">Leave Requests</span>
                                         </a>
-                                        <a href="{% url 'attendance:leave_approval_list' %}" class="sidebar-link block rounded px-3 py-2 text-body-md {% if '/leave-requests/approval/' in request.path %}bg-primary-container font-semibold text-on-primary{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
+                                        <a href="{% url 'attendance:leave_approval_list' %}" class="sidebar-link flex items-center gap-3 rounded px-3 py-2 text-body-md {% if '/leave-requests/approval/' in request.path %}bg-primary-container font-semibold text-on-primary{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><circle cx="12" cy="12" r="8.5"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg>
                                             <span class="sidebar-nav-text">Leave Approval</span>
                                         </a>
                                     {% endif %}
                                 {% endfor %}
                                 {% if request.user.employee_profile %}
-                                    <a href="{% url 'attendance:my_leave_requests' %}" class="sidebar-link block rounded px-3 py-2 text-body-md {% if '/leave-requests/mine/' in request.path %}bg-primary-container font-semibold text-on-primary{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
+                                    <a href="{% url 'attendance:my_leave_requests' %}" class="sidebar-link flex items-center gap-3 rounded px-3 py-2 text-body-md {% if '/leave-requests/mine/' in request.path %}bg-primary-container font-semibold text-on-primary{% else %}text-on-primary-container hover:bg-primary-container{% endif %}">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 shrink-0"><rect x="3.5" y="5" width="17" height="15" rx="1.5"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/></svg>
                                         <span class="sidebar-nav-text">My Leave Requests</span>
                                     </a>
                                 {% endif %}
@@ -185,7 +192,7 @@
         </aside>
 
         <div id="app-shell" class="app-shell min-h-screen transition-all duration-200 md:pl-60">
-            <header class="h-16 border-b border-outline-variant bg-surface-container-lowest px-4 md:px-6">
+            <header class="sticky top-0 z-20 h-16 border-b border-outline-variant bg-surface-container-lowest px-4 md:px-6">
                 <div class="flex h-full items-center justify-between gap-3">
                     <div class="flex items-center gap-3">
                         <button id="sidebar-open" type="button" class="inline-flex h-9 w-9 items-center justify-center rounded border border-outline-variant bg-white text-on-surface hover:bg-surface-container-low focus:outline-none focus:ring-2 focus:ring-secondary md:hidden" aria-label="Open menu">

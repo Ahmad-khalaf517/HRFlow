@@ -44,9 +44,11 @@
 
             {% if form.non_field_errors %}
 
-                <div class="mb-5 rounded border border-outline-variant p-4 text-sm text-on-surface">
+                <div class="mb-5 rounded border border-error bg-error-container p-4 text-body-sm text-on-error-container">
 
-                    {{ form.non_field_errors }}
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
 
                 </div>
 
@@ -72,7 +74,7 @@
 
                 {% for error in form.name.errors %}
 
-                    <p class="mt-1 text-sm text-on-surface">
+                    <p class="mt-1 text-body-sm text-error">
 
                         {{ error }}
 
@@ -102,7 +104,7 @@
 
                 {% for error in form.description.errors %}
 
-                    <p class="mt-1 text-sm text-on-surface">
+                    <p class="mt-1 text-body-sm text-error">
 
                         {{ error }}
 
@@ -132,7 +134,7 @@
 
                 {% for error in form.manager.errors %}
 
-                    <p class="mt-1 text-sm text-on-surface">
+                    <p class="mt-1 text-body-sm text-error">
 
                         {{ error }}
 

@@ -1,4 +1,7 @@
+from datetime import date
+
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import CheckConstraint, F, Q, UniqueConstraint
 
@@ -182,6 +185,32 @@ class Contract(models.Model):
             ),
             CheckConstraint(condition=Q(basic_salary__gte=0), name="contract_basic_salary_gte_0"),
         ]
+
+    def clean(self):
+        super().clean()
+
+        if self.start_date and self.end_date and self.end_date < self.start_date:
+            raise ValidationError({"end_date": "End date cannot be before the start date."})
+
+        if self.basic_salary is not None and self.basic_salary < 0:
+            raise ValidationError({"basic_salary": "Basic salary cannot be negative."})
+
+        # docs/business-rules.md doesn't spell this out beyond "only one active
+        # contract", but two contract rows covering the same calendar day for one
+        # employee (of any status) is never a valid combination — see HRF-22 (#12).
+        if self.employee_id and self.start_date:
+            others = Contract.objects.filter(employee_id=self.employee_id)
+            if self.pk:
+                others = others.exclude(pk=self.pk)
+
+            self_end = self.end_date or date.max
+            for other in others:
+                other_end = other.end_date or date.max
+                if self.start_date <= other_end and other.start_date <= self_end:
+                    raise ValidationError(
+                        "This employee already has a contract covering an overlapping "
+                        "date range."
+                    )
 
     def __str__(self):
         return f"{self.employee} — {self.get_status_display()} ({self.start_date})"

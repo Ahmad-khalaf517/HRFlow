@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load employees_extras %}
 
 {% block title %}Attendance · HRFlow{% endblock %}
 
@@ -13,7 +14,9 @@
             <p class="text-label-caps text-on-surface-variant">Daily records</p>
             <p class="text-body-md text-on-surface-variant">Employee attendance and work hours.</p>
         </div>
-        <a href="{% url 'attendance:attendance_create' %}" class="btn-primary">Create Attendance</a>
+        {% if request.user|has_group:"Admin,HR Manager" or request.user.employee_profile %}
+            <a href="{% url 'attendance:attendance_create' %}" class="btn-primary">Create Attendance</a>
+        {% endif %}
     </div>
 
     <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
@@ -111,7 +114,9 @@
         <div class="card max-w-xl">
             <h2 class="text-headline-md text-on-surface mb-2">No attendance records</h2>
             <p class="text-body-md text-on-surface-variant mb-4">There are no attendance entries for this view yet.</p>
-            <a href="{% url 'attendance:attendance_create' %}" class="btn-primary">Create Attendance</a>
+            {% if request.user|has_group:"Admin,HR Manager" or request.user.employee_profile %}
+                <a href="{% url 'attendance:attendance_create' %}" class="btn-primary">Create Attendance</a>
+            {% endif %}
         </div>
     {% endif %}
 </div>

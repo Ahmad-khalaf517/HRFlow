@@ -39,8 +39,10 @@
             {% endif %}
 
             {% if form.non_field_errors %}
-                <div class="mb-4">
-                    {{ form.non_field_errors }}
+                <div class="mb-4 rounded border border-error bg-error-container p-4 text-body-sm text-on-error-container">
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
                 </div>
             {% endif %}
 
@@ -61,11 +63,11 @@
 
                         {{ form.employee_number }}
 
-                        {% if form.employee_number.errors %}
-                            <p class="text-red-600 text-sm mt-1">
-                                {{ form.employee_number.errors.0 }}
+                        {% for error in form.employee_number.errors %}
+                            <p class="text-error text-body-sm mt-1">
+                                {{ error }}
                             </p>
-                        {% endif %}
+                        {% endfor %}
                     </div>
 
 
@@ -76,11 +78,11 @@
 
                         {{ form.email }}
 
-                        {% if form.email.errors %}
-                            <p class="text-red-600 text-sm mt-1">
-                                {{ form.email.errors.0 }}
+                        {% for error in form.email.errors %}
+                            <p class="text-error text-body-sm mt-1">
+                                {{ error }}
                             </p>
-                        {% endif %}
+                        {% endfor %}
                     </div>
 
 
@@ -91,11 +93,11 @@
 
                         {{ form.first_name }}
 
-                        {% if form.first_name.errors %}
-                            <p class="text-red-600 text-sm mt-1">
-                                {{ form.first_name.errors.0 }}
+                        {% for error in form.first_name.errors %}
+                            <p class="text-error text-body-sm mt-1">
+                                {{ error }}
                             </p>
-                        {% endif %}
+                        {% endfor %}
                     </div>
 
 
@@ -106,11 +108,11 @@
 
                         {{ form.last_name }}
 
-                        {% if form.last_name.errors %}
-                            <p class="text-red-600 text-sm mt-1">
-                                {{ form.last_name.errors.0 }}
+                        {% for error in form.last_name.errors %}
+                            <p class="text-error text-body-sm mt-1">
+                                {{ error }}
                             </p>
-                        {% endif %}
+                        {% endfor %}
                     </div>
 
 
@@ -121,11 +123,11 @@
 
                         {{ form.phone }}
 
-                        {% if form.phone.errors %}
-                            <p class="text-red-600 text-sm mt-1">
-                                {{ form.phone.errors.0 }}
+                        {% for error in form.phone.errors %}
+                            <p class="text-error text-body-sm mt-1">
+                                {{ error }}
                             </p>
-                        {% endif %}
+                        {% endfor %}
                     </div>
 
 
@@ -136,11 +138,11 @@
 
                         {{ form.date_of_birth }}
 
-                        {% if form.date_of_birth.errors %}
-                            <p class="text-red-600 text-sm mt-1">
-                                {{ form.date_of_birth.errors.0 }}
+                        {% for error in form.date_of_birth.errors %}
+                            <p class="text-error text-body-sm mt-1">
+                                {{ error }}
                             </p>
-                        {% endif %}
+                        {% endfor %}
                     </div>
 
                 </div>
@@ -164,11 +166,11 @@
 
                         {{ form.hire_date }}
 
-                        {% if form.hire_date.errors %}
-                            <p class="text-red-600 text-sm mt-1">
-                                {{ form.hire_date.errors.0 }}
+                        {% for error in form.hire_date.errors %}
+                            <p class="text-error text-body-sm mt-1">
+                                {{ error }}
                             </p>
-                        {% endif %}
+                        {% endfor %}
                     </div>
 
 
@@ -179,11 +181,11 @@
 
                         {{ form.employment_status }}
 
-                        {% if form.employment_status.errors %}
-                            <p class="text-red-600 text-sm mt-1">
-                                {{ form.employment_status.errors.0 }}
+                        {% for error in form.employment_status.errors %}
+                            <p class="text-error text-body-sm mt-1">
+                                {{ error }}
                             </p>
-                        {% endif %}
+                        {% endfor %}
                     </div>
 
 
@@ -194,11 +196,11 @@
 
                         {{ form.department }}
 
-                        {% if form.department.errors %}
-                            <p class="text-red-600 text-sm mt-1">
-                                {{ form.department.errors.0 }}
+                        {% for error in form.department.errors %}
+                            <p class="text-error text-body-sm mt-1">
+                                {{ error }}
                             </p>
-                        {% endif %}
+                        {% endfor %}
                     </div>
 
 
@@ -209,11 +211,11 @@
 
                         {{ form.position }}
 
-                        {% if form.position.errors %}
-                            <p class="text-red-600 text-sm mt-1">
-                                {{ form.position.errors.0 }}
+                        {% for error in form.position.errors %}
+                            <p class="text-error text-body-sm mt-1">
+                                {{ error }}
                             </p>
-                        {% endif %}
+                        {% endfor %}
                     </div>
 
                 </div>
@@ -237,11 +239,11 @@
 
                         {{ form.address }}
 
-                        {% if form.address.errors %}
-                            <p class="text-red-600 text-sm mt-1">
-                                {{ form.address.errors.0 }}
+                        {% for error in form.address.errors %}
+                            <p class="text-error text-body-sm mt-1">
+                                {{ error }}
                             </p>
-                        {% endif %}
+                        {% endfor %}
                     </div>
 
 
@@ -252,11 +254,11 @@
 
                         {{ form.bank_name }}
 
-                        {% if form.bank_name.errors %}
-                            <p class="text-red-600 text-sm mt-1">
-                                {{ form.bank_name.errors.0 }}
+                        {% for error in form.bank_name.errors %}
+                            <p class="text-error text-body-sm mt-1">
+                                {{ error }}
                             </p>
-                        {% endif %}
+                        {% endfor %}
                     </div>
 
 
@@ -267,11 +269,11 @@
 
                         {{ form.bank_account_number }}
 
-                        {% if form.bank_account_number.errors %}
-                            <p class="text-red-600 text-sm mt-1">
-                                {{ form.bank_account_number.errors.0 }}
+                        {% for error in form.bank_account_number.errors %}
+                            <p class="text-error text-body-sm mt-1">
+                                {{ error }}
                             </p>
-                        {% endif %}
+                        {% endfor %}
                     </div>
 
                 </div>

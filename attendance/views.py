@@ -226,7 +226,7 @@ def attendance_update(request, pk):
 
 @login_required
 def leave_type_list(request):
-    if not _has_leave_management_access(request.user):
+    if not _has_leave_view_access(request.user):
         raise Http404
     leave_types = LeaveType.objects.order_by("name")
     return render(request, "attendance/leave_type_list.html", {"leave_types": leave_types})
@@ -276,7 +276,7 @@ def leave_request_list(request):
 
 @login_required
 def leave_approval_list(request):
-    if not _has_leave_approval_access(request.user):
+    if not _has_leave_view_access(request.user):
         raise Http404
     queryset = (
         LeaveRequest.objects.select_related("employee", "leave_type")
