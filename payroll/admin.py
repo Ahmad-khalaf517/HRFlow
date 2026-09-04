@@ -53,6 +53,8 @@ class PayslipAdmin(admin.ModelAdmin):
 
 
 @admin.register(Payment)
-class PaymentAdmin(admin.ModelAdmin):
+class PaymentAdmin(PayrollRecordAdmin):
+    """Payments are created only by the guarded record_payment service (one exact net payment)."""
+
     list_display = ["payroll_item", "amount", "payment_date", "status"]
     list_filter = ["status"]

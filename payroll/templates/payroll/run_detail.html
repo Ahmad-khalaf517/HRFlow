@@ -150,6 +150,7 @@
                     <th class="px-3 py-2 text-label-caps">Tax</th>
                     <th class="px-3 py-2 text-label-caps">Total ded.</th>
                     <th class="px-3 py-2 text-label-caps">Net</th>
+                    <th class="px-3 py-2 text-label-caps">Payment</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-outline-variant">
@@ -173,9 +174,21 @@
                     <td class="px-3 py-3 text-data-mono text-on-surface-variant">${{ item.tax_amount }}</td>
                     <td class="px-3 py-3 text-data-mono text-on-surface">${{ item.total_deductions }}</td>
                     <td class="px-3 py-3 text-data-mono text-on-surface font-semibold">${{ item.net_salary }}</td>
+                    <td class="px-3 py-3 text-body-sm">
+                        {% if item.is_paid %}
+                        <span class="badge bg-secondary-container text-on-secondary-container">Paid</span>
+                        {% elif run.status == "approved" %}
+                        <form method="post" action="{% url 'payroll:item-pay' run.pk item.pk %}" onsubmit="return confirm('Record the full net payment for this employee?');">
+                            {% csrf_token %}
+                            <button type="submit" class="btn-secondary">Mark paid</button>
+                        </form>
+                        {% else %}
+                        <span class="text-on-surface-variant">—</span>
+                        {% endif %}
+                    </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="11" class="px-3 py-6 text-center text-body-md text-on-surface-variant">{% if run.status == "draft" %}Not calculated yet.{% else %}No employees match this view.{% endif %}</td></tr>
+                <tr><td colspan="12" class="px-3 py-6 text-center text-body-md text-on-surface-variant">{% if run.status == "draft" %}Not calculated yet.{% else %}No employees match this view.{% endif %}</td></tr>
                 {% endfor %}
             </tbody>
         </table>

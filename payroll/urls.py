@@ -23,4 +23,5 @@ urlpatterns = [
     path("runs/<int:pk>/calculate/", views.run_calculate, name="run-calculate"),
     path("runs/<int:pk>/review/", views.run_review, name="run-review"),
     path("runs/<int:pk>/approve/", views.run_approve, name="run-approve"),
+    path("runs/<int:pk>/items/<int:item_pk>/pay/", views.item_pay, name="item-pay"),
 ]

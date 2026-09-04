@@ -20,7 +20,7 @@ from .forms import (
     PayslipFilterForm,
     TaxBracketForm,
 )
-from .models import Bonus, ManualDeduction, Payroll, TaxBracket
+from .models import Bonus, ManualDeduction, Payment, Payroll, PayrollItem, TaxBracket
 
 
 def require_payroll_manager(view_func):
@@ -221,8 +221,14 @@ def run_detail(request, pk):
     payslip_ids = set(
         services.published_payslip_items().filter(payroll=run).values_list("pk", flat=True)
     )
+    paid_ids = set(
+        Payment.objects.filter(payroll_item__payroll=run, status="completed").values_list(
+            "payroll_item_id", flat=True
+        )
+    )
     for item in page:
         item.payslip_available = item.pk in payslip_ids
+        item.is_paid = item.pk in paid_ids
     return render(
         request,
         "payroll/run_detail.html",
@@ -282,6 +288,23 @@ def run_approve(request, pk):
             )
         else:
             messages.success(request, "Payroll approved.")
+    return redirect("payroll:run-detail", pk=pk)
+
+
+@require_payroll_manager
+def item_pay(request, pk, item_pk):
+    run = get_object_or_404(Payroll, pk=pk)
+    item = get_object_or_404(PayrollItem, pk=item_pk, payroll=run)
+    if request.method == "POST":
+        try:
+            services.record_payment(item, request.user)
+        except ValidationError as exc:
+            detail = "; ".join(exc.messages) if hasattr(exc, "messages") else str(exc)
+            messages.error(request, detail)
+        else:
+            messages.success(
+                request, f"Payment recorded for {item.employee_name_snapshot or item.employee}."
+            )
     return redirect("payroll:run-detail", pk=pk)
 
 

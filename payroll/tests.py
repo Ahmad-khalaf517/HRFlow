@@ -9,7 +9,7 @@ from django.test import Client, TestCase
 
 from employees.models import Contract, Employee
 
-from .models import Bonus, ManualDeduction, Payroll, PayrollItem, TaxBracket
+from .models import Bonus, ManualDeduction, Payment, Payroll, PayrollItem, TaxBracket
 from .services import (
     approve_payroll,
     calculate_payroll,
@@ -17,6 +17,7 @@ from .services import (
     get_active_adjustments_for_period,
     get_matching_tax_bracket,
     mark_reviewed,
+    record_payment,
     user_in_groups,
 )
 
@@ -293,6 +294,64 @@ class PayrollStatusTransitionTests(TestCase):
             calculate_payroll(self.payroll, self.officer)
         with self.assertRaises(ValidationError):
             approve_payroll(self.payroll, self.officer)
+
+
+class PaymentWorkflowTests(TestCase):
+    """business-rules.md §8: one exact-net payment per approved item; Paid once all are paid."""
+
+    def setUp(self):
+        self.officer = User.objects.create_user(username="pay_officer", password="testpass123")
+        Group.objects.get_or_create(name="Payroll Officer")[0].user_set.add(self.officer)
+        self.employee_user = User.objects.create_user(username="pay_emp", password="testpass123")
+        Group.objects.get_or_create(name="Employee")[0].user_set.add(self.employee_user)
+        self.employee = Employee.objects.create(
+            employee_number="EMP-PAY-1",
+            first_name="Pay",
+            last_name="Roll",
+            email="payroll1@example.com",
+            hire_date=date(2024, 1, 1),
+        )
+        Contract.objects.create(
+            employee=self.employee,
+            start_date=date(2024, 1, 1),
+            basic_salary=Decimal("3000"),
+            working_hours_per_day=Decimal("8"),
+        )
+        self.payroll = create_payroll_run(11, 2026, self.officer)
+        p1, p2, p3 = patch_attendance_facts()
+        with p1, p2, p3:
+            calculate_payroll(self.payroll, self.officer)
+        mark_reviewed(self.payroll, self.officer)
+        approve_payroll(self.payroll, self.officer)
+        self.payroll.refresh_from_db()
+        self.item = self.payroll.items.get(employee=self.employee)
+
+    def test_record_payment_rejects_actor_outside_manager_groups(self):
+        with self.assertRaises(PermissionDenied):
+            record_payment(self.item, self.employee_user)
+        self.assertFalse(Payment.objects.filter(payroll_item=self.item).exists())
+
+    def test_record_payment_rejects_non_approved_payroll(self):
+        other_payroll = create_payroll_run(12, 2026, self.officer)
+        p1, p2, p3 = patch_attendance_facts()
+        with p1, p2, p3:
+            calculate_payroll(other_payroll, self.officer)
+        item = other_payroll.items.get(employee=self.employee)
+        with self.assertRaises(ValidationError):
+            record_payment(item, self.officer)
+
+    def test_record_payment_creates_exact_net_completed_payment_and_pays_payroll(self):
+        payment = record_payment(self.item, self.officer)
+        self.assertEqual(payment.status, "completed")
+        self.assertEqual(payment.amount, self.item.net_salary)
+        self.payroll.refresh_from_db()
+        self.assertEqual(self.payroll.status, "paid")
+
+    def test_record_payment_rejects_duplicate_payment(self):
+        record_payment(self.item, self.officer)
+        with self.assertRaises(ValidationError):
+            record_payment(self.item, self.officer)
+        self.assertEqual(Payment.objects.filter(payroll_item=self.item).count(), 1)
 
 
 class PayrollServiceHelperTests(TestCase):

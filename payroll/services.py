@@ -26,6 +26,7 @@ from .models import (
     LOCKED_PAYROLL_STATUSES,
     Bonus,
     ManualDeduction,
+    Payment,
     Payroll,
     PayrollItem,
     TaxBracket,
@@ -315,3 +316,29 @@ def approve_payroll(payroll: Payroll, actor) -> Payroll:
     payroll.approved_at = timezone.now()
     payroll.save(update_fields=["status", "approved_by", "approved_at"])
     return payroll
+
+
+@transaction.atomic
+def record_payment(payroll_item: PayrollItem, actor) -> Payment:
+    """business-rules.md §8: one exact-net payment per approved item; Paid once all are paid."""
+    if not user_in_groups(actor, PAYROLL_MANAGER_GROUPS):
+        raise PermissionDenied("Only Admin or Payroll Officer may record payments.")
+    item = PayrollItem.objects.select_related("payroll").select_for_update().get(
+        pk=payroll_item.pk
+    )
+    if item.payroll.status != "approved":
+        raise ValidationError("Only an approved payroll's items can be paid.")
+    if item.payments.filter(status="completed").exists():
+        raise ValidationError("This payroll item has already been paid.")
+    payment = Payment.objects.create(
+        payroll_item=item,
+        amount=item.net_salary,
+        payment_date=timezone.now().date(),
+        status="completed",
+        created_by=actor,
+    )
+    payroll = Payroll.objects.select_for_update().get(pk=item.payroll_id)
+    if not payroll.items.exclude(payments__status="completed").exists():
+        payroll.status = "paid"
+        payroll.save(update_fields=["status"])
+    return payment
