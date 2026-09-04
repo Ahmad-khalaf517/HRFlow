@@ -1,13 +1,22 @@
 from django.contrib.auth.models import Group, User
+from django.contrib.auth.tokens import default_token_generator
+from django.core import mail
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 
 from employees.models import Employee
 
 from .constants import DEFAULT_INITIAL_PASSWORD
 from .forms import StaffUserCreationForm
-from .services import create_staff_user
+from .services import (
+    create_staff_user,
+    mark_must_change_password,
+    update_staff_user,
+    user_must_change_password,
+)
 
 
 class HomePageTests(TestCase):
@@ -283,3 +292,144 @@ class RoleAwareDashboardTests(TestCase):
         self.assertNotContains(response, user.email)
         self.assertNotContains(response, "Payroll runs")
         self.assertNotContains(response, "User Management")
+
+
+class ForcedPasswordChangeTests(TestCase):
+    """A login provisioned with the shared default password must rotate it first."""
+
+    def setUp(self):
+        self.password = DEFAULT_INITIAL_PASSWORD
+        self.user = User.objects.create_user(username="needs-rotation", password=self.password)
+        mark_must_change_password(self.user)
+
+    def test_flagged_user_is_redirected_to_password_change(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse("home"))
+        self.assertRedirects(response, reverse("password_change"))
+
+    def test_flagged_user_can_still_reach_password_change_and_logout(self):
+        self.client.force_login(self.user)
+        self.assertEqual(self.client.get(reverse("password_change")).status_code, 200)
+        self.assertEqual(self.client.post(reverse("logout")).status_code, 302)
+
+    def test_completing_password_change_clears_the_flag_and_unlocks_the_app(self):
+        self.client.force_login(self.user)
+        response = self.client.post(
+            reverse("password_change"),
+            {
+                "old_password": self.password,
+                "new_password1": "a-new-strong-pass-9",
+                "new_password2": "a-new-strong-pass-9",
+            },
+        )
+        self.assertRedirects(response, reverse("password_change_done"))
+        self.user.refresh_from_db()
+        self.assertFalse(user_must_change_password(self.user))
+        self.assertEqual(self.client.get(reverse("home")).status_code, 200)
+
+    def test_ordinary_user_without_the_flag_is_never_redirected(self):
+        plain = User.objects.create_user(username="ordinary", password="testpass123")
+        self.client.force_login(plain)
+        self.assertEqual(self.client.get(reverse("home")).status_code, 200)
+
+    def test_staff_and_employee_provisioning_flags_the_new_login(self):
+        created = create_staff_user(
+            username="fresh.hr",
+            first_name="Fresh",
+            last_name="Hr",
+            email="fresh.hr@example.com",
+            role="HR Manager",
+        )
+        self.assertTrue(user_must_change_password(created))
+
+
+class PasswordResetFlowTests(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            username="reset-me", password="old-password-1", email="reset-me@example.com"
+        )
+
+    def test_reset_request_emails_a_confirm_link_and_new_password_logs_in(self):
+        response = self.client.post(reverse("password_reset"), {"email": self.user.email})
+        self.assertRedirects(response, reverse("password_reset_done"))
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn("password_reset_confirm", mail.outbox[0].body)
+
+        # Django's PasswordResetConfirmView requires visiting the emailed link once
+        # (GET) before it will accept the new-password POST against the session.
+        uid = urlsafe_base64_encode(force_bytes(self.user.pk))
+        token = default_token_generator.make_token(self.user)
+        confirm_url = reverse("password_reset_confirm", kwargs={"uidb64": uid, "token": token})
+        self.client.get(confirm_url, follow=True)
+        session_url = reverse(
+            "password_reset_confirm", kwargs={"uidb64": uid, "token": "set-password"}
+        )
+        response = self.client.post(
+            session_url,
+            {"new_password1": "brand-new-pass-7", "new_password2": "brand-new-pass-7"},
+        )
+        self.assertRedirects(response, reverse("password_reset_complete"))
+        self.user.refresh_from_db()
+        self.assertTrue(self.user.check_password("brand-new-pass-7"))
+
+    def test_unknown_email_does_not_reveal_account_existence(self):
+        response = self.client.post(
+            reverse("password_reset"), {"email": "nobody@example.com"}
+        )
+        self.assertRedirects(response, reverse("password_reset_done"))
+        self.assertEqual(len(mail.outbox), 0)
+
+
+class StaffUserLifecycleTests(TestCase):
+    def setUp(self):
+        self.admin = User.objects.create_user(username="lifecycle-admin", password="testpass123")
+        self.admin.groups.add(Group.objects.get(name="Admin"))
+        self.staff = create_staff_user(
+            username="lifecycle.hr",
+            first_name="Lifecycle",
+            last_name="Hr",
+            email="lifecycle.hr@example.com",
+            role="HR Manager",
+        )
+
+    def test_update_staff_user_changes_details_and_role(self):
+        updated = update_staff_user(
+            self.staff,
+            first_name="Updated",
+            last_name="Name",
+            email="updated@example.com",
+            role="Payroll Officer",
+        )
+        self.assertEqual(updated.get_full_name(), "Updated Name")
+        self.assertEqual(list(updated.groups.values_list("name", flat=True)), ["Payroll Officer"])
+
+    def test_update_view_requires_account_manager_group(self):
+        # HR Manager is an account manager (see StaffUserViewPermissionTests); Payroll
+        # Officer is not, so it is the correct role to prove the mixin denies access.
+        outsider = User.objects.create_user(username="lifecycle-payroll", password="testpass123")
+        outsider.groups.add(Group.objects.get(name="Payroll Officer"))
+        self.client.force_login(outsider)
+        response = self.client.get(reverse("staff-user-update", args=[self.staff.pk]))
+        self.assertEqual(response.status_code, 403)
+
+    def test_toggle_active_deactivates_and_reactivates(self):
+        self.client.force_login(self.admin)
+        url = reverse("staff-user-toggle-active", args=[self.staff.pk])
+
+        self.client.post(url)
+        self.staff.refresh_from_db()
+        self.assertFalse(self.staff.is_active)
+
+        self.client.post(url)
+        self.staff.refresh_from_db()
+        self.assertTrue(self.staff.is_active)
+
+    def test_cannot_deactivate_own_account(self):
+        self.admin.groups.add(Group.objects.get(name="Payroll Officer"))
+        self.client.force_login(self.admin)
+        response = self.client.post(
+            reverse("staff-user-toggle-active", args=[self.admin.pk]), follow=True
+        )
+        self.assertContains(response, "You cannot deactivate your own account.")
+        self.admin.refresh_from_db()
+        self.assertTrue(self.admin.is_active)

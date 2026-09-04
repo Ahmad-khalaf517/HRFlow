@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from django.db import IntegrityError, transaction
 
 from accounts.constants import DEFAULT_INITIAL_PASSWORD, EMPLOYEE_GROUP
+from accounts.services import mark_must_change_password
 
 
 def create_employee_with_account(form):
@@ -20,6 +21,7 @@ def create_employee_with_account(form):
                 email=employee.email,
             )
             user.groups.add(Group.objects.get(name=EMPLOYEE_GROUP))
+            mark_must_change_password(user)
             employee.user = user
             employee.save(update_fields=["user", "updated_at"])
             return employee

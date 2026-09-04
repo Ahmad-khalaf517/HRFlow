@@ -1,15 +1,21 @@
 {% extends "base.html" %}
 
-{% block title %}Add user · HRFlow{% endblock %}
-{% block page_title %}<h1 class="text-headline-md text-on-surface">Add user</h1>{% endblock %}
+{% block title %}{% if staff_user %}Edit user{% else %}Add user{% endif %} · HRFlow{% endblock %}
+{% block page_title %}<h1 class="text-headline-md text-on-surface">{% if staff_user %}Edit user{% else %}Add user{% endif %}</h1>{% endblock %}
 
 {% block content %}
 <div class="card max-w-2xl">
     <div class="mb-6">
-        <h2 class="text-headline-md text-on-surface">Create a staff account</h2>
+        <h2 class="text-headline-md text-on-surface">
+            {% if staff_user %}Update {{ staff_user.get_full_name|default:staff_user.username }}{% else %}Create a staff account{% endif %}
+        </h2>
         <p class="mt-1 text-body-sm text-on-surface-variant">
+            {% if staff_user %}
+            Username, password, and active status are managed separately from this form.
+            {% else %}
             This screen creates HR Manager and Payroll Officer accounts. The initial password is
-            <span class="text-data-mono">password1</span>.
+            <span class="text-data-mono">password1</span>, and the account must change it at next sign-in.
+            {% endif %}
         </p>
     </div>
 
@@ -20,7 +26,7 @@
         {% endfor %}
         <div class="flex justify-end gap-3 border-t border-outline-variant pt-5">
             <a class="btn-secondary" href="{% url 'staff-user-list' %}">Cancel</a>
-            <button class="btn-primary" type="submit">Create user</button>
+            <button class="btn-primary" type="submit">{% if staff_user %}Save changes{% else %}Create user{% endif %}</button>
         </div>
     </form>
 </div>

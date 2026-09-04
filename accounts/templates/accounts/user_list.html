@@ -21,6 +21,7 @@
                         <th class="px-5 py-4 text-left text-label-caps">Username</th>
                         <th class="px-5 py-4 text-left text-label-caps">Role</th>
                         <th class="px-5 py-4 text-left text-label-caps">Status</th>
+                        <th class="px-5 py-4 text-left text-label-caps">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -40,9 +41,20 @@
                             <span class="badge bg-surface-container text-on-surface-variant">Inactive</span>
                             {% endif %}
                         </td>
+                        <td class="px-5 py-4">
+                            <div class="flex flex-wrap items-center gap-3">
+                                <a class="text-body-sm text-secondary underline" href="{% url 'staff-user-update' account.pk %}">Edit</a>
+                                {% if account != request.user %}
+                                <form method="post" action="{% url 'staff-user-toggle-active' account.pk %}" onsubmit="return confirm('{% if account.is_active %}Deactivate{% else %}Reactivate{% endif %} {{ account.get_full_name|default:account.username }}?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="text-body-sm text-error underline">{% if account.is_active %}Deactivate{% else %}Reactivate{% endif %}</button>
+                                </form>
+                                {% endif %}
+                            </div>
+                        </td>
                     </tr>
                     {% empty %}
-                    <tr><td colspan="4" class="px-5 py-10 text-center text-body-md text-on-surface-variant">No staff accounts yet.</td></tr>
+                    <tr><td colspan="5" class="px-5 py-10 text-center text-body-md text-on-surface-variant">No staff accounts yet.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>

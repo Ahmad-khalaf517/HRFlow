@@ -4,7 +4,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.core.exceptions import ValidationError
 
 from .constants import STAFF_ACCOUNT_ROLES
-from .services import create_staff_user
+from .services import create_staff_user, update_staff_user
 
 
 class LoginForm(AuthenticationForm):
@@ -49,3 +49,36 @@ class StaffUserCreationForm(forms.Form):
         if not self.is_valid():
             raise ValueError("Cannot save an invalid staff user form.")
         return create_staff_user(**self.cleaned_data)
+
+
+class StaffUserUpdateForm(forms.Form):
+    first_name = forms.CharField(max_length=150, widget=forms.TextInput(attrs={"class": "input"}))
+    last_name = forms.CharField(max_length=150, widget=forms.TextInput(attrs={"class": "input"}))
+    email = forms.EmailField(widget=forms.EmailInput(attrs={"class": "input"}))
+    role = forms.ChoiceField(
+        choices=[(role, role) for role in STAFF_ACCOUNT_ROLES],
+        widget=forms.Select(attrs={"class": "input"}),
+    )
+
+    def __init__(self, *args, user, **kwargs):
+        self.user = user
+        kwargs.setdefault(
+            "initial",
+            {
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "email": user.email,
+                "role": user.groups.filter(name__in=STAFF_ACCOUNT_ROLES)
+                .values_list("name", flat=True)
+                .first(),
+            },
+        )
+        super().__init__(*args, **kwargs)
+
+    def clean_email(self):
+        return self.cleaned_data["email"].strip()
+
+    def save(self):
+        if not self.is_valid():
+            raise ValueError("Cannot save an invalid staff user form.")
+        return update_staff_user(self.user, **self.cleaned_data)

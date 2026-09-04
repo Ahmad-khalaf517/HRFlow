@@ -60,6 +60,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "accounts.middleware.ForcePasswordChangeMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -141,6 +142,18 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "home"
 LOGOUT_REDIRECT_URL = "login"
+
+# Demo/dev default: password-reset emails print to the console instead of
+# requiring real SMTP credentials. Set EMAIL_BACKEND/SMTP_* env vars for a
+# real deployment — see docs/business-rules.md MVP boundary (synthetic data only).
+EMAIL_BACKEND = os.environ.get(
+    "EMAIL_BACKEND",
+    "django.core.mail.backends.console.EmailBackend"
+    if DEBUG
+    else "django.core.mail.backends.smtp.EmailBackend",
+)
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "no-reply@hrflow.local")
+PASSWORD_RESET_TIMEOUT = 3600  # 1 hour; demo-scale, not a compliance requirement
 
 CSRF_TRUSTED_ORIGINS = [
     origin.strip()
