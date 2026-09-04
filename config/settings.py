@@ -25,6 +25,14 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-dev-only-change-me")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env_bool("DEBUG", True)
 
+if not DEBUG and (
+    not os.environ.get("SECRET_KEY") or SECRET_KEY.startswith("django-insecure-")
+):
+    raise RuntimeError(
+        "SECRET_KEY must be set to a real secret (not the insecure dev default) "
+        "when DEBUG=False."
+    )
+
 ALLOWED_HOSTS = [
     host.strip()
     for host in os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
@@ -161,3 +169,15 @@ CSRF_TRUSTED_ORIGINS = [
     if origin.strip()
 ]
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+# Production security hardening (docs/security-and-data-policy.md; these are exactly
+# what `manage.py check --deploy` flags). Gated on DEBUG so local HTTP dev is
+# unaffected. This closes the code-level gap only — TEAM_CONTEXT.md §12 still
+# correctly requires a separate review for jurisdiction/legal compliance, encryption
+# at rest, audit/retention policy, monitoring, and backups before any real deployment.
+SECURE_SSL_REDIRECT = env_bool("SECURE_SSL_REDIRECT", not DEBUG)
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+SECURE_HSTS_SECONDS = 0 if DEBUG else int(os.environ.get("SECURE_HSTS_SECONDS", 604800))  # 7 days
+SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
+SECURE_HSTS_PRELOAD = not DEBUG
