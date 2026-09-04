@@ -116,11 +116,13 @@ class EmployeeFlowAuditTests(TestCase):
         response = self.client.get(reverse("employees:employee-list"), {"search": "Extra"})
         self.assertContains(response, 'href="?search=Extra&amp;page=2"')
 
-    def test_profile_links_to_existing_hr_records_without_granting_payslips(self):
+    def test_profile_links_to_existing_hr_records_and_limited_payslips(self):
         self.client.force_login(self.manager)
         response = self.client.get(reverse("employees:employee-detail", args=[self.employee.pk]))
 
         employee_query = f"?search={self.employee.employee_number}"
         self.assertContains(response, reverse("attendance:attendance_list") + employee_query)
         self.assertContains(response, reverse("attendance:leave_request_list") + employee_query)
-        self.assertNotContains(response, reverse("payroll:payslip-list"))
+        # business-rules.md §9: HR Manager's payslip access is "Limited" (payroll's
+        # own tests cover the amount redaction), not absent.
+        self.assertContains(response, reverse("payroll:payslip-list"))
