@@ -319,8 +319,9 @@ def payslip_list(request):
         items = services.payslip_items_for_user(request.user)
     except PermissionDenied as exc:
         return render(request, "payroll/access_denied.html", {"reason": str(exc)}, status=403)
+    can_browse_all = services.can_browse_all_payslips(request.user)
     form = PayslipFilterForm(request.GET)
-    if not services.user_in_groups(request.user, services.PAYROLL_MANAGER_GROUPS):
+    if not can_browse_all:
         del form.fields["department"]
         del form.fields["search"]
     if form.is_valid():
@@ -343,9 +344,8 @@ def payslip_list(request):
         {
             "form": form,
             "page_obj": Paginator(items, 25).get_page(request.GET.get("page")),
-            "is_payroll_manager": services.user_in_groups(
-                request.user, services.PAYROLL_MANAGER_GROUPS
-            ),
+            "can_browse_all": can_browse_all,
+            "show_amounts": services.has_full_payslip_access(request.user),
         },
     )
 
@@ -366,6 +366,7 @@ def payslip_detail(request, pk):
         "payroll/payslip_detail.html",
         {
             "item": item,
+            "show_amounts": services.has_full_payslip_access(request.user),
             "earnings": [
                 ("Basic salary", item.basic_salary),
                 ("Allowances", item.allowances),

@@ -14,7 +14,7 @@ from django.db import IntegrityError, transaction
 from django.db.models import Q, Sum
 from django.utils import timezone
 
-from accounts.constants import EMPLOYEE_GROUP
+from accounts.constants import EMPLOYEE_GROUP, HR_MANAGER_GROUP
 from attendance.services import (
     get_absence_days,
     get_employee_overtime_hours,
@@ -83,12 +83,24 @@ def payslip_items_for_user(user):
     if not user.is_authenticated or not user.is_active:
         raise PermissionDenied("Sign in with an active account to view payslips.")
     items = published_payslip_items()
-    if user_in_groups(user, PAYROLL_MANAGER_GROUPS):
+    if can_browse_all_payslips(user):
         return items
     if user_in_groups(user, [EMPLOYEE_GROUP]):
         return items.filter(employee__user=user)
-    # HR-specific "Limited" access awaits the business owner's definition.
     raise PermissionDenied("Your role does not have access to payslips.")
+
+
+def can_browse_all_payslips(user) -> bool:
+    """business-rules.md §9: Admin/Payroll Officer see All payslips; HR Manager's
+    access is Limited — every row, but see has_full_payslip_access for amounts."""
+    return user_in_groups(user, PAYROLL_MANAGER_GROUPS) or user_in_groups(user, [HR_MANAGER_GROUP])
+
+
+def has_full_payslip_access(user) -> bool:
+    """business-rules.md §9: only HR Manager's payslip access is "Limited" — they can
+    confirm a payslip's existence/status per employee/period but not its money
+    breakdown, which stays with Admin, Payroll Officer, and the employee themselves."""
+    return not user_in_groups(user, [HR_MANAGER_GROUP])
 
 
 def get_active_adjustments_for_period(model, employee, period_start: date, period_end: date):

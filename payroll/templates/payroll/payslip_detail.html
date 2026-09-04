@@ -11,6 +11,7 @@
         <button type="button" id="print-payslip" class="btn-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary">Print payslip</button>
     </div>
     {% if item.calculation_inputs.attendance_source == 'mock-attendance-v1' %}<p class="payslip-controls text-body-sm text-on-surface-variant">This historical payslip uses saved demo attendance totals.</p>{% endif %}
+    {% if not show_amounts %}<p class="payslip-controls text-body-sm text-on-surface-variant">HR Manager access is limited to payslip status — amounts are managed by Payroll.</p>{% endif %}
     <article class="payslip-sheet card space-y-6" aria-label="Payslip for {{ item.employee_name_snapshot }}">
         <div class="flex flex-wrap items-start justify-between gap-4 border-b border-outline-variant pb-4">
             <div>
@@ -29,18 +30,18 @@
                 <h3 id="earnings-heading" class="mb-3 text-headline-md">Earnings</h3>
                 <dl class="space-y-3">
                     {% for label, amount in earnings %}
-                    <div class="flex justify-between gap-4 text-body-md"><dt>{{ label }}</dt><dd class="text-data-mono">{{ amount|floatformat:2 }}</dd></div>
+                    <div class="flex justify-between gap-4 text-body-md"><dt>{{ label }}</dt><dd class="text-data-mono">{% if show_amounts %}{{ amount|floatformat:2 }}{% else %}—{% endif %}</dd></div>
                     {% endfor %}
-                    <div class="flex justify-between gap-4 border-t border-outline-variant pt-3 font-semibold"><dt>Gross pay</dt><dd class="text-data-mono">{{ item.gross_salary|floatformat:2 }}</dd></div>
+                    <div class="flex justify-between gap-4 border-t border-outline-variant pt-3 font-semibold"><dt>Gross pay</dt><dd class="text-data-mono">{% if show_amounts %}{{ item.gross_salary|floatformat:2 }}{% else %}—{% endif %}</dd></div>
                 </dl>
             </section>
             <section aria-labelledby="deductions-heading">
                 <h3 id="deductions-heading" class="mb-3 text-headline-md">Deductions</h3>
                 <dl class="space-y-3">
                     {% for label, amount in deductions %}
-                    <div class="flex justify-between gap-4 text-body-md"><dt>{{ label }}</dt><dd class="text-data-mono">{{ amount|floatformat:2 }}</dd></div>
+                    <div class="flex justify-between gap-4 text-body-md"><dt>{{ label }}</dt><dd class="text-data-mono">{% if show_amounts %}{{ amount|floatformat:2 }}{% else %}—{% endif %}</dd></div>
                     {% endfor %}
-                    <div class="flex justify-between gap-4 border-t border-outline-variant pt-3 font-semibold"><dt>Total deductions</dt><dd class="text-data-mono">{{ item.total_deductions|floatformat:2 }}</dd></div>
+                    <div class="flex justify-between gap-4 border-t border-outline-variant pt-3 font-semibold"><dt>Total deductions</dt><dd class="text-data-mono">{% if show_amounts %}{{ item.total_deductions|floatformat:2 }}{% else %}—{% endif %}</dd></div>
                 </dl>
             </section>
         </div>
@@ -51,7 +52,7 @@
         </dl>
         <div class="flex flex-wrap items-center justify-between gap-3 payslip-net rounded bg-primary text-on-primary p-5">
             <p class="text-headline-md">Net pay</p>
-            <p class="text-headline-lg"><span class="text-body-md">{{ item.currency_code }}</span> <span class="font-mono text-2xl font-semibold">{{ item.net_salary|floatformat:2 }}</span></p>
+            <p class="text-headline-lg">{% if show_amounts %}<span class="text-body-md">{{ item.currency_code }}</span> <span class="font-mono text-2xl font-semibold">{{ item.net_salary|floatformat:2 }}</span>{% else %}<span class="text-body-md">Restricted</span>{% endif %}</p>
         </div>
     </article>
 </div>

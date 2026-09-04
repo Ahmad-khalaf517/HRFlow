@@ -192,7 +192,7 @@ def dashboard(request):
                 },
             ]
 
-    if request.user.is_superuser or is_admin or is_payroll_officer:
+    if request.user.is_superuser or is_admin or is_hr_manager or is_payroll_officer:
         quick_links.append({
             "label": "Payslips",
             "description": "View and print payslips from approved payroll periods.",

@@ -127,10 +127,32 @@ class PayslipTests(TestCase):
                 self.assertEqual(response.context["page_obj"].paginator.count, 6)
                 self.assertEqual(self.client.get(self.detail_url(owner="other")).status_code, 200)
 
-    def test_hr_specific_access_is_not_inferred_from_limited_rule(self):
+    def test_hr_manager_sees_every_payslip_with_amounts_redacted(self):
+        # business-rules.md §9: HR Manager's payslip access is "Limited" — every row,
+        # like Admin/Payroll Officer, but without the money breakdown.
         self.client.force_login(self.users["hr"])
-        for url in (reverse("payroll:payslip-list"), self.detail_url(owner="hr")):
-            self.assertEqual(self.client.get(url).status_code, 403)
+        list_response = self.client.get(reverse("payroll:payslip-list"))
+        self.assertEqual(list_response.status_code, 200)
+        self.assertEqual(list_response.context["page_obj"].paginator.count, 6)
+        self.assertContains(list_response, "Demo Other")
+        self.assertNotContains(list_response, "2751.87")
+
+        detail_response = self.client.get(self.detail_url(owner="other"))
+        self.assertEqual(detail_response.status_code, 200)
+        self.assertContains(detail_response, "Demo Other")
+        self.assertNotContains(detail_response, "2751.87")
+        self.assertContains(detail_response, "Restricted")
+
+    def test_admin_and_officer_are_not_shown_redacted_amounts(self):
+        for role in ("admin", "officer"):
+            self.client.force_login(self.users[role])
+            response = self.client.get(self.detail_url(owner="other"))
+            with self.subTest(role=role):
+                self.assertContains(response, "2751.87")
+
+    def test_employee_sees_their_own_full_amounts(self):
+        self.client.force_login(self.users["employee"])
+        self.assertContains(self.client.get(self.detail_url()), "2751.87")
 
     def test_staff_flag_alone_does_not_grant_access(self):
         self.client.force_login(self.users["staff"])
@@ -212,7 +234,7 @@ class PayslipTests(TestCase):
             self.client.force_login(self.users[role])
             response = self.client.get(reverse("home"))
             with self.subTest(role=role):
-                if role in ("hr", "staff"):
+                if role == "staff":
                     self.assertNotContains(response, reverse("payroll:payslip-list"))
                 else:
                     self.assertContains(response, reverse("payroll:payslip-list"))
