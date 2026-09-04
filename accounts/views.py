@@ -9,7 +9,8 @@ from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import FormView, ListView
 
-from .constants import ACCOUNT_MANAGER_GROUPS, STAFF_ACCOUNT_ROLES
+from .authorization import can_manage_accounts
+from .constants import STAFF_ACCOUNT_ROLES
 from .forms import StaffUserCreationForm, StaffUserUpdateForm
 from .services import clear_must_change_password, set_staff_user_active
 
@@ -29,7 +30,7 @@ class AccountManagementRequiredMixin(LoginRequiredMixin):
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
             return super().dispatch(request, *args, **kwargs)
-        if not request.user.groups.filter(name__in=ACCOUNT_MANAGER_GROUPS).exists():
+        if not can_manage_accounts(request.user):
             return render(
                 request,
                 "accounts/access_denied.html",

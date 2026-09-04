@@ -7,6 +7,8 @@ from django.db import transaction
 from django.db.models import Sum
 from django.utils import timezone
 
+from accounts.authorization import can_manage_hr_records
+
 from .models import Attendance, LeaveRequest
 
 
@@ -45,9 +47,7 @@ def get_unpaid_leave_days(employee, start_date, end_date):
 
 @transaction.atomic
 def transition_leave(leave_request, actor, target_status):
-    if not actor.is_authenticated or not (
-        actor.is_superuser or actor.groups.filter(name__in=["Admin", "HR Manager"]).exists()
-    ):
+    if not can_manage_hr_records(actor):
         raise PermissionDenied("Only Admin or HR Manager may review leave requests.")
     locked = LeaveRequest.objects.select_for_update().get(pk=leave_request.pk)
     if locked.employee.user_id == actor.pk:

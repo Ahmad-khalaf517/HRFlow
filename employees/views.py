@@ -14,6 +14,8 @@ from django.views.generic import (
     UpdateView,
 )
 
+from accounts.authorization import can_manage_hr_records, can_view_directory
+
 from .forms import (
     ContractForm,
     DepartmentForm,
@@ -39,16 +41,12 @@ class HRManagementRequiredMixin(LoginRequiredMixin):
     to access management actions.
     """
 
-    allowed_groups = ["Admin", "HR Manager"]
-
     def dispatch(self, request, *args, **kwargs):
 
         if not request.user.is_authenticated:
             return super().dispatch(request, *args, **kwargs)
 
-        if not request.user.groups.filter(
-            name__in=self.allowed_groups
-        ).exists():
+        if not can_manage_hr_records(request.user):
 
             return render(
                 request,
@@ -68,18 +66,13 @@ def _has_employee_view_access(user):
     attendance.views._has_attendance_view_access.
     """
 
-    return user.is_authenticated and (
-        user.is_superuser
-        or user.groups.filter(
-            name__in=["Admin", "HR Manager", "Payroll Officer"]
-        ).exists()
-    )
+    return can_view_directory(user)
 
 
 def _can_access_employee_record(user, employee):
     if _has_employee_view_access(user):
         return True
-    return user.is_authenticated and employee.user_id == user.pk
+    return user.is_authenticated and user.is_active and employee.user_id == user.pk
 
 
 class EmployeeViewAccessRequiredMixin(LoginRequiredMixin):

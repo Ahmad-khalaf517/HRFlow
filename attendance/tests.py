@@ -3,7 +3,7 @@ from decimal import Decimal
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
-from django.core.exceptions import ValidationError
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.db import IntegrityError, transaction
 from django.test import TestCase
 from django.urls import NoReverseMatch, reverse
@@ -11,6 +11,7 @@ from django.urls import NoReverseMatch, reverse
 from employees.models import Contract, Employee
 
 from .models import Attendance, LeaveRequest, LeaveType
+from .services import transition_leave
 
 User = get_user_model()
 
@@ -424,3 +425,58 @@ class LeaveRequestTests(TestCase):
             reverse("attendance:leave_request_approve")
         with self.assertRaises(NoReverseMatch):
             reverse("attendance:leave_request_reject")
+
+
+class SuperuserManagementBypassTests(TestCase):
+    """A bare Django superuser is not automatically an HRFlow "Admin"/"HR Manager".
+
+    accounts.authorization.can_manage_hr_records is the single policy behind this for
+    employees, attendance, and leave — see accounts.tests.StaffUserViewPermissionTests
+    for the same rule already enforced for accounts' own user management.
+    """
+
+    def setUp(self):
+        self.bare_superuser = User.objects.create_user(
+            username="bare-superuser", password="testpass123", is_superuser=True, is_staff=True
+        )
+        self.requester = User.objects.create_user(username="leave-owner", password="testpass123")
+        self.employee = Employee.objects.create(
+            user=self.requester,
+            employee_number="EMP-SU-1",
+            first_name="Owner",
+            last_name="Employee",
+            email="owner@example.com",
+            hire_date=date(2024, 1, 1),
+        )
+        self.leave_type = LeaveType.objects.create(name="Superuser Test Leave")
+        self.leave_request = LeaveRequest.objects.create(
+            employee=self.employee,
+            leave_type=self.leave_type,
+            start_date=date(2024, 8, 1),
+            end_date=date(2024, 8, 1),
+            reason="Test",
+        )
+
+    def test_bare_superuser_cannot_approve_leave_via_service(self):
+        with self.assertRaises(PermissionDenied):
+            transition_leave(self.leave_request, self.bare_superuser, "approved")
+
+    def test_bare_superuser_gets_404_from_approval_view(self):
+        self.client.force_login(self.bare_superuser)
+        response = self.client.post(
+            reverse("attendance:leave_request_approve", args=[self.leave_request.pk])
+        )
+        self.assertEqual(response.status_code, 404)
+        self.leave_request.refresh_from_db()
+        self.assertEqual(self.leave_request.status, "pending")
+
+    def test_bare_superuser_can_still_view_the_full_leave_queue(self):
+        self.client.force_login(self.bare_superuser)
+        response = self.client.get(reverse("attendance:leave_approval_list"))
+        self.assertEqual(response.status_code, 200)
+
+    def test_hr_manager_superuser_can_still_approve(self):
+        self.bare_superuser.groups.add(Group.objects.get(name="HR Manager"))
+        transition_leave(self.leave_request, self.bare_superuser, "approved")
+        self.leave_request.refresh_from_db()
+        self.assertEqual(self.leave_request.status, "approved")

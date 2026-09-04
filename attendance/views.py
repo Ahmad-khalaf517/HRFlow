@@ -10,6 +10,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
+from accounts.authorization import can_manage_hr_records, can_view_directory
 from employees.models import Employee
 
 from .forms import (
@@ -23,28 +24,24 @@ from .models import Attendance, LeaveRequest, LeaveType
 
 
 def _has_attendance_management_access(user):
-    return user.is_authenticated and (
-        user.is_superuser or user.groups.filter(name__in=["Admin", "HR Manager"]).exists()
-    )
+    """Group-only, no superuser bypass — matches employees.views.HRManagementRequiredMixin
+    and accounts.views.AccountManagementRequiredMixin (see accounts.authorization)."""
+    return can_manage_hr_records(user)
 
 
 def _has_attendance_view_access(user):
-    return user.is_authenticated and (
-        _has_attendance_management_access(user)
-        or user.groups.filter(name="Payroll Officer").exists()
-    )
+    return can_view_directory(user)
 
 
 def _can_access_employee_records(user, employee):
     if _has_attendance_view_access(user):
         return True
-    return user.is_authenticated and employee.user_id == user.pk
+    return user.is_authenticated and user.is_active and employee.user_id == user.pk
 
 
 def _has_leave_management_access(user):
-    return user.is_authenticated and (
-        user.is_superuser or user.groups.filter(name__in=["Admin", "HR Manager"]).exists()
-    )
+    """Group-only, no superuser bypass — see _has_attendance_management_access."""
+    return can_manage_hr_records(user)
 
 
 def _has_leave_approval_access(user):
@@ -52,15 +49,13 @@ def _has_leave_approval_access(user):
 
 
 def _has_leave_view_access(user):
-    return user.is_authenticated and (
-        _has_leave_management_access(user) or user.groups.filter(name="Payroll Officer").exists()
-    )
+    return can_view_directory(user)
 
 
 def _can_access_leave_request(user, leave_request):
     if _has_leave_view_access(user):
         return True
-    return user.is_authenticated and leave_request.employee.user_id == user.pk
+    return user.is_authenticated and user.is_active and leave_request.employee.user_id == user.pk
 
 
 def _status_counts(queryset, statuses):
@@ -344,8 +339,7 @@ def my_leave_requests(request):
 @login_required
 def leave_request_create(request):
     employee_profile = getattr(request.user, "employee_profile", None)
-    is_manager = request.user.groups.filter(name__in=["Admin", "HR Manager"]).exists()
-    if is_manager or request.user.is_superuser:
+    if _has_leave_management_access(request.user):
         if request.method == "POST":
             form = LeaveRequestForm(request.POST)
         else:
