@@ -353,7 +353,7 @@ class PasswordResetFlowTests(TestCase):
         response = self.client.post(reverse("password_reset"), {"email": self.user.email})
         self.assertRedirects(response, reverse("password_reset_done"))
         self.assertEqual(len(mail.outbox), 1)
-        self.assertIn("password_reset_confirm", mail.outbox[0].body)
+        self.assertIn("/accounts/password/reset/confirm/", mail.outbox[0].body)
 
         # Django's PasswordResetConfirmView requires visiting the emailed link once
         # (GET) before it will accept the new-password POST against the session.
