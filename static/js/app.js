@@ -53,6 +53,30 @@
     desktop.addEventListener('change', () => setMobileOpen(false));
     setMobileOpen(false);
 
+    // User menu dropdown (change password / sign out).
+    const userMenuButton = document.getElementById('user-menu-button');
+    const userMenu = document.getElementById('user-menu');
+    function setUserMenuOpen(open) {
+        if (!userMenuButton || !userMenu) return;
+        userMenu.classList.toggle('hidden', !open);
+        userMenuButton.setAttribute('aria-expanded', String(open));
+    }
+    userMenuButton?.addEventListener('click', event => {
+        event.stopPropagation();
+        setUserMenuOpen(userMenu.classList.contains('hidden'));
+    });
+    document.addEventListener('click', event => {
+        if (!userMenu || userMenu.classList.contains('hidden')) return;
+        if (userMenu.contains(event.target) || userMenuButton.contains(event.target)) return;
+        setUserMenuOpen(false);
+    });
+    document.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && userMenu && !userMenu.classList.contains('hidden')) {
+            setUserMenuOpen(false);
+            userMenuButton?.focus();
+        }
+    });
+
     // Feedback persists until dismissed, including errors and slow-to-read messages.
     document.querySelectorAll('.toast-close').forEach(button => {
         button.addEventListener('click', () => button.closest('[data-message]').remove());

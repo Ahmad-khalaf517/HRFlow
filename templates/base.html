@@ -155,15 +155,26 @@
                     </div>
                     <div class="flex min-w-0 items-center gap-2 text-body-sm text-on-surface-variant">
                         {% if request.user.is_authenticated %}
-                            <span class="w-7 h-7 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center text-body-sm font-semibold shrink-0">
-                                {% if request.user.first_name %}{{ request.user.first_name|slice:":1"|upper }}{% else %}{{ request.user.get_username|slice:":1"|upper }}{% endif %}
-                            </span>
-                            <span class="hidden max-w-48 truncate sm:block">{{ request.user.get_full_name|default:request.user.get_username }}</span>
-                            <a href="{% url 'password_change' %}" class="btn-ghost">Change password</a>
-                            <form method="post" action="{% url 'logout' %}">
-                                {% csrf_token %}
-                                <button type="submit" class="btn-ghost">Sign out</button>
-                            </form>
+                            <div class="relative">
+                                <button id="user-menu-button" type="button" class="flex items-center gap-2 rounded px-1.5 py-1 hover:bg-surface-container-low focus:outline-none focus:ring-2 focus:ring-secondary" aria-haspopup="true" aria-expanded="false" aria-controls="user-menu">
+                                    <span class="w-7 h-7 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center text-body-sm font-semibold shrink-0">
+                                        {% if request.user.first_name %}{{ request.user.first_name|slice:":1"|upper }}{% else %}{{ request.user.get_username|slice:":1"|upper }}{% endif %}
+                                    </span>
+                                    <span class="hidden max-w-48 truncate sm:block">{{ request.user.get_full_name|default:request.user.get_username }}</span>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 shrink-0" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+                                </button>
+                                <div id="user-menu" role="menu" aria-labelledby="user-menu-button" class="hidden absolute right-0 top-full z-50 mt-2 w-64 overflow-hidden rounded border border-outline-variant bg-white text-left shadow-lg">
+                                    <div class="border-b border-outline-variant px-4 py-3">
+                                        <p class="truncate text-body-md font-semibold text-on-surface">{{ request.user.get_full_name|default:request.user.get_username }}</p>
+                                        <p class="truncate text-body-sm text-on-surface-variant">{{ request.user.email|default:"No email on file" }}</p>
+                                    </div>
+                                    <a href="{% url 'password_change' %}" role="menuitem" class="block px-4 py-2 text-body-sm text-on-surface hover:bg-surface-container-low">Change password</a>
+                                    <form method="post" action="{% url 'logout' %}">
+                                        {% csrf_token %}
+                                        <button type="submit" role="menuitem" class="block w-full px-4 py-2 text-left text-body-sm text-on-surface hover:bg-surface-container-low">Sign out</button>
+                                    </form>
+                                </div>
+                            </div>
                         {% else %}
                             <span class="text-outline">Not signed in</span>
                         {% endif %}
