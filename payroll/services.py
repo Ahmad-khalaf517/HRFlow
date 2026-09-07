@@ -99,8 +99,12 @@ def can_browse_all_payslips(user) -> bool:
 def has_full_payslip_access(user) -> bool:
     """business-rules.md §9: only HR Manager's payslip access is "Limited" — they can
     confirm a payslip's existence/status per employee/period but not its money
-    breakdown, which stays with Admin, Payroll Officer, and the employee themselves."""
-    return not user_in_groups(user, [HR_MANAGER_GROUP])
+    breakdown, which stays with Admin, Payroll Officer, and the employee themselves.
+
+    Deliberately checks group membership directly rather than via user_in_groups():
+    that helper's superuser bypass would make every superuser count as "HR Manager"
+    here, which inverts this specific exclusion check."""
+    return not user.groups.filter(name=HR_MANAGER_GROUP).exists()
 
 
 def get_active_adjustments_for_period(model, employee, period_start: date, period_end: date):
