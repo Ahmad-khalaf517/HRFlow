@@ -45,11 +45,29 @@ def _money(value: Decimal) -> Decimal:
 
 
 def user_in_groups(user, group_names) -> bool:
+    """HRFlow role groups only — a bare superuser does NOT pass.
+
+    Matches accounts.authorization.in_groups's policy for management actions
+    (creating/editing bonuses/deductions/tax brackets, payroll run transitions,
+    recording payments): access must trace back to an assigned role, not the
+    separate is_superuser flag. Previously bypassed superusers here, which let
+    any superuser manage payroll regardless of role — the same class of gap
+    accounts.authorization already closed for attendance/employees/accounts.
+    """
     if not user.is_authenticated or not user.is_active:
         return False
-    if user.is_superuser:
-        return True
     return user.groups.filter(name__in=group_names).exists()
+
+
+def user_in_groups_or_superuser(user, group_names) -> bool:
+    """Read/directory-style access — a Django superuser always passes.
+
+    Matches accounts.authorization.in_groups_or_superuser; for browsing
+    records, not for management actions (see user_in_groups above).
+    """
+    if not user.is_authenticated or not user.is_active:
+        return False
+    return user.is_superuser or user_in_groups(user, group_names)
 
 
 def published_payslip_items():
@@ -92,8 +110,11 @@ def payslip_items_for_user(user):
 
 def can_browse_all_payslips(user) -> bool:
     """business-rules.md §9: Admin/Payroll Officer see All payslips; HR Manager's
-    access is Limited — every row, but see has_full_payslip_access for amounts."""
-    return user_in_groups(user, PAYROLL_MANAGER_GROUPS) or user_in_groups(user, [HR_MANAGER_GROUP])
+    access is Limited — every row, but see has_full_payslip_access for amounts.
+
+    Directory-style read access, so a bare superuser passes here (unlike the
+    management actions gated by user_in_groups)."""
+    return user_in_groups_or_superuser(user, PAYROLL_MANAGER_GROUPS + [HR_MANAGER_GROUP])
 
 
 def has_full_payslip_access(user) -> bool:

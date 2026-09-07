@@ -456,6 +456,18 @@ class PayrollViewPermissionTests(TestCase):
             resp = self.client.get(url)
             self.assertEqual(resp.status_code, 200, url)
 
+    def test_bare_superuser_with_no_role_group_gets_403_on_every_payroll_view(self):
+        """A Django superuser is not automatically an HRFlow role — matches
+        accounts.authorization's no-superuser-bypass policy for management
+        actions. payroll/services.py.user_in_groups used to bypass this."""
+        User.objects.create_user(
+            username="perm_bare_superuser", password="testpass123", is_superuser=True
+        )
+        self.client.login(username="perm_bare_superuser", password="testpass123")
+        for url in self.PAYROLL_URLS:
+            resp = self.client.get(url)
+            self.assertEqual(resp.status_code, 403, url)
+
 
 class PayrollViewFlowTests(TestCase):
     def setUp(self):
