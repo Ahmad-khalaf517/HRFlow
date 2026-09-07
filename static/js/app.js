@@ -77,6 +77,23 @@
         }
     });
 
+    // Show/hide password toggles (login, change-password, reset forms).
+    document.querySelectorAll('.password-toggle').forEach(button => {
+        const input = document.getElementById(button.getAttribute('aria-controls'));
+        const eye = button.querySelector('.icon-eye');
+        const eyeOff = button.querySelector('.icon-eye-off');
+        if (!input) return;
+        button.addEventListener('click', () => {
+            const shown = input.type === 'text';
+            input.type = shown ? 'password' : 'text';
+            button.setAttribute('aria-pressed', String(!shown));
+            button.setAttribute('aria-label', shown ? 'Show password' : 'Hide password');
+            eye?.classList.toggle('hidden', !shown);
+            eyeOff?.classList.toggle('hidden', shown);
+            input.focus();
+        });
+    });
+
     // Feedback persists until dismissed, including errors and slow-to-read messages.
     document.querySelectorAll('.toast-close').forEach(button => {
         button.addEventListener('click', () => button.closest('[data-message]').remove());
