@@ -289,7 +289,10 @@ class RoleAwareDashboardTests(TestCase):
         self.assertContains(response, "My profile")
         self.assertContains(response, reverse("employees:employee-detail", args=[employee.pk]))
         self.assertContains(response, "Demo Employee")
-        self.assertNotContains(response, user.email)
+        # The account-menu dropdown (see templates/base.html) intentionally shows the
+        # signed-in user's own email — that's their own record, not a leak of someone
+        # else's. Only the employee's own linked-record email is expected here.
+        self.assertNotContains(response, employee.email)
         self.assertNotContains(response, "Payroll runs")
         self.assertNotContains(response, "User Management")
 
