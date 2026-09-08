@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load employees_extras %}
 
-{% block title %}Attendance · HRFlow{% endblock %}
+{% block title %}{% if title %}{{ title }} · HRFlow{% else %}Attendance · HRFlow{% endif %}{% endblock %}
 
 {% block page_title %}
     <h1 class="text-headline-lg text-on-surface">{% if title %}{{ title }}{% else %}Attendance{% endif %}</h1>

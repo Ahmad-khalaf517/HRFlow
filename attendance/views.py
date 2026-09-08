@@ -312,11 +312,12 @@ def leave_request_list(request):
 def leave_approval_list(request):
     if not _has_leave_view_access(request.user):
         raise Http404
-    queryset = (
-        LeaveRequest.objects.select_related("employee", "leave_type")
-        .filter(status="pending")
-        .order_by("-start_date")
-    )
+    all_requests = LeaveRequest.objects.select_related("employee", "leave_type")
+    # Counts must reflect all statuses, not just the pending queue below it —
+    # computing them after the status="pending" filter made Approved/Rejected
+    # always show 0 regardless of how many requests were actually decided.
+    counts = _status_counts(all_requests, ["pending", "approved", "rejected"])
+    queryset = all_requests.filter(status="pending").order_by("-start_date")
     page = Paginator(queryset, 20).get_page(request.GET.get("page"))
     return render(
         request,
@@ -325,7 +326,7 @@ def leave_approval_list(request):
             "leave_requests": page,
             "page_obj": page,
             "title": "Leave Approval",
-            "status_counts": _status_counts(queryset, ["pending", "approved", "rejected"]),
+            "status_counts": counts,
         },
     )
 
