@@ -208,6 +208,14 @@
     </div>
     {% endif %}
 
+    <dialog id="confirm-dialog" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm rounded border border-outline-variant bg-white p-6 backdrop:bg-primary/40">
+        <p id="confirm-dialog-message" class="text-body-md text-on-surface mb-6"></p>
+        <div class="flex justify-end gap-2">
+            <button type="button" id="confirm-dialog-cancel" class="btn-secondary">Cancel</button>
+            <button type="button" id="confirm-dialog-confirm" class="btn-primary">Confirm</button>
+        </div>
+    </dialog>
+
     <script src="{% static 'js/app.js' %}" defer></script>
 </body>
 </html>

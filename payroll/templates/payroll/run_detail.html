@@ -121,7 +121,7 @@
         </form>
         {% endif %}
         {% if run.status == "reviewed" %}
-        <form method="post" action="{% url 'payroll:run-approve' run.pk %}" onsubmit="return confirm('Approve this payroll? Its saved calculations will be locked.');">
+        <form method="post" action="{% url 'payroll:run-approve' run.pk %}" data-confirm="Approve this payroll? Its saved calculations will be locked.">
             {% csrf_token %}
             <button type="submit" class="btn-primary">Approve</button>
         </form>
@@ -178,7 +178,7 @@
                         {% if item.is_paid %}
                         <span class="badge bg-secondary-container text-on-secondary-container">Paid</span>
                         {% elif run.status == "approved" %}
-                        <form method="post" action="{% url 'payroll:item-pay' run.pk item.pk %}" onsubmit="return confirm('Record the full net payment for this employee?');">
+                        <form method="post" action="{% url 'payroll:item-pay' run.pk item.pk %}" data-confirm="Record the full net payment for this employee?">
                             {% csrf_token %}
                             <button type="submit" class="btn-secondary">Mark paid</button>
                         </form>

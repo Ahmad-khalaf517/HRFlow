@@ -77,6 +77,44 @@
         }
     });
 
+    // Confirmation dialog replacing native window.confirm() — used by forms
+    // with a data-confirm message (payroll approve/pay, staff/employee/
+    // position deactivate/terminate/reactivate). A native confirm() can't be
+    // themed and blocks assistive/automated clients; this one is a plain
+    // <dialog>, styled like the rest of the app.
+    const confirmDialog = document.getElementById('confirm-dialog');
+    if (confirmDialog) {
+        const confirmMessage = document.getElementById('confirm-dialog-message');
+        const confirmOk = document.getElementById('confirm-dialog-confirm');
+        const confirmCancel = document.getElementById('confirm-dialog-cancel');
+        let pendingForm = null;
+
+        document.querySelectorAll('form[data-confirm]').forEach(form => {
+            form.addEventListener('submit', event => {
+                event.preventDefault();
+                pendingForm = form;
+                confirmMessage.textContent = form.dataset.confirm;
+                const danger = 'confirmDanger' in form.dataset;
+                confirmOk.classList.toggle('btn-danger', danger);
+                confirmOk.classList.toggle('btn-primary', !danger);
+                confirmDialog.showModal();
+            });
+        });
+
+        confirmOk.addEventListener('click', () => {
+            confirmDialog.close();
+            pendingForm?.submit();
+            pendingForm = null;
+        });
+        confirmCancel.addEventListener('click', () => confirmDialog.close());
+        confirmDialog.addEventListener('click', event => {
+            if (event.target === confirmDialog) confirmDialog.close();
+        });
+        confirmDialog.addEventListener('close', () => {
+            pendingForm = null;
+        });
+    }
+
     // Show/hide password toggles (login, change-password, reset forms).
     document.querySelectorAll('.password-toggle').forEach(button => {
         const input = document.getElementById(button.getAttribute('aria-controls'));

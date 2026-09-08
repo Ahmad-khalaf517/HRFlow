@@ -45,7 +45,7 @@
                             <div class="flex flex-wrap items-center gap-3">
                                 <a class="text-body-sm text-secondary underline" href="{% url 'staff-user-update' account.pk %}">Edit</a>
                                 {% if account != request.user %}
-                                <form method="post" action="{% url 'staff-user-toggle-active' account.pk %}" onsubmit="return confirm('{% if account.is_active %}Deactivate{% else %}Reactivate{% endif %} {{ account.get_full_name|default:account.username }}?');">
+                                <form method="post" action="{% url 'staff-user-toggle-active' account.pk %}" data-confirm="{% if account.is_active %}Deactivate{% else %}Reactivate{% endif %} {{ account.get_full_name|default:account.username }}?"{% if account.is_active %} data-confirm-danger{% endif %}>
                                     {% csrf_token %}
                                     <button type="submit" class="text-body-sm text-error underline">{% if account.is_active %}Deactivate{% else %}Reactivate{% endif %}</button>
                                 </form>

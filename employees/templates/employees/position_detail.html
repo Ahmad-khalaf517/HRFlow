@@ -279,7 +279,8 @@ Position Details
                 <form
                     method="post"
                     action="{% url 'employees:position-deactivate' position.pk %}"
-                    onsubmit="return confirm('Are you sure you want to deactivate this position?');"
+                    data-confirm="Are you sure you want to deactivate this position?"
+                    data-confirm-danger
                 >
 
                     {% csrf_token %}
